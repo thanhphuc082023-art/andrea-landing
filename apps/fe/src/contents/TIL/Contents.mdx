@@ -1,0 +1,1778 @@
+import TIL from '@/components/mdx/TIL';
+
+<TIL.Items date="2025-06-07">
+
+  <TIL.Item>
+    
+    ## WebGPU - High-performance graphics and computing for the web
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>webgpu</TIL.ItemTag>
+      <TIL.ItemTag>graphics</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    WebGPU has become the new standard for 3D graphics and high-performance computing in the browser:
+
+    ```js
+    async function initWebGPU() {
+      if (!navigator.gpu) {
+        throw new Error('WebGPU is not supported in this browser');
+      }
+
+      // Initialize adapter and device
+      const adapter = await navigator.gpu.requestAdapter();
+      const device = await adapter.requestDevice();
+
+      // Get context from canvas
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('webgpu');
+
+      // Configure context
+      const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+      context.configure({
+        device: device,
+        format: canvasFormat,
+        alphaMode: 'premultiplied',
+      });
+
+      // Create shader
+      const shaderModule = device.createShaderModule({
+        code: `
+          @vertex
+          fn vertexMain(@location(0) position: vec2f) -> @builtin(position) vec4f {
+            return vec4f(position, 0.0, 1.0);
+          }
+
+          @fragment
+          fn fragmentMain() -> @location(0) vec4f {
+            return vec4f(0.0, 0.5, 1.0, 1.0); // Blue color
+          }
+        `
+      });
+
+      // Create pipeline
+      const pipeline = device.createRenderPipeline({
+        layout: 'auto',
+        vertex: {
+          module: shaderModule,
+          entryPoint: 'vertexMain',
+          buffers: [{
+            arrayStride: 8,
+            attributes: [{
+              shaderLocation: 0,
+              offset: 0,
+              format: 'float32x2',
+            }],
+          }],
+        },
+        fragment: {
+          module: shaderModule,
+          entryPoint: 'fragmentMain',
+          targets: [{
+            format: canvasFormat,
+          }],
+        },
+      });
+
+      return { device, context, pipeline };
+    }
+    ```
+
+    WebGPU brings numerous benefits:
+    - Graphics performance much faster than WebGL
+    - Powerful parallel computing for AI and machine learning
+    - Modern architecture compatible with the latest GPUs
+    - Better designed, safer API than WebGL
+
+    All modern browsers (Chrome, Edge, Firefox, Safari) now support WebGPU, enabling the development of complex graphics applications and AI models running directly in the browser.
+
+    [WebGPU Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## Server Actions and React Server Components - Web development without API endpoints
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react</TIL.ItemTag>
+      <TIL.ItemTag>next.js</TIL.ItemTag>
+      <TIL.ItemTag>server-components</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    The API-less development model has become the new standard in Next.js and React:
+
+    ```jsx
+    // app/admin/dashboard/page.jsx
+    // Server Component - Doesn't run on the client
+    import { prisma } from '@/lib/db';
+    import AdminPanel from './AdminPanel';
+
+    // Sensitive data only processed on the server
+    async function getAdminData() {
+      // Direct database queries from the component
+      const users = await prisma.user.findMany({
+        include: { permissions: true }
+      });
+      const stats = await prisma.analytics.getSummary();
+      return { users, stats };
+    }
+
+    // Access database in component without creating an API
+    export default async function AdminDashboard() {
+      const { users, stats } = await getAdminData();
+
+      return (
+        <main>
+          <h1>Admin Dashboard</h1>
+          <div className="stats-summary">
+            <p>Total users: {stats.totalUsers}</p>
+            <p>Today's orders: {stats.todayOrders}</p>
+            <p>Revenue: ${stats.revenue.toLocaleString()}</p>
+          </div>
+
+          {/* Client component receives data from server */}
+          <AdminPanel initialData={{ users, stats }} />
+        </main>
+      );
+    }
+
+    // AdminForm.jsx (in the same directory)
+    "use client";
+
+    import { useFormState } from 'react-dom';
+    import { updateUserPermissions } from './actions';
+
+    export function AdminForm({ userId }) {
+      // Connect form with server action
+      const [state, formAction] = useFormState(updateUserPermissions, {
+        userId,
+        success: false,
+        error: null
+      });
+
+      return (
+        <form action={formAction}>
+          <input type="hidden" name="userId" value={userId} />
+          <select name="role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+            <option value="moderator">Moderator</option>
+          </select>
+          <button type="submit">Update Permissions</button>
+
+          {state.success && <p className="success">Update successful!</p>}
+          {state.error && <p className="error">{state.error}</p>}
+        </form>
+      );
+    }
+
+    // actions.js
+    "use server";
+
+    import { prisma } from '@/lib/db';
+    import { revalidatePath } from 'next/cache';
+
+    export async function updateUserPermissions(prevState, formData) {
+      const userId = formData.get('userId');
+      const role = formData.get('role');
+
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { role }
+        });
+
+        // Refresh related server components
+        revalidatePath('/admin/dashboard');
+
+        return { userId, success: true, error: null };
+      } catch (error) {
+        return { userId, success: false, error: error.message };
+      }
+    }
+    ```
+
+    This model provides:
+    - Complete elimination of manual API endpoints
+    - Better security because sensitive code only runs on the server
+    - Type-safety from database to UI with full-stack TypeScript
+    - Simpler, more efficient development experience
+
+    [Next.js Server Components Documentation](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## Hono and New Microframeworks - Replacing Express.js
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>hono</TIL.ItemTag>
+      <TIL.ItemTag>elysia</TIL.ItemTag>
+      <TIL.ItemTag>backend</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    High-performance microframeworks like Hono and Elysia are replacing Express.js:
+
+    ```typescript
+    // API with Hono
+    import { Hono } from 'hono';
+    import { cors } from 'hono/cors';
+    import { jwt } from 'hono/jwt';
+    import { prisma } from './db';
+
+    // Type-safe API routes
+    const app = new Hono()
+      .use(cors())
+      .use('/api/auth/*', jwt({ secret: process.env.JWT_SECRET }));
+
+    // Typed request/response with zod validation
+    import { z } from 'zod';
+    const userSchema = z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+      age: z.number().min(18).optional(),
+    });
+
+    app.post('/api/users', async (c) => {
+      const body = await c.req.json();
+
+      // Validate with zod
+      const result = userSchema.safeParse(body);
+      if (!result.success) {
+        return c.json({ error: result.error }, 400);
+      }
+
+      const user = await prisma.user.create({
+        data: result.data
+      });
+
+      return c.json({ user }, 201);
+    });
+
+    // Middleware and type safety
+    app.get('/api/profile', async (c) => {
+      // JWT payload is automatically typed
+      const user = c.get('jwtPayload');
+
+      const profile = await prisma.user.findUnique({
+        where: { id: user.id },
+        include: { posts: true }
+      });
+
+      if (!profile) {
+        return c.json({ error: 'User not found' }, 404);
+      }
+
+      return c.json({ profile });
+    });
+
+    // New runtimes: Edge, Cloudflare, Vercel, Deno, Bun
+    export default app;
+    ```
+
+    Hono, Elysia, and other new microframeworks outperform Express.js in several ways:
+    - 10-20x faster performance
+    - Type-safe APIs with end-to-end TypeScript
+    - Support for multiple runtimes (Node, Deno, Bun, Cloudflare Workers)
+    - Small bundle size, runs well in edge environments
+    - Modern API with async/await and ESM
+
+    [Hono Documentation](https://hono.dev)
+    [Elysia Documentation](https://elysiajs.com)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## UI Kits for 2025 - Shadcn, Park UI and Aceternity UI
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>ui</TIL.ItemTag>
+      <TIL.ItemTag>tailwind</TIL.ItemTag>
+      <TIL.ItemTag>design-system</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    ## UI Kits for 2025 - Shadcn, Park UI and Aceternity UI
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>ui</TIL.ItemTag>
+      <TIL.ItemTag>tailwind</TIL.ItemTag>
+      <TIL.ItemTag>design-system</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    The modern UI Kit ecosystem has evolved dramatically, changing how we approach component libraries:
+
+    ```jsx
+    // Example of Shadcn/ui - Copy code instead of installing an npm package
+    // components/ui/calendar.tsx
+    import * as React from "react"
+    import { ChevronLeft, ChevronRight } from "lucide-react"
+    import { DayPicker } from "react-day-picker"
+
+    import { cn } from "@/lib/utils"
+    import { buttonVariants } from "@/components/ui/button"
+
+    export type CalendarProps = React.ComponentProps<typeof DayPicker>
+
+    function Calendar({
+      className,
+      classNames,
+      showOutsideDays = true,
+      ...props
+    }: CalendarProps) {
+      return (
+        <DayPicker
+          showOutsideDays={showOutsideDays}
+          className={cn("p-3", className)}
+          classNames={{
+            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+            month: "space-y-4",
+            caption: "flex justify-center pt-1 relative items-center",
+            caption_label: "text-sm font-medium",
+            nav: "space-x-1 flex items-center",
+            nav_button: cn(
+              buttonVariants({ variant: "outline" }),
+              "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+            ),
+            nav_button_previous: "absolute left-1",
+            nav_button_next: "absolute right-1",
+            table: "w-full border-collapse space-y-1",
+            head_row: "flex",
+            head_cell:
+              "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+            row: "flex w-full mt-2",
+            cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+            day: cn(
+              buttonVariants({ variant: "ghost" }),
+              "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
+            ),
+            day_range_end: "day-range-end",
+            day_selected:
+              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+            day_today: "bg-accent text-accent-foreground",
+            day_outside:
+              "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
+            day_disabled: "text-muted-foreground opacity-50",
+            day_range_middle:
+              "aria-selected:bg-accent aria-selected:text-accent-foreground",
+            day_hidden: "invisible",
+            ...classNames,
+          }}
+          components={{
+            IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+            IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+          }}
+          {...props}
+        />
+      )
+    }
+    Calendar.displayName = "Calendar"
+
+    export { Calendar }
+    ```
+
+    ```jsx
+    // Using Aceternity UI for modern animations
+    "use client";
+
+    import { SparklesCore } from "@/components/ui/sparkles";
+    import { Button } from "@/components/ui/button";
+    import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+
+    export function HeroSection() {
+      return (
+        <div className="h-screen w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
+          <h1 className="md:text-7xl text-3xl lg:text-9xl font-bold text-center text-white relative z-20">
+            ACETERNITY
+          </h1>
+          <div className="w-[40rem] h-40 relative">
+            {/* Sparkles effect with purple hue */}
+            <SparklesCore
+              background="transparent"
+              minSize={0.4}
+              maxSize={1}
+              particleDensity={70}
+              className="w-full h-full"
+              particleColor="#8B5CF6"
+            />
+          </div>
+
+          <div className="flex gap-4 mt-8 z-20">
+            <HoverBorderGradient
+              as={Button}
+              className="text-white"
+              gradient="gradient-1"
+            >
+              Get Started
+            </HoverBorderGradient>
+
+            <HoverBorderGradient
+              as={Button}
+              variant="outline"
+              className="text-white"
+              gradient="gradient-2"
+            >
+              Learn More
+            </HoverBorderGradient>
+          </div>
+        </div>
+      );
+    }
+    ```
+
+    These new approaches are changing how we work with UI components:
+
+    1. **Copy-paste instead of installing packages**: Shadcn/ui isn't a library, but a collection of components you copy into your project and customize.
+
+    2. **No version lock**: You have complete control over the code and can upgrade parts without worrying about breaking changes.
+
+    3. **Better performance**: Smaller bundle size because you only use what you need.
+
+    4. **Advanced animations**: Aceternity UI and Park UI provide complex animations like 3D cards, sparkles, and spotlight effects.
+
+    [Shadcn Documentation](https://ui.shadcn.com)
+    [Aceternity UI](https://ui.aceternity.com)
+    [Park UI](https://park-ui.com)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## Rust and WebAssembly for Frontend
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>rust</TIL.ItemTag>
+      <TIL.ItemTag>wasm</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Rust + WebAssembly has become an essential tool in high-performance frontend applications:
+
+    ```rust
+    // lib.rs - Rust code
+    use wasm_bindgen::prelude::*;
+
+    #[wasm_bindgen]
+    pub fn fibonacci(n: u32) -> u32 {
+        match n {
+            0 => 0,
+            1 => 1,
+            _ => fibonacci(n - 1) + fibonacci(n - 2),
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn process_image(data: &[u8], width: u32, height: u32) -> Vec<u8> {
+        let mut result = Vec::with_capacity(data.len());
+
+        // Image processing algorithm written in Rust
+        // Processing millions of pixels efficiently
+        for i in (0..data.len()).step_by(4) {
+            // Apply filter, blur, edge detection, etc.
+            let r = data[i];
+            let g = data[i + 1];
+            let b = data[i + 2];
+            let a = data[i + 3];
+
+            // Grayscale conversion
+            let gray = (0.299 * r as f32 + 0.587 * g as f32 + 0.114 * b as f32) as u8;
+
+            result.push(gray); // R
+            result.push(gray); // G
+            result.push(gray); // B
+            result.push(a);    // A
+        }
+
+        result
+    }
+    ```
+
+    ```jsx
+    // React component using Rust WASM
+    import { useEffect, useState } from 'react';
+    import init, { process_image } from 'image_processor_wasm';
+
+    function ImageProcessor({ imageUrl }) {
+      const [processedImageUrl, setProcessedImageUrl] = useState(null);
+      const [processing, setProcessing] = useState(false);
+
+      useEffect(() => {
+        async function processImage() {
+          // Initialize WASM module
+          await init();
+          setProcessing(true);
+
+          try {
+            // Get image data
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const bitmap = await createImageBitmap(blob);
+
+            // Draw on canvas to get pixel data
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            // Call Rust WASM function for fast image processing
+            const start = performance.now();
+            const processedData = process_image(
+              new Uint8Array(imageData.data),
+              canvas.width,
+              canvas.height
+            );
+            console.log(`Processing took ${performance.now() - start}ms`);
+
+            // Update image with results
+            const processedImageData = new ImageData(
+              new Uint8ClampedArray(processedData),
+              canvas.width,
+              canvas.height
+            );
+            ctx.putImageData(processedImageData, 0, 0);
+
+            // Create URL for processed image
+            setProcessedImageUrl(canvas.toDataURL());
+          } finally {
+            setProcessing(false);
+          }
+        }
+
+        if (imageUrl) {
+          processImage();
+        }
+      }, [imageUrl]);
+
+      return (
+        <div className="image-processor">
+          <div className="images-container">
+            <div>
+              <h3>Original</h3>
+              <img src={imageUrl} alt="Original" />
+            </div>
+
+            <div>
+              <h3>Processed {processing && '(Processing...)'}</h3>
+              {processedImageUrl ? (
+                <img src={processedImageUrl} alt="Processed" />
+              ) : (
+                <div className="placeholder">
+                  {processing ? 'Processing...' : 'No image processed yet'}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ```
+
+    Benefits of Rust + WebAssembly for frontend:
+
+    1. **Near-native code performance**: image processing, audio, video, physics simulations, AI
+
+    2. **Memory safety**: Rust ensures no memory errors like those in C/C++
+
+    3. **Interop with JavaScript**: easy integration with React, Vue, Angular applications
+
+    4. **Ideal for edge computing**: WASM code runs efficiently on Cloudflare Workers and other edge platforms
+
+    Companies like Figma, Adobe, and Vercel are using Rust + WASM to increase the performance of complex web applications.
+
+    [Rust WASM Documentation](https://rustwasm.github.io/book/)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2025-04-12">
+
+  <TIL.Item>
+    
+    ## React Compiler - Automatic optimization for all React applications
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react</TIL.ItemTag>
+      <TIL.ItemTag>compiler</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    React Compiler (formerly known as React Forget) has become an essential tool for every React developer:
+
+    ```jsx
+    // Normal React code - no changes needed
+    function ProfileCard({ user }) {
+      return (
+        <div className="card">
+          <img src={user.avatar} alt={user.name} />
+          <h2>{user.name}</h2>
+          <p>{user.bio}</p>
+          <div className="stats">
+            <span>Followers: {user.followers}</span>
+            <span>Following: {user.following}</span>
+          </div>
+        </div>
+      );
+    }
+    ```
+
+    React Compiler automatically analyzes code to determine exactly which parts of a component need to be re-rendered when props change. No need for:
+    - useMemo
+    - useCallback
+    - React.memo
+    - memo()
+    - shouldComponentUpdate
+
+    Just install and enable the compiler in your project configuration, and you'll get optimized performance automatically.
+
+    [React Compiler Documentation](https://react.dev/learn/react-compiler)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## React Server Actions 2.0 - Modern form handling
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react</TIL.ItemTag>
+      <TIL.ItemTag>server-actions</TIL.ItemTag>
+      <TIL.ItemTag>forms</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    React Server Actions 2.0 has become the new standard for form handling in Next.js and React:
+
+    ```jsx
+    // app/checkout/page.js
+    'use client';
+
+    import { useFormStatus, useFormState } from 'react';
+    import { submitOrder } from '@/actions/checkout';
+
+    function SubmitButton() {
+      // Track form submission status
+      const { pending } = useFormStatus();
+
+      return (
+        <button
+          type="submit"
+          disabled={pending}
+          className="btn btn-primary w-full"
+        >
+          {pending ? 'Processing...' : 'Place Order Now'}
+        </button>
+      );
+    }
+
+    export default function CheckoutPage() {
+      // Initialize form state with action and initial state
+      const [state, formAction] = useFormState(submitOrder, {
+        errors: {},
+        message: '',
+      });
+
+      return (
+        <form action={formAction} className="space-y-6">
+          {state.message && (
+            <div className="success-message">{state.message}</div>
+          )}
+
+          <div className="form-group">
+            <label htmlFor="name">Full Name</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              className={state.errors.name ? 'input-error' : ''}
+            />
+            {state.errors.name && (
+              <p className="error-text">{state.errors.name}</p>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className={state.errors.email ? 'input-error' : ''}
+            />
+            {state.errors.email && (
+              <p className="error-text">{state.errors.email}</p>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="address">Address</label>
+            <textarea
+              id="address"
+              name="address"
+              required
+              className={state.errors.address ? 'input-error' : ''}
+            />
+            {state.errors.address && (
+              <p className="error-text">{state.errors.address}</p>
+            )}
+          </div>
+
+          <SubmitButton />
+        </form>
+      );
+    }
+    ```
+
+    Server Actions 2.0 provides a complete form experience with:
+    - Server-side validation with detailed error responses
+    - Automatically managed loading states
+    - Optimistic updates for immediate UI feedback
+    - Progressive enhancement (works even when JS is disabled)
+    - Support for file uploads and server streaming
+
+    [React Server Actions Documentation](https://react.dev/reference/react/use-server)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## React Suspense for Data Fetching - A new model for data fetching
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react</TIL.ItemTag>
+      <TIL.ItemTag>suspense</TIL.ItemTag>
+      <TIL.ItemTag>data-fetching</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Suspense for Data Fetching has become the standard way to handle data fetching in React:
+
+    ```jsx
+    // ProductDetails.js
+    import { Suspense } from 'react';
+    import { getProduct, getRelatedProducts } from '@/api/products';
+
+    // Component using the use() hook to fetch data
+    function ProductInfo({ id }) {
+      // use() is similar to await but works in components
+      const product = use(getProduct(id));
+
+      return (
+        <div className="product-info">
+          <h1>{product.name}</h1>
+          <p className="price">${product.price.toLocaleString()}</p>
+          <div className="description">{product.description}</div>
+          <button className="add-to-cart">Add to Cart</button>
+        </div>
+      );
+    }
+
+    function RelatedProducts({ id }) {
+      // This component will suspend independently
+      const relatedProducts = use(getRelatedProducts(id));
+
+      return (
+        <div className="related-products">
+          <h2>Related Products</h2>
+          <div className="grid grid-cols-4 gap-4">
+            {relatedProducts.map(product => (
+              <div key={product.id} className="product-card">
+                <img src={product.image} alt={product.name} />
+                <h3>{product.name}</h3>
+                <p>${product.price.toLocaleString()}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    export default function ProductPage({ id }) {
+      return (
+        <div className="product-page">
+          {/* Show fallback while waiting for data */}
+          <Suspense fallback={<ProductInfoSkeleton />}>
+            <ProductInfo id={id} />
+          </Suspense>
+
+          {/* Nested Suspense for progressive experience */}
+          <Suspense fallback={<RelatedProductsSkeleton />}>
+            <RelatedProducts id={id} />
+          </Suspense>
+        </div>
+      );
+    }
+    ```
+
+    Suspense for Data Fetching helps you:
+    - Organize code by "what" instead of "when" (write code according to display logic, not timing logic)
+    - Avoid waterfall requests by fetching in parallel
+    - Prevent UI inconsistency and flickering
+    - Stream data from server while showing skeleton UI
+    - Build progressive loading UX easily
+
+    [Suspense for Data Fetching](https://react.dev/reference/react/Suspense)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## React Signals - New state management for React 19+
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react</TIL.ItemTag>
+      <TIL.ItemTag>signals</TIL.ItemTag>
+      <TIL.ItemTag>state-management</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    React Signals revolutionizes state management in React with superior performance:
+
+    ```jsx
+    import { signal, computed, effect } from '@react/signals';
+
+    // Create global state
+    const count = signal(0);
+    const doubleCount = computed(() => count.value * 2);
+
+    // Side effect automatically runs when dependencies change
+    effect(() => {
+      console.log('Count changed:', count.value);
+      console.log('Double count:', doubleCount.value);
+    });
+
+    function Counter() {
+      // No need for useState, no need to re-render the entire component
+
+      return (
+        <div>
+          <p>Count: {count}</p>
+          <p>Double count: {doubleCount}</p>
+          <button onClick={() => count.value++}>Increase</button>
+        </div>
+      );
+    }
+
+    function DisplayCount() {
+      // This component only re-renders when count used in the component changes
+      return <div>Current count somewhere else: {count}</div>;
+    }
+
+    // You can change the signal from anywhere
+    function resetCount() {
+      count.value = 0;
+    }
+    ```
+
+    React Signals solves many key issues in React:
+    - Only re-renders exactly the parts of the UI that use the changed state
+    - No need for useMemo, useCallback, or React.memo for optimization
+    - Easily share state between components without context
+    - Simple and beginner-friendly API
+
+    React Signals offers better performance than traditional state management solutions like Redux, Zustand, or Jotai.
+
+    [React Signals Documentation](https://react.dev/learn/signals)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2025-04-12">
+
+  <TIL.Item>
+    
+    ## React 19 and the latest Server Components
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react</TIL.ItemTag>
+      <TIL.ItemTag>server-components</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    React 19 has become a leap forward in performance with significant improvements to Server Components:
+
+    ```jsx
+    // app/products/page.jsx - Zero Client JavaScript
+    export default async function ProductsPage() {
+      const products = await fetchProducts();
+
+      return (
+        <section>
+          <h1>Our Products</h1>
+          <div className="grid grid-cols-3 gap-4">
+            {products.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    // No need to load unnecessary JS
+    function ProductCard({ product }) {
+      return (
+        <div className="border p-4 rounded-lg">
+          <img src={product.image} alt={product.name} />
+          <h2>{product.name}</h2>
+          <p>${product.price.toLocaleString()}</p>
+        </div>
+      );
+    }
+    ```
+
+    The combination of Server Components and Streaming in React 19 has significantly improved Core Web Vitals, especially FCP (First Contentful Paint) and LCP (Largest Contentful Paint).
+
+    [React 19 Documentation](https://react.dev/blog/2025/03/18/react-19)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## Tailwind v4.0 - New CSS Variables API
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>tailwind</TIL.ItemTag>
+      <TIL.ItemTag>css</TIL.ItemTag>
+      <TIL.ItemTag>theming</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Tailwind CSS v4.0 introduces a powerful CSS Variables API allowing dynamic customization:
+
+    ```jsx
+    // tailwind.config.js
+    module.exports = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+              dark: 'rgb(var(--color-primary-dark) / <alpha-value>)',
+              light: 'rgb(var(--color-primary-light) / <alpha-value>)',
+            },
+          },
+        },
+      },
+      plugins: [],
+    }
+
+    // globals.css
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @layer base {
+      :root {
+        --color-primary: 56 189 248;
+        --color-primary-dark: 2 132 199;
+        --color-primary-light: 186 230 253;
+      }
+
+      html[data-theme="purple"] {
+        --color-primary: 139 92 246;
+        --color-primary-dark: 109 40 217;
+        --color-primary-light: 221 214 254;
+      }
+    }
+
+    // ThemeSwitcher.tsx
+    export function ThemeSwitcher() {
+      const setTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+
+      return (
+        <div className="flex gap-2">
+          <button onClick={() => setTheme('default')} className="bg-primary p-2">
+            Blue
+          </button>
+          <button onClick={() => setTheme('purple')} className="bg-primary p-2">
+            Purple
+          </button>
+        </div>
+      );
+    }
+    ```
+
+    This approach allows you to completely change your color palette without reloading CSS, perfect for custom theme selection features.
+
+    [Tailwind v4 Documentation](https://tailwindcss.com/blog/tailwindcss-v4)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## Astro 4.0 - Hybrid Rendering for Frontend
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>astro</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+      <TIL.ItemTag>rendering</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Astro 4.0 introduces a revolutionary Hybrid Rendering model for frontend development:
+
+    ```html
+    ---
+    // src/pages/products/[id].astro
+    import ProductView from '../../components/ProductView.jsx';
+    import RelatedProducts from '../../components/RelatedProducts.jsx';
+
+    export const prerender = false; // Opt into SSR
+
+    const { id } = Astro.params;
+    const product = await fetch(`https://api.example.com/products/${id}`).then(r => r.json());
+    ---
+
+    <html>
+      <head>
+        <title>{product.name}</title>
+      </head>
+      <body>
+        <main>
+          <!-- Static HTML, zero JavaScript -->
+          <h1>{product.name}</h1>
+          <p>{product.description}</p>
+          <p class="text-xl font-bold">${product.price.toLocaleString()}</p>
+
+          <!-- Hydrated React component only when necessary -->
+          <ProductView client:visible product={product} />
+
+          <!-- Load related data when user scrolls to it -->
+          <RelatedProducts client:visible productId={id} />
+        </main>
+      </body>
+    </html>
+    ```
+
+    Astro allows combining static parts (zero JS) with selectively hydrated React, Vue, or Svelte components only when necessary, delivering peak performance.
+
+    [Astro 4.0 Documentation](https://astro.build)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2025-03-15">
+
+  <TIL.Item>
+    
+    ## htmx 2.0 - Modern web interactions without JavaScript frameworks
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>htmx</TIL.ItemTag>
+      <TIL.ItemTag>hypermedia</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    htmx 2.0 takes the hypermedia approach to a new level:
+
+    ```html
+    <!-- Product list with filtering and pagination -->
+    <div id="product-container">
+      <div class="filters">
+        <select
+          name="category"
+          hx-get="/products"
+          hx-target="#product-list"
+          hx-indicator=".loading-indicator">
+          <option value="">All categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="clothing">Clothing</option>
+        </select>
+
+        <span class="loading-indicator htmx-indicator">Loading...</span>
+      </div>
+
+      <div id="product-list" hx-get="/products" hx-trigger="load" hx-swap="innerHTML">
+        <!-- Will be replaced by server response -->
+      </div>
+
+      <div class="pagination">
+        <button
+          hx-get="/products?page=1"
+          hx-target="#product-list"
+          hx-push-url="true">
+          Page 1
+        </button>
+        <button
+          hx-get="/products?page=2"
+          hx-target="#product-list"
+          hx-push-url="true">
+          Page 2
+        </button>
+      </div>
+
+      <!-- Cart with animation when adding products -->
+      <div id="cart" hx-get="/cart" hx-trigger="cart-updated from:body">
+        <!-- Cart contents -->
+      </div>
+    </div>
+
+    <!-- Server returns plain HTML, not JSON -->
+    <!-- Each product has an add to cart button -->
+    <div class="product-card">
+      <h3>Smartphone XYZ</h3>
+      <p>$899</p>
+      <button
+        hx-post="/add-to-cart"
+        hx-vals='{"product_id": 123}'
+        hx-swap="none"
+        hx-trigger="click"
+        hx-on::after-request="htmx.trigger('#cart', 'cart-updated')">
+        Add to Cart
+      </button>
+    </div>
+    ```
+
+    htmx 2.0 allows building interactive web applications without the need to learn complex frameworks or write lots of JavaScript, while significantly improving performance.
+
+    [htmx 2.0 Documentation](https://htmx.org)
+
+  </TIL.Item>
+
+  <TIL.Item>
+    
+    ## Qwik - Framework with no hydration
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>qwik</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+      <TIL.ItemTag>resumability</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Qwik is changing how we think about loading web applications with the concept of "resumability":
+
+    ```jsx
+    import { component$, useSignal } from '@builder.io/qwik';
+
+    export default component$(() => {
+      const count = useSignal(0);
+
+      return (
+        <div>
+          <h1>Qwik Counter</h1>
+          <p>Current value: {count.value}</p>
+
+          <button onClick$={() => count.value++}>
+            Increase
+          </button>
+        </div>
+      );
+    });
+    ```
+
+    The difference here is that although the code looks like React, Qwik doesn't need hydration. JavaScript is only loaded when needed (e.g., when a user clicks a button). This leads to:
+
+    1. Much faster page load times
+    2. Optimized Core Web Vitals
+    3. Less total JavaScript sent to the browser
+
+    Qwik also provides Qwik City, a meta-framework similar to Next.js but built on resumability principles.
+
+    [Qwik Documentation](https://qwik.builder.io/docs)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2025-02-10">
+
+  <TIL.Item>
+    
+    ## Bun - High-performance Node.js and npm replacement
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>bun</TIL.ItemTag>
+      <TIL.ItemTag>javascript</TIL.ItemTag>
+      <TIL.ItemTag>performance</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Bun has become the new standard for JavaScript development with superior performance:
+
+    ```bash
+    # Create a React + TypeScript project at lightning speed
+    bun create react-ts my-app
+
+    # Install dependencies faster than npm/yarn/pnpm
+    bun install
+
+    # Lightning-fast dev server
+    bun dev
+
+    # Using built-in APIs
+    cat example.ts
+    ```
+
+    ```typescript
+    // example.ts
+    const server = Bun.serve({
+      port: 3000,
+      async fetch(req) {
+        const url = new URL(req.url);
+
+        if (url.pathname === "/api/products") {
+          // Access built-in database
+          const db = new Bun.SQLite("mydb.sqlite");
+          const products = db.query("SELECT * FROM products LIMIT 10").all();
+
+          return new Response(JSON.stringify(products), {
+            headers: { "Content-Type": "application/json" }
+          });
+        }
+
+        return new Response("Welcome to Bun!");
+      }
+    });
+
+    console.log(`Listening on http://localhost:${server.port}`);
+    ```
+
+    Bun is not just a faster Node.js runner, but a complete ecosystem with:
+    - Built-in package manager replacing npm/yarn
+    - Native TypeScript and JSX support without configuration
+    - Built-in APIs for HTTP, WebSockets, file system, and SQLite
+    - Ability to run most Node.js applications without changes
+
+    New projects are prioritizing Bun for significantly faster development speeds.
+
+    [Bun Documentation](https://bun.sh/docs)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2025-01-20">
+
+  <TIL.Item>
+    
+    ## AI-driven Frontend Development
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>ai</TIL.ItemTag>
+      <TIL.ItemTag>frontend</TIL.ItemTag>
+      <TIL.ItemTag>developer-experience</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    AI tools are changing how frontend developers work:
+
+    ```jsx
+    // Example of a component created by GitHub Copilot
+    import { useState, useEffect } from 'react';
+    import { fetchProductData } from '../api/products';
+
+    export function ProductGallery({ category, limit = 10 }) {
+      const [products, setProducts] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [page, setPage] = useState(1);
+
+      useEffect(() => {
+        async function loadProducts() {
+          try {
+            setLoading(true);
+            const data = await fetchProductData(category, page, limit);
+            setProducts(data);
+          } catch (err) {
+            setError(err.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        loadProducts();
+      }, [category, page, limit]);
+
+      const nextPage = () => setPage(prev => prev + 1);
+      const prevPage = () => setPage(prev => Math.max(1, prev - 1));
+
+      if (loading) return <div className="skeleton-loader">Loading...</div>;
+      if (error) return <div className="error-message">{error}</div>;
+
+      return (
+        <div className="product-gallery">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.map(product => (
+              <div key={product.id} className="product-card">
+                <img src={product.image} alt={product.name} />
+                <h3>{product.name}</h3>
+                <p>${product.price.toLocaleString()}</p>
+                <button className="buy-button">Buy Now</button>
+              </div>
+            ))}
+          </div>
+
+          <div className="pagination">
+            <button onClick={prevPage} disabled={page === 1}>
+              Previous Page
+            </button>
+            <span>Page {page}</span>
+            <button onClick={nextPage}>
+              Next Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    ```
+
+    AI tools are revolutionizing frontend developer workflows:
+
+    1. **GitHub Copilot** can create complete components from natural language descriptions
+    2. **V0** generates interfaces from hand-drawn sketches or verbal descriptions
+    3. **Vercel AI SDK** makes it easy to integrate AI into frontend applications
+    4. **TailwindCSS AI** generates CSS code from design descriptions
+
+    Modern developers are using AI as a "pair programmer" to multiply frontend development productivity.
+
+    [GitHub Copilot](https://github.com/features/copilot)
+    [Vercel AI SDK](https://sdk.vercel.ai/docs)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-04-02">
+
+  <TIL.Item>
+    
+    ## Next.js 15 Server Actions Improvements
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>nextjs</TIL.ItemTag>
+      <TIL.ItemTag>react</TIL.ItemTag>
+      <TIL.ItemTag>forms</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Next.js 15 introduced significant improvements to Server Actions with:
+
+    ```jsx
+    // Progress indicators for long-running actions
+    export default function Form() {
+      const [isPending, startTransition] = useTransition();
+
+      async function submitForm(formData) {
+        startTransition(async () => {
+          await saveData(formData);
+        });
+      }
+
+      return (
+        <form action={submitForm}>
+          <input name="name" />
+          <button type="submit" disabled={isPending}>
+            {isPending ? 'Saving...' : 'Save'}
+          </button>
+        </form>
+      );
+    }
+    ```
+
+    Other improvements include optimistic updates, client-side validation integration, and better error handling through the built-in useFormStatus hook.
+
+    [Next.js Server Actions](https://nextjs.org/docs/app/api-reference/functions/server-actions)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-04-01">
+
+  <TIL.Item>
+    
+    ## Shadcn UI + Next.js 15 Integration
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>shadcn</TIL.ItemTag>
+      <TIL.ItemTag>nextjs</TIL.ItemTag>
+      <TIL.ItemTag>ui</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Shadcn UI now works seamlessly with Next.js 15 Server Components, making form handling even cleaner:
+
+    ```jsx
+    // app/contact/page.jsx
+    import { Button } from "@/components/ui/button";
+    import { Input } from "@/components/ui/input";
+    import { Textarea } from "@/components/ui/textarea";
+
+    async function submitForm(formData) {
+      'use server';
+      // Process form data
+    }
+
+    export default function ContactPage() {
+      return (
+        <form action={submitForm} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="name">Name</label>
+            <Input id="name" name="name" required />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="message">Message</label>
+            <Textarea id="message" name="message" required />
+          </div>
+          <Button type="submit">Send Message</Button>
+        </form>
+      );
+    }
+    ```
+
+    The new CLI tool also makes components installation faster:
+
+    ```bash
+    npx shadcn-ui@latest add form dialog toast
+    ```
+
+    [Shadcn UI Documentation](https://ui.shadcn.com/docs)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-03-30">
+
+  <TIL.Item>
+    
+    ## Next.js 15 View Transitions API
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>nextjs</TIL.ItemTag>
+      <TIL.ItemTag>framer-motion</TIL.ItemTag>
+      <TIL.ItemTag>animation</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Next.js 15 now supports the View Transitions API combined with Framer Motion for enhanced animations:
+
+    ```jsx
+    import { motion } from 'framer-motion';
+    import Link from 'next/link';
+
+    export default function Header() {
+      return (
+        <header>
+          <nav>
+            <Link href="/about" useViewTransition>
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                About
+              </motion.span>
+            </Link>
+          </nav>
+        </header>
+      );
+    }
+    ```
+
+    The combination of View Transitions and Framer Motion gives you the best of both worlds: smooth page transitions and fine-grained component animations.
+
+    [View Transitions API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-03-25">
+
+  <TIL.Item>
+    
+    ## React Query v5 with Next.js
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react-query</TIL.ItemTag>
+      <TIL.ItemTag>nextjs</TIL.ItemTag>
+      <TIL.ItemTag>data-fetching</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    React Query v5 works exceptionally well with Next.js App Router for client components:
+
+    ```jsx
+    'use client';
+
+    import { useQuery } from '@tanstack/react-query';
+
+    export default function Products() {
+      const { data, isPending, error } = useQuery({
+        queryKey: ['products'],
+        queryFn: async () => {
+          const res = await fetch('/api/products');
+          if (!res.ok) throw new Error('Network response error');
+          return res.json();
+        },
+      });
+
+      if (isPending) return <div>Loading...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return (
+        <div className="grid grid-cols-3 gap-4">
+          {data.map(product => (
+            <div key={product.id} className="border p-4 rounded">
+              <h3>{product.name}</h3>
+              <p>{product.description}</p>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    ```
+
+    Key improvements in v5 include smaller bundle size, better TypeScript support, and simplified APIs.
+
+    [React Query Documentation](https://tanstack.com/query/latest)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-03-20">
+
+  <TIL.Item>
+    
+    ## Framer Motion + Shadcn UI Integration
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>framer-motion</TIL.ItemTag>
+      <TIL.ItemTag>shadcn</TIL.ItemTag>
+      <TIL.ItemTag>animation</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Combining Framer Motion with Shadcn UI components creates beautifully animated interfaces:
+
+    ```jsx
+    import { motion, AnimatePresence } from 'framer-motion';
+    import {
+      Accordion,
+      AccordionContent,
+      AccordionItem,
+      AccordionTrigger,
+    } from "@/components/ui/accordion";
+
+    export default function AnimatedAccordion() {
+      return (
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>
+              <motion.span whileHover={{ x: 5 }}>
+                Item One
+              </motion.span>
+            </AccordionTrigger>
+            <AnimatePresence>
+              <AccordionContent>
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Content for item one
+                </motion.div>
+              </AccordionContent>
+            </AnimatePresence>
+          </AccordionItem>
+        </Accordion>
+      );
+    }
+    ```
+
+    This approach keeps Shadcn's elegant styling while adding Framer Motion's powerful animation capabilities.
+
+    [Framer Motion Documentation](https://www.framer.com/motion/)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-03-15">
+
+  <TIL.Item>
+    
+    ## Advanced Framer Motion Gestures
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>framer-motion</TIL.ItemTag>
+      <TIL.ItemTag>animation</TIL.ItemTag>
+      <TIL.ItemTag>interaction</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Framer Motion's gesture detection provides intuitive user interactions:
+
+    ```jsx
+    import { motion } from 'framer-motion';
+    import { useState } from 'react';
+
+    export default function DraggableCard() {
+      const [position, setPosition] = useState({ x: 0, y: 0 });
+      const [rotation, setRotation] = useState(0);
+
+      return (
+        <motion.div
+          drag
+          dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
+          whileDrag={{ scale: 1.1, boxShadow: "0px 10px 25px rgba(0,0,0,0.1)" }}
+          dragElastic={0.7}
+          onDrag={(_, info) => {
+            // Calculate rotation based on horizontal drag
+            setRotation(info.offset.x * 0.1);
+          }}
+          animate={{
+            x: position.x,
+            y: position.y,
+            rotate: rotation
+          }}
+          className="w-64 h-80 bg-white rounded-lg p-6 cursor-grab"
+          onDragEnd={(_, info) => {
+            setPosition({
+              x: position.x + info.offset.x,
+              y: position.y + info.offset.y
+            });
+          }}
+        >
+          <h3 className="text-lg font-bold">Drag Me</h3>
+          <p>Rotation: {Math.round(rotation)}°</p>
+        </motion.div>
+      );
+    }
+    ```
+
+    This example creates a draggable card with physics-based elasticity and rotation based on drag direction.
+
+    [Framer Motion Gestures](https://www.framer.com/motion/gestures/)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-03-05">
+
+  <TIL.Item>
+    
+    ## React Query Server-Side Rendering with Next.js
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>react-query</TIL.ItemTag>
+      <TIL.ItemTag>nextjs</TIL.ItemTag>
+      <TIL.ItemTag>ssr</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Hydrate React Query cache from server-fetched data in Next.js for optimal performance:
+
+    ```jsx
+    // app/providers.jsx
+    'use client';
+
+    import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+    import { useState } from 'react';
+
+    export default function Providers({ children, dehydratedState }) {
+      const [queryClient] = useState(() => new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+          },
+        },
+      }));
+
+      return (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      );
+    }
+
+    // app/page.jsx
+    import Providers from './providers';
+    import ProductList from '@/components/ProductList';
+
+    export default async function Page() {
+      // Fetch data server-side
+      const products = await fetch('https://api.example.com/products')
+        .then(res => res.json());
+
+      return (
+        <Providers>
+          <ProductList initialData={products} />
+        </Providers>
+      );
+    }
+    ```
+
+    This pattern prevents unnecessary client-side fetching on initial load while maintaining React Query's caching capabilities.
+
+    [React Query SSR](https://tanstack.com/query/latest/docs/react/guides/ssr)
+
+  </TIL.Item>
+
+</TIL.Items>
+
+<TIL.Items date="2024-02-20">
+
+  <TIL.Item>
+    
+    ## Shadcn UI Theming System
+
+    <TIL.ItemTags>
+      <TIL.ItemTag>shadcn</TIL.ItemTag>
+      <TIL.ItemTag>tailwind</TIL.ItemTag>
+      <TIL.ItemTag>theming</TIL.ItemTag>
+    </TIL.ItemTags>
+
+    Shadcn UI provides a powerful theming system with CSS variables and Tailwind:
+
+    ```jsx
+    // app/globals.css
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @layer base {
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --primary: 221.2 83.2% 53.3%;
+        --primary-foreground: 210 40% 98%;
+      }
+
+      .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        --primary: 217.2 91.2% 59.8%;
+        --primary-foreground: 222.2 47.4% 11.2%;
+      }
+    }
+
+    // theme-toggle.jsx
+    'use client';
+
+    import { useTheme } from 'next-themes';
+    import { Button } from '@/components/ui/button';
+    import { Moon, Sun } from 'lucide-react';
+
+    export function ThemeToggle() {
+      const { theme, setTheme } = useTheme();
+
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </Button>
+      );
+    }
+    ```
+
+    This approach makes it easy to create custom themed components that respect both light and dark mode preferences.
+
+    [Shadcn UI Theming](https://ui.shadcn.com/docs/theming)
+
+  </TIL.Item>
+
+</TIL.Items>
