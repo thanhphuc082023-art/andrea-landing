@@ -30,7 +30,11 @@ function Navbar() {
       <div className="max-sd:h-[60px] h-20 w-full bg-[#F5F5F5]">
         <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0" aria-label="Andrea - Trang chủ">
+          <Link
+            href="/"
+            className="flex-shrink-0"
+            aria-label="Andrea - Trang chủ"
+          >
             <StrapiLogo
               width={110}
               height={41}
@@ -48,7 +52,7 @@ function Navbar() {
                 className={clsx(
                   'text-lg transition-colors duration-200',
                   activeItem === item.title
-                    ? 'text-brand-orange hover:text-brand-orange/80 font-bold'
+                    ? 'text-brand-orange hover:text-brand-orange-dark font-bold' // Now uses WCAG AA compliant colors
                     : 'font-normal text-gray-700 hover:text-gray-900'
                 )}
                 onClick={() => setActiveItem(item.title)}
@@ -61,7 +65,7 @@ function Navbar() {
           {/* Mobile Menu Button */}
           <button
             type="button"
-            className="relative flex h-8 w-8 flex-col justify-center md:hidden cursor-pointer"
+            className="relative flex h-8 w-8 cursor-pointer flex-col justify-center md:hidden"
             onClick={toggleMobileMenu}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -74,19 +78,27 @@ function Navbar() {
             aria-controls="mobile-navigation"
           >
             <m.span
-              className="bg-brand-orange absolute top-1/2 h-1 w-full -translate-x-1/2 origin-center rounded"
-              animate={isMobileMenuOpen ? { rotate: 45, y: 0 } : { rotate: 0, y: -10 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="bg-brand-orange absolute top-1/2 h-1 w-full origin-center -translate-x-1/2 rounded"
+              animate={
+                isMobileMenuOpen ? { rotate: 45, y: 0 } : { rotate: 0, y: -10 }
+              }
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
             />
             <m.span
-              className="bg-brand-orange absolute top-1/2 h-1 w-full -translate-x-1/2 origin-center rounded"
-              animate={isMobileMenuOpen ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="bg-brand-orange absolute top-1/2 h-1 w-full origin-center -translate-x-1/2 rounded"
+              animate={
+                isMobileMenuOpen
+                  ? { opacity: 0, scale: 0 }
+                  : { opacity: 1, scale: 1 }
+              }
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
             />
             <m.span
-              className="bg-brand-orange absolute top-1/2 h-1 w-full -translate-x-1/2 origin-center rounded"
-              animate={isMobileMenuOpen ? { rotate: -45, y: 0 } : { rotate: 0, y: 10 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="bg-brand-orange absolute top-1/2 h-1 w-full origin-center -translate-x-1/2 rounded"
+              animate={
+                isMobileMenuOpen ? { rotate: -45, y: 0 } : { rotate: 0, y: 10 }
+              }
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
             />
           </button>
         </div>
@@ -99,12 +111,12 @@ function Navbar() {
             initial={{ x: '-100%', opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '-100%', opacity: 0 }}
-            transition={{ 
-              duration: 0.4, 
+            transition={{
+              duration: 0.4,
               ease: [0.25, 0.46, 0.45, 0.94],
-              opacity: { duration: 0.2 }
+              opacity: { duration: 0.2 },
             }}
-            className="fixed inset-0 top-[60px] z-[999] bg-[#EFEFEF] md:hidden max-sd:top-[60px] lg:top-20"
+            className="max-sd:top-[60px] fixed inset-0 top-[60px] z-[999] bg-[#EFEFEF] md:hidden lg:top-20"
             id="mobile-navigation"
           >
             <nav className="flex h-full flex-col gap-6 px-6 py-8">
@@ -113,19 +125,19 @@ function Navbar() {
                   key={item.title}
                   initial={{ x: -50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ 
+                  transition={{
                     delay: 0.1 + index * 0.1,
                     duration: 0.5,
-                    ease: [0.25, 0.46, 0.45, 0.94]
+                    ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                 >
                   <Link
                     href={item.href}
                     className={clsx(
-                      'block text-xl transition-all duration-300 py-4 border-b border-gray-200/50',
-                      'hover:translate-x-2 hover:border-brand-orange/30',
+                      'block border-b border-gray-200/50 py-4 text-xl transition-all duration-300',
+                      'hover:border-brand-orange/30 hover:translate-x-2',
                       activeItem === item.title
-                        ? 'font-bold text-[#EE4823] translate-x-1'
+                        ? 'text-brand-orange translate-x-1 font-bold' // Now uses WCAG AA compliant color
                         : 'font-normal text-gray-700 hover:text-gray-900'
                     )}
                     onClick={() => handleMobileMenuClick(item.title)}

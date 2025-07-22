@@ -153,7 +153,7 @@ function ContactForm() {
                 className={clsx(
                   'min-w-[143px] rounded-md px-9 py-2.5',
                   'bg-brand-orange text-white',
-                  'transition-all duration-300 hover:bg-orange-600',
+                  'hover:bg-brand-orange-dark transition-all duration-300',
                   'focus:ring-brand-orange outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900'
                 )}
               >

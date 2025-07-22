@@ -157,8 +157,8 @@ function Blog() {
             type="button"
             className={clsx(
               'min-w-[143px] rounded-md px-9 py-2.5',
-              'bg-brand-orange text-white',
-              'transition-all duration-300 hover:bg-orange-600'
+              'bg-brand-orange hover:bg-brand-orange-dark text-white',
+              'transition-all duration-300'
             )}
             aria-label="Xem thêm bài viết blog"
           >

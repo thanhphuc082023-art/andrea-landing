@@ -25,7 +25,11 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans, "")', ...defaultTheme.fontFamily.sans],
         mono: ['var(--font-mono, "")', ...defaultTheme.fontFamily.mono],
-        playfair: ['var(--font-playfair)', 'Playfair Display', ...defaultTheme.fontFamily.serif],
+        playfair: [
+          'var(--font-playfair)',
+          'Playfair Display',
+          ...defaultTheme.fontFamily.serif,
+        ],
       },
       borderRadius: {
         10: '10px',
@@ -38,8 +42,9 @@ module.exports = {
           dark: colors.slate[800],
         },
         brand: {
-          orange: '#E5511A', // Darker orange for better contrast (was #F15A24)
-          'orange-light': '#F15A24', // Original orange for backgrounds
+          orange: '#D2440E', // WCAG AA compliant orange (contrast ratio 4.5:1 on white)
+          'orange-light': '#F15A24', // Original orange for backgrounds only
+          'orange-dark': '#B8390C', // Darker orange for hover states
         },
         grayECO: '#BCBEC0',
         text: {
