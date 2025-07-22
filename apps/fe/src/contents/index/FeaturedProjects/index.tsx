@@ -39,6 +39,7 @@ function FeaturedProjects() {
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   quality={85}
                   priority={true}
+                  loading="lazy"
                 />
               </div>
 
