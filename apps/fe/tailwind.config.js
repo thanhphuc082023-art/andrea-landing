@@ -13,16 +13,43 @@ module.exports = {
     extend: {
       screens: {
         xs: '480px',
+        'max-2xl': { max: '1536px' },
+        'max-xl': { max: '1280px' },
+        'max-sd': { max: '1194px' },
+        'max-lg': { max: '1024px' },
+        'max-md': { max: '768px' },
+      },
+      fontSize: {
+        14: '14px',
       },
       fontFamily: {
         sans: ['var(--font-sans, "")', ...defaultTheme.fontFamily.sans],
         mono: ['var(--font-mono, "")', ...defaultTheme.fontFamily.mono],
+        playfair: ['Playfair Display', ...defaultTheme.fontFamily.serif],
+      },
+      borderRadius: {
+        15: '15px',
+        30: '30px',
       },
       colors: {
         divider: {
           light: colors.slate[200],
           dark: colors.slate[800],
         },
+        brand: {
+          orange: '#F15A24',
+        },
+        grayECO: '#BCBEC0',
+        text: {
+          primary: '#1A253A',
+          secondary: '#7D7D7D',
+        },
+        card: {
+          bg: '#F4F4F4',
+        },
+      },
+      maxWidth: {
+        container: '1440px',
       },
       animation: {
         'bounce-x': 'bounce-x 1s infinite',

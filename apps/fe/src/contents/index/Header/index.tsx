@@ -1,37 +1,50 @@
 import clsx from 'clsx';
 
-import HeaderCta from '@/contents/index/Header/HeaderCta';
-import HeaderImage from '@/contents/index/Header/HeaderImage';
-import HeaderTechStack from '@/contents/index/Header/HeaderTechStack';
-import HeaderTitle from '@/contents/index/Header/HeaderTitle';
+import HeaderVideo from '@/contents/index/Header/HeaderVideo';
+import NewHeaderTitle from '@/contents/index/Header/NewHeaderTitle';
 
 function Header() {
   return (
     <header
       id="page-header"
-      className={clsx(
-        'background-grid background-grid--fade-out pb-20 pt-36',
-        'lg:pb-28 lg:pt-52'
-      )}
+      className={clsx('relative overflow-hidden', 'max-sd:mt-[60px] mt-20')}
     >
-      <div className={clsx('content-wrapper')}>
-        <div className={clsx('relative')}>
-          <div className={clsx('relative z-10')}>
-            <HeaderTitle />
-          </div>
-          <div className={clsx('mt-6 md:mt-8')}>
-            <HeaderCta isFree={false} />
-          </div>
-          <div className={clsx('mt-20 lg:mt-36')}>
-            <HeaderTechStack />
-          </div>
+      <HeaderVideo videoSrc="https://andrea.vn/uploads/videos/intro-website_3.mp4" />
+
+      {/* Content */}
+      <div
+        className={clsx(
+          'max-sd:pt-[105px] relative z-10 pt-[116px] max-md:pt-[84px]'
+        )}
+      >
+        <div className={clsx('content-wrapper mx-auto')}>
           <div
             className={clsx(
-              'pointer-events-none absolute -top-36 right-0 z-0 hidden select-none',
-              'lg:block'
+              'relative flex flex-wrap items-end justify-between gap-[30px] max-md:justify-center max-md:gap-[10px] lg:flex-nowrap'
             )}
           >
-            <HeaderImage />
+            {/* Title positioned like in Figma: left side */}
+            <div className={clsx('')}>
+              <NewHeaderTitle />
+            </div>
+
+            {/* Description luôn bên phải, mọi màn hình */}
+            <div className={clsx('mb-5 max-w-xl')}>
+              <div
+                className={clsx(
+                  'font-sans text-base font-[400] text-black',
+                  'leading-[26px] max-md:text-center dark:text-slate-300'
+                )}
+              >
+                <p>
+                  {`Angency tư vấn, thiết kế sáng tạo đa lĩnh vực, chuyên cung cấp
+                  giải pháp thiết kế hình ảnh thương hiệu chất lượng cao, với
+                  đội ngũ thiết kế được đào tạo bài bản kết hợp với các cộng sự,
+                  chuyên gia uy tín trong ngành, chúng tôi "Andrea" đồng hành
+                  cùng bạn xây dựng thương hiệu uy tín và chuyên nghiêp.`}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,174 @@
+// Base Strapi types
+export interface StrapiBaseAttributes {
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+}
+
+export interface StrapiEntity<T = Record<string, any>> {
+  id: number;
+  attributes: T & StrapiBaseAttributes;
+}
+
+export interface StrapiMedia {
+  id: number;
+  name: string;
+  alternativeText?: string;
+  caption?: string;
+  width: number;
+  height: number;
+  formats?: {
+    thumbnail?: StrapiImageFormat;
+    small?: StrapiImageFormat;
+    medium?: StrapiImageFormat;
+    large?: StrapiImageFormat;
+  };
+  hash: string;
+  ext: string;
+  mime: string;
+  size: number;
+  url: string;
+  previewUrl?: string;
+  provider: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StrapiImageFormat {
+  name: string;
+  hash: string;
+  ext: string;
+  mime: string;
+  width: number;
+  height: number;
+  size: number;
+  url: string;
+}
+
+// Common content types
+export interface StrapiSEO {
+  metaTitle?: string;
+  metaDescription?: string;
+  metaImage?: StrapiMedia | null;
+  keywords?: string;
+  metaRobots?: string;
+  structuredData?: any;
+  metaViewport?: string;
+  canonicalURL?: string;
+}
+
+export interface StrapiArticle {
+  title: string;
+  content: string;
+  slug: string;
+  excerpt?: string;
+  featuredImage?: StrapiMedia | null;
+  author?: {
+    data: StrapiAuthor | null;
+  };
+  categories?: {
+    data: StrapiCategory[];
+  };
+  tags?: {
+    data: StrapiTag[];
+  };
+  seo?: StrapiSEO;
+  featured?: boolean;
+  readingTime?: number;
+}
+
+export interface StrapiProject {
+  title: string;
+  description: string;
+  content: string;
+  slug: string;
+  technologies?: string[];
+  projectUrl?: string;
+  githubUrl?: string;
+  featured: boolean;
+  images?: {
+    data: StrapiMedia[];
+  };
+  category?: {
+    data: StrapiCategory | null;
+  };
+  seo?: StrapiSEO;
+  status?: 'draft' | 'in-progress' | 'completed';
+}
+
+export interface StrapiAuthor {
+  name: string;
+  email: string;
+  bio?: string;
+  avatar?: StrapiMedia | null;
+  social?: {
+    website?: string;
+    twitter?: string;
+    linkedin?: string;
+    github?: string;
+  };
+}
+
+export interface StrapiCategory {
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  icon?: StrapiMedia | null;
+}
+
+export interface StrapiTag {
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+}
+
+export interface StrapiPage {
+  title: string;
+  slug: string;
+  content: string;
+  seo?: StrapiSEO;
+  components?: any[]; // For dynamic zones
+}
+
+export interface StrapiGlobal {
+  siteName: string;
+  siteDescription: string;
+  defaultSeo: StrapiSEO;
+  logo?: StrapiMedia | null;
+  favicon?: StrapiMedia | null;
+  socialLinks?: {
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    youtube?: string;
+    github?: string;
+  };
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
+  navigation?: {
+    header: StrapiNavigationItem[];
+    footer: StrapiNavigationItem[];
+  };
+}
+
+export interface StrapiNavigationItem {
+  label: string;
+  url: string;
+  external?: boolean;
+  children?: StrapiNavigationItem[];
+}
+
+// Helper types for API responses
+export type ArticleEntity = StrapiEntity<StrapiArticle>;
+export type ProjectEntity = StrapiEntity<StrapiProject>;
+export type AuthorEntity = StrapiEntity<StrapiAuthor>;
+export type CategoryEntity = StrapiEntity<StrapiCategory>;
+export type TagEntity = StrapiEntity<StrapiTag>;
+export type PageEntity = StrapiEntity<StrapiPage>;
+export type GlobalEntity = StrapiEntity<StrapiGlobal>;

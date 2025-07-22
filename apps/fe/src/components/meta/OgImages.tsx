@@ -148,10 +148,10 @@ export function PostOgImage({
         <img
           width="48"
           height="48"
-          src="https://github.com/tiroxuki0.png?size=48"
+          src="https://github.com/andrea0.png?size=48"
           style={styles.authorAvatar}
         />
-        <div style={styles.authorName}>@tiroxuki0</div>
+        <div style={styles.authorName}>@andrea0</div>
 
         {date && (
           <>
@@ -214,10 +214,10 @@ export function PageOgImage({
         <img
           width="48"
           height="48"
-          src="https://github.com/tiroxuki0.png?size=48"
+          src="https://github.com/andrea0.png?size=48"
           style={styles.authorAvatar}
         />
-        <div style={styles.authorName}>@tiroxuki0</div>
+        <div style={styles.authorName}>@andrea0</div>
       </div>
       <div
         style={

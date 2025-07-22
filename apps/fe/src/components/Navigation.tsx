@@ -1,9 +1,12 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import StrapiLogo from '@/components/StrapiLogo';
 
 function Navbar() {
   const [activeItem, setActiveItem] = useState('Về chúng tôi');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
     { title: 'Về chúng tôi', href: '/about' },
@@ -13,16 +16,26 @@ function Navbar() {
     { title: 'Liên hệ', href: '/contact' },
   ];
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleMobileMenuClick = (title: string) => {
+    setActiveItem(title);
+    setIsMobileMenuOpen(false); // Đóng menu sau khi click
+  };
+
   return (
     <header className="fixed left-0 right-0 top-0 z-[1000] w-full">
-      <div className="h-20 w-full bg-[#EFEFEF]">
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 lg:px-[70px]">
+      <div className="max-sd:h-[60px] h-20 w-full bg-[#EFEFEF]">
+        <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/88c53e90e43b157e0c7a051f1ccb0507c99e0ee9?width=220"
-              alt="Andréa"
-              className="h-[41px] w-[110px]"
+            <StrapiLogo
+              width={110}
+              height={41}
+              className="max-sd:w-[84px] max-sd:h-[31px] h-[41px] w-[110px]"
+              fallbackToDefault
             />
           </Link>
 
@@ -33,9 +46,9 @@ function Navbar() {
                 key={item.title}
                 href={item.href}
                 className={clsx(
-                  'text-lg font-sans transition-colors duration-200',
+                  'text-lg transition-colors duration-200',
                   activeItem === item.title
-                    ? 'font-bold text-[#EE4823]'
+                    ? 'text-brand-orange hover:text-brand-orange/80 font-bold'
                     : 'font-normal text-black/50 hover:text-black/70'
                 )}
                 onClick={() => setActiveItem(item.title)}
@@ -47,36 +60,63 @@ function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
+            type="button"
             className="flex flex-col gap-1 md:hidden"
             aria-label="Toggle menu"
+            onClick={toggleMobileMenu}
           >
-            <span className="h-0.5 w-6 bg-black/50"></span>
-            <span className="h-0.5 w-6 bg-black/50"></span>
-            <span className="h-0.5 w-6 bg-black/50"></span>
+            <span className="bg-brand-orange h-0.5 w-6" />
+            <span className="bg-brand-orange h-0.5 w-6" />
+            <span className="bg-brand-orange h-0.5 w-6" />
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation Menu - Hidden by default, can be toggled */}
-      <div className="hidden bg-[#EFEFEF] md:hidden">
-        <nav className="flex flex-col gap-4 px-4 py-6">
-          {navigationItems.map((item) => (
-            <Link
-              key={item.title}
-              href={item.href}
-              className={clsx(
-                'text-lg font-sans transition-colors duration-200',
-                activeItem === item.title
-                  ? 'font-bold text-[#EE4823]'
-                  : 'font-normal text-black/50'
-              )}
-              onClick={() => setActiveItem(item.title)}
-            >
-              {item.title}
-            </Link>
-          ))}
-        </nav>
-      </div>
+      {/* Mobile Navigation Menu - Full screen slide from left */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <m.div
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '-100%', opacity: 0 }}
+            transition={{ 
+              duration: 0.4, 
+              ease: [0.25, 0.46, 0.45, 0.94],
+              opacity: { duration: 0.2 }
+            }}
+            className="fixed inset-0 top-[60px] z-[999] bg-[#EFEFEF] md:hidden max-sd:top-[60px] lg:top-20"
+          >
+            <nav className="flex h-full flex-col gap-6 px-6 py-8">
+              {navigationItems.map((item, index) => (
+                <m.div
+                  key={item.title}
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ 
+                    delay: 0.1 + index * 0.1,
+                    duration: 0.5,
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                  }}
+                >
+                  <Link
+                    href={item.href}
+                    className={clsx(
+                      'block text-xl transition-all duration-300 py-4 border-b border-gray-200/50',
+                      'hover:translate-x-2 hover:border-brand-orange/30',
+                      activeItem === item.title
+                        ? 'font-bold text-[#EE4823] translate-x-1'
+                        : 'font-normal text-black/70 hover:text-black'
+                    )}
+                    onClick={() => handleMobileMenuClick(item.title)}
+                  >
+                    {item.title}
+                  </Link>
+                </m.div>
+              ))}
+            </nav>
+          </m.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

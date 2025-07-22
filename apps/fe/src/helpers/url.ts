@@ -1,7 +1,7 @@
 export const getBaseUrl = () => {
   switch (process.env.NEXT_PUBLIC_VERCEL_ENV) {
     case 'production':
-      return 'https://resume-minhhuy.vercel.app';
+      return 'https://andrea.vercel.app';
     case 'preview':
       return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
     default:

@@ -17,6 +17,17 @@ const nextConfig = {
       permanent: false,
     },
   ],
+  images: {
+    domains: [
+      'api.builder.io',
+      'images.unsplash.com',
+      'res.cloudinary.com',
+      'cdn.builder.io',
+      'strapi.andrea.dev',
+      'andrea.dev',
+      'andrea-landing.pages.dev',
+    ],
+  },
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   reactStrictMode: true,
 };

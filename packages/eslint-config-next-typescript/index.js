@@ -13,7 +13,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   rules: {
     'no-nested-ternary': 'off',
-    '@next/next/no-html-link-for-pages': ['error', 'apps/minhhuy/src/pages/'],
+    '@next/next/no-html-link-for-pages': ['error', 'apps/fe/src/pages/'],
     'no-underscore-dangle': ['error', { allow: ['_count', '_sum'] }],
     'import/extensions': 'off',
     'import/order': 'off',

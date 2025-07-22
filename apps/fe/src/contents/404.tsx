@@ -16,16 +16,16 @@ function Error404Contents() {
       >
         <h1 className={clsx('py-12 text-center')}>
           <div className={clsx('mb-3 text-8xl font-extrabold')}>404</div>
-          <div className={clsx('text-2xl')}> Page Not Found </div>
+          <div className={clsx('text-2xl')}> Không tìm thấy trang </div>
         </h1>
         <Link
           href="/"
           className={clsx(
-            'text-accent-600 rounded-xl px-4 py-2 text-xl',
+            'text-brand-orange rounded-xl px-4 py-2 text-xl',
             'dark:text-accent-400'
           )}
         >
-          back to homepage
+          Quay lại trang chủ
         </Link>
       </div>
     </div>

@@ -1,19 +1,27 @@
-import NextHead from "next/head"
+import NextHead from 'next/head';
 
-import useCurrentUrl from "@/hooks/useCurrentUrl"
+import useCurrentUrl from '@/hooks/useCurrentUrl';
 
 interface HeadProps {
-  title: string
-  description: string
-  ogImage: string
-  overrideTitle?: boolean
-  structuredData?: string
+  title: string;
+  description: string;
+  ogImage: string;
+  overrideTitle?: boolean;
+  structuredData?: string;
 }
 
-function Head({ title, description, ogImage, overrideTitle = false, structuredData = "" }: HeadProps) {
-  const currentUrl = useCurrentUrl()
+function Head({
+  title,
+  description,
+  ogImage,
+  overrideTitle = false,
+  structuredData = '',
+}: HeadProps) {
+  const currentUrl = useCurrentUrl();
 
-  const htmlTitle = overrideTitle ? title : `${title} — Minh Huy · Front-End Developer`
+  const htmlTitle = overrideTitle
+    ? title
+    : `${title} — Minh Huy · Front-End Developer`;
 
   return (
     <NextHead>
@@ -40,9 +48,11 @@ function Head({ title, description, ogImage, overrideTitle = false, structuredDa
       <meta name="twitter:image:alt" content={`Image with "${title}" text.`} />
 
       {/* structured data */}
-      {structuredData && <script type="application/ld+json">{structuredData}</script>}
+      {structuredData && (
+        <script type="application/ld+json">{structuredData}</script>
+      )}
     </NextHead>
-  )
+  );
 }
 
-export default Head
+export default Head;
