@@ -8,34 +8,6 @@ const {
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
-  // Enable purge for production builds
-  purge: {
-    enabled: process.env.NODE_ENV === 'production',
-    content: [
-      './src/**/*.{js,ts,jsx,tsx}',
-      './src/pages/**/*.{js,ts,jsx,tsx}',
-      './src/components/**/*.{js,ts,jsx,tsx}',
-      './src/contents/**/*.{js,ts,jsx,tsx,mdx}',
-      './src/contents-layouts/**/*.{js,ts,jsx,tsx}',
-    ],
-    options: {
-      safelist: [
-        // Keep dynamic classes that might be generated
-        'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl',
-        'font-normal', 'font-medium', 'font-semibold', 'font-bold',
-        'leading-tight', 'leading-normal', 'leading-relaxed',
-        'tracking-tight', 'tracking-normal', 'tracking-wide',
-        'flex', 'grid', 'block', 'inline-block', 'hidden',
-        'w-full', 'h-full', 'max-w-screen-xl', 'mx-auto',
-        // Keep spacing utilities that are commonly used
-        /^(p|m)(t|r|b|l|x|y)?-\d+$/,
-        // Keep responsive prefixes
-        /^(xs|sm|md|lg|xl|2xl):/,
-        // Keep brand colors
-        /^(text|bg|border)-brand/,
-      ],
-    },
-  },
   darkMode: 'class',
   theme: {
     extend: {
