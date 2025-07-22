@@ -15,7 +15,7 @@ function IndexContents() {
       <div className={clsx('pb-20 lg:pb-28')}>
         <Header />
       </div>
-      {/* <div className={clsx('mb-20', 'lg:mb-28')}>
+      <div className={clsx('mb-20', 'lg:mb-28')}>
         <BrandSection />
       </div>
 
@@ -43,7 +43,7 @@ function IndexContents() {
 
       <div>
         <ContactForm />
-      </div> */}
+      </div>
 
       {/* <div className={clsx("hidden", "lg:mb-24 lg:block")}>
         <FeaturedCardSection />

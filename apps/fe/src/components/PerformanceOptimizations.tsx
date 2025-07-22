@@ -26,6 +26,16 @@ export function PerformanceOptimizations() {
         href="https://api.builder.io/api/v1/image/assets/TEMP/aa900ed26675db6e843778c020dcbb13b0f69d38?width=1920&format=webp"
         as="image"
         type="image/webp"
+        fetchPriority="high"
+      />
+
+      {/* Preload mobile version too */}
+      <link
+        rel="preload"
+        href="https://api.builder.io/api/v1/image/assets/TEMP/aa900ed26675db6e843778c020dcbb13b0f69d38?width=768&format=webp"
+        as="image"
+        type="image/webp"
+        media="(max-width: 768px)"
       />
 
       {/* DNS prefetch for other domains */}

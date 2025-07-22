@@ -54,33 +54,44 @@ function HeaderVideo({ videoSrc = '' }: HeaderVideoProps) {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.4, duration: 1.2 }}
     >
-      {videoSrc && shouldShowVideo && !isMobile && !videoError ? (
+      {/* Always show image first for LCP optimization */}
+      <Image
+        src={primaryImageSrc}
+        alt="Header background"
+        fill
+        className="object-cover object-center"
+        priority
+        fetchPriority="high"
+        quality={90}
+        sizes={imageSizes}
+        placeholder="blur"
+        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+      />
+
+      {/* Load video after image for better performance */}
+      {videoSrc && shouldShowVideo && !isMobile && !videoError && (
         <video
-          className={clsx('h-full w-full object-cover')}
+          className={clsx(
+            'absolute inset-0 h-full w-full object-cover opacity-0'
+          )}
           autoPlay
           muted
           loop
           playsInline
           preload="none"
-          poster={`${baseImageUrl}?width=1920&format=webp`}
+          onCanPlayThrough={() => {
+            // Fade in video once it's ready to play
+            const video = document.querySelector('video');
+            if (video) {
+              video.style.opacity = '1';
+              video.style.transition = 'opacity 0.5s ease-in-out';
+            }
+          }}
           onError={handleVideoError}
         >
           <source src={videoSrc} type="video/mp4" onError={handleVideoError} />
           <track kind="captions" src="" srcLang="vi" label="Vietnamese" />
         </video>
-      ) : (
-        /* Optimized responsive image using Next.js Image */
-        <Image
-          src={primaryImageSrc}
-          alt="Header background"
-          fill
-          className="object-cover object-center"
-          priority={true}
-          quality={90}
-          sizes={imageSizes}
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-        />
       )}
     </m.div>
   );
