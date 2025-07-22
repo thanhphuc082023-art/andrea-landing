@@ -38,9 +38,9 @@ function Footer() {
             </p>
 
             <div>
-              <h4 className={clsx('mb-3 text-sm font-medium text-orange-500')}>
+              <h2 className={clsx('mb-3 text-sm font-medium text-orange-500')}>
                 Kết nối với chúng tôi
-              </h4>
+              </h2>
               <div className={clsx('flex gap-3')}>
                 <a
                   href="https://facebook.com/"
@@ -122,14 +122,14 @@ function Footer() {
 
           {/* Chi nhánh TP. Hồ Chí Minh */}
           <div className={clsx('lg:col-span-1')}>
-            <h4
+            <h3
               className={clsx(
                 'text-sm font-medium text-slate-900',
                 'dark:text-slate-100'
               )}
             >
               Trụ sở chính TP. Hồ Chí Minh
-            </h4>
+            </h3>
             <div
               className={clsx(
                 'my-3 h-px max-w-[52px] bg-black/10',
@@ -149,14 +149,14 @@ function Footer() {
 
           {/* Chi nhánh Hà Nội */}
           <div className={clsx('lg:col-span-1')}>
-            <h4
+            <h3
               className={clsx(
                 'mb-3 text-sm font-medium text-slate-900',
                 'dark:text-slate-100'
               )}
             >
               Văn phòng Hà Nội
-            </h4>
+            </h3>
             <div
               className={clsx(
                 'my-3 h-px max-w-[52px] bg-black/10',
@@ -176,9 +176,9 @@ function Footer() {
 
           {/* Thông tin liên hệ */}
           <div className={clsx('lg:col-span-1')}>
-            <h4 className={clsx('mb-3 text-sm font-medium text-orange-500')}>
+            <h3 className={clsx('mb-3 text-sm font-medium text-orange-500')}>
               Thông tin liên hệ
-            </h4>
+            </h3>
             <div
               className={clsx(
                 'my-3 h-px max-w-[52px] bg-black/10',

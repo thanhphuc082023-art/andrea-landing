@@ -25,7 +25,7 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans, "")', ...defaultTheme.fontFamily.sans],
         mono: ['var(--font-mono, "")', ...defaultTheme.fontFamily.mono],
-        playfair: ['Playfair Display', ...defaultTheme.fontFamily.serif],
+        playfair: ['var(--font-playfair)', 'Playfair Display', ...defaultTheme.fontFamily.serif],
       },
       borderRadius: {
         15: '15px',
@@ -42,7 +42,7 @@ module.exports = {
         grayECO: '#BCBEC0',
         text: {
           primary: '#1A253A',
-          secondary: '#7D7D7D',
+          secondary: '#4B5563', // Darker gray for better contrast (instead of #7D7D7D)
         },
         card: {
           bg: '#F4F4F4',

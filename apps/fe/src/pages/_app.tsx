@@ -4,12 +4,14 @@ import RootLayout from '@/components/layouts/Root';
 import WithNavigationFooter from '@/components/layouts/WithNavigationFooter';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
 import Provider from '@/providers';
+import { playfairDisplay } from '@/lib/fonts';
 
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
 
 import '@/styles/main.css';
+import '@/styles/header-video.css';
 
 type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -37,11 +39,13 @@ function App({ Component, pageProps, router }: AppPropsWithLayout) {
   return (
     <Provider>
       <RootLayout>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        {getLayout(<Component {...pageProps} />)}
-        <div id="scroll-to-top" />
-        <ScrollToTopButton />
-        <GoogleAnalytics gaId="G-FB9QLDNKNN" />
+        <div className={playfairDisplay.variable}>
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          {getLayout(<Component {...pageProps} />)}
+          <div id="scroll-to-top" />
+          <ScrollToTopButton />
+          <GoogleAnalytics gaId="G-FB9QLDNKNN" />
+        </div>
       </RootLayout>
     </Provider>
   );

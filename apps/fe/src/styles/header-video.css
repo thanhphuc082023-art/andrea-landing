@@ -1,0 +1,32 @@
+/* Critical CSS for HeaderVideo component - Above the fold optimization */
+.header-video-container {
+  content-visibility: auto;
+  contain-intrinsic-size: 100vh;
+}
+
+/* Preload hints for better performance */
+.header-video-container img,
+.header-video-container video {
+  image-rendering: optimizeQuality;
+  transform: translateZ(0); /* Force hardware acceleration */
+  will-change: transform, opacity;
+}
+
+/* Optimize for mobile */
+@media (max-width: 767px) {
+  .header-video-container {
+    contain-intrinsic-size: calc(100vh - 60px);
+  }
+  
+  .header-video-container video {
+    display: none; /* Hide video on mobile by default */
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .header-video-container {
+    animation: none;
+    transition: none;
+  }
+}

@@ -71,8 +71,8 @@ function ServiceCard({
         <div className={clsx('flex flex-1 flex-col justify-between gap-14')}>
           <p
             className={clsx(
-              'text-text-secondary text-base font-normal leading-6 tracking-wide',
-              'dark:text-slate-300'
+              'text-base font-normal leading-6 tracking-wide',
+              'text-gray-700 dark:text-slate-300'
             )}
             style={{
               lineHeight: '24px',

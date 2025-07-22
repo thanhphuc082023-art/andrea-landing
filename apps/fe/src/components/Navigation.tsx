@@ -30,7 +30,7 @@ function Navbar() {
       <div className="max-sd:h-[60px] h-20 w-full bg-[#EFEFEF]">
         <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
+          <Link href="/" className="flex-shrink-0" aria-label="Andrea - Trang chủ">
             <StrapiLogo
               width={110}
               height={41}
@@ -49,7 +49,7 @@ function Navbar() {
                   'text-lg transition-colors duration-200',
                   activeItem === item.title
                     ? 'text-brand-orange hover:text-brand-orange/80 font-bold'
-                    : 'font-normal text-black/50 hover:text-black/70'
+                    : 'font-normal text-gray-700 hover:text-gray-900'
                 )}
                 onClick={() => setActiveItem(item.title)}
               >
@@ -61,13 +61,33 @@ function Navbar() {
           {/* Mobile Menu Button */}
           <button
             type="button"
-            className="flex flex-col gap-1 md:hidden"
-            aria-label="Toggle menu"
+            className="relative flex h-8 w-8 flex-col justify-center md:hidden cursor-pointer"
             onClick={toggleMobileMenu}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleMobileMenu();
+              }
+            }}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation"
           >
-            <span className="bg-brand-orange h-0.5 w-6" />
-            <span className="bg-brand-orange h-0.5 w-6" />
-            <span className="bg-brand-orange h-0.5 w-6" />
+            <m.span
+              className="bg-brand-orange absolute top-1/2 h-1 w-full -translate-x-1/2 origin-center rounded"
+              animate={isMobileMenuOpen ? { rotate: 45, y: 0 } : { rotate: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            />
+            <m.span
+              className="bg-brand-orange absolute top-1/2 h-1 w-full -translate-x-1/2 origin-center rounded"
+              animate={isMobileMenuOpen ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+            />
+            <m.span
+              className="bg-brand-orange absolute top-1/2 h-1 w-full -translate-x-1/2 origin-center rounded"
+              animate={isMobileMenuOpen ? { rotate: -45, y: 0 } : { rotate: 0, y: 10 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            />
           </button>
         </div>
       </div>
@@ -85,6 +105,7 @@ function Navbar() {
               opacity: { duration: 0.2 }
             }}
             className="fixed inset-0 top-[60px] z-[999] bg-[#EFEFEF] md:hidden max-sd:top-[60px] lg:top-20"
+            id="mobile-navigation"
           >
             <nav className="flex h-full flex-col gap-6 px-6 py-8">
               {navigationItems.map((item, index) => (
@@ -105,7 +126,7 @@ function Navbar() {
                       'hover:translate-x-2 hover:border-brand-orange/30',
                       activeItem === item.title
                         ? 'font-bold text-[#EE4823] translate-x-1'
-                        : 'font-normal text-black/70 hover:text-black'
+                        : 'font-normal text-gray-700 hover:text-gray-900'
                     )}
                     onClick={() => handleMobileMenuClick(item.title)}
                   >

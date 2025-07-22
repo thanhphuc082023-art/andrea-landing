@@ -18,11 +18,14 @@ function ContactForm() {
 
           {/* Contact Form */}
           <form className={clsx('space-y-6')}>
-            {/* First Row - Name and Phone */}
+            {/* First Row - Name */}
             <div>
               <input
+                id="name"
+                name="name"
                 type="text"
                 placeholder="Tên của bạn"
+                aria-label="Tên của bạn"
                 className={clsx(
                   'w-full px-4 py-3',
                   'border border-gray-400/50 bg-transparent text-white',
@@ -35,8 +38,11 @@ function ContactForm() {
             <div className={clsx('grid grid-cols-1 gap-6 md:grid-cols-2')}>
               <div>
                 <input
+                  id="phone"
+                  name="phone"
                   type="tel"
                   placeholder="Số điện thoại"
+                  aria-label="Số điện thoại"
                   className={clsx(
                     'w-full px-4 py-3',
                     'border border-gray-400/50 bg-transparent text-white',
@@ -48,8 +54,11 @@ function ContactForm() {
               </div>
               <div>
                 <input
+                  id="email"
+                  name="email"
                   type="email"
                   placeholder="Email"
+                  aria-label="Email"
                   className={clsx(
                     'w-full px-4 py-3',
                     'border border-gray-400/50 bg-transparent text-white',
@@ -61,14 +70,15 @@ function ContactForm() {
               </div>
             </div>
 
-            {/* Second Row - Email */}
-
             {/* Third Row - Company and Security Code */}
             <div className={clsx('grid grid-cols-1 gap-6 md:grid-cols-2')}>
               <div className={clsx('md:col-span-1')}>
                 <input
+                  id="company"
+                  name="company"
                   type="text"
                   placeholder="Tên công ty/ Ngành nghề"
+                  aria-label="Tên công ty/ Ngành nghề"
                   className={clsx(
                     'w-full px-4 py-3',
                     'border border-gray-400/50 bg-transparent text-white',
@@ -81,8 +91,11 @@ function ContactForm() {
               <div className="grid grid-cols-1 gap-6 md:col-span-1 md:grid-cols-3">
                 <div className="md:col-span-2">
                   <input
+                    id="security-code"
+                    name="securityCode"
                     type="text"
                     placeholder="Mã bảo mật"
+                    aria-label="Mã bảo mật"
                     className={clsx(
                       'w-full px-4 py-3',
                       'border border-gray-400/50 bg-transparent text-white',
@@ -94,7 +107,10 @@ function ContactForm() {
                 </div>
                 <div className="md:col-span-1">
                   <input
+                    id="captcha"
+                    name="captcha"
                     type="text"
+                    aria-label="Mã xác thực"
                     className={clsx(
                       'w-full px-4 py-3',
                       'border border-gray-400/50 bg-gray-300 text-gray-600',
@@ -110,7 +126,10 @@ function ContactForm() {
             {/* Fourth Row - Message */}
             <div>
               <textarea
+                id="message"
+                name="message"
                 placeholder="Nội dung yêu cầu"
+                aria-label="Nội dung yêu cầu"
                 rows={4}
                 className={clsx(
                   'w-full px-4 py-3',

@@ -103,6 +103,7 @@ function Blog() {
               'bg-brand-orange text-white',
               'transition-all duration-300 hover:bg-orange-600'
             )}
+            aria-label="Xem thêm bài viết blog"
           >
             Xem thêm
           </button>
