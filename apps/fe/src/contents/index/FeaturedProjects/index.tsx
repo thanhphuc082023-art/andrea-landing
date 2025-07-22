@@ -38,7 +38,7 @@ function FeaturedProjects() {
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   quality={85}
-                  priority
+                  priority={true}
                 />
               </div>
 

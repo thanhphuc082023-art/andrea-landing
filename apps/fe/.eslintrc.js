@@ -8,5 +8,6 @@ module.exports = {
   },
   rules: {
     'react/jsx-props-no-spreading': 'off',
+    'react/jsx-boolean-value': 'off',
   },
 };

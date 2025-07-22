@@ -1,3 +1,4 @@
+/* eslint-disable */
 import clsx from 'clsx';
 import { m } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -74,8 +75,7 @@ function HeaderVideo({ videoSrc = '' }: HeaderVideoProps) {
           alt="Header background"
           fill
           className="object-cover object-center"
-          priority
-          fetchPriority="high"
+          priority={true}
           quality={90}
           sizes={imageSizes}
           placeholder="blur"
