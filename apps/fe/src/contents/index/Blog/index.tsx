@@ -75,9 +75,13 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
       </div>
 
       {/* Mobile Layout */}
-      <div className={clsx('md:hidden flex gap-4 overflow-hidden bg-white')}>
+      <div className={clsx('flex gap-4 overflow-hidden bg-white md:hidden')}>
         {/* Image */}
-        <div className={clsx('relative w-[177px] h-[127px] flex-shrink-0 rounded-10 overflow-hidden')}>
+        <div
+          className={clsx(
+            'rounded-10 relative h-[127px] w-[177px] flex-shrink-0 overflow-hidden'
+          )}
+        >
           <Image
             src={post.image}
             alt={post.title}
@@ -92,13 +96,15 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
         </div>
 
         {/* Content */}
-        <div className={clsx('flex-1 flex flex-col items-start justify-between')}>
+        <div
+          className={clsx('flex flex-1 flex-col items-start justify-between')}
+        >
           <div>
             <p className={clsx('mb-2 text-xs text-black/50')}>{post.date}</p>
             <h3
               className={clsx(
                 'text-sm font-medium text-black',
-                'line-clamp-2 leading-tight mb-2'
+                'mb-2 line-clamp-2 leading-tight'
               )}
             >
               {post.title}
@@ -123,7 +129,7 @@ function Blog() {
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
         {/* Section Title */}
-        <div className={clsx('mb-12 max-sd:mb-14 max-md:mb-11')}>
+        <div className={clsx('max-sd:mb-14 mb-12 max-md:mb-11')}>
           <h2
             className={clsx(
               'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
@@ -134,7 +140,12 @@ function Blog() {
         </div>
 
         {/* Blog Grid */}
-        <div className={clsx('grid grid-cols-1 gap-8 md:grid-cols-3', 'max-md:gap-4')}>
+        <div
+          className={clsx(
+            'grid grid-cols-1 gap-8 md:grid-cols-3',
+            'max-md:gap-4'
+          )}
+        >
           {blogPosts.map((post) => (
             <BlogCard key={post.id} post={post} />
           ))}

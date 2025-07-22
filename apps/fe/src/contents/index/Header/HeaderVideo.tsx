@@ -17,7 +17,7 @@ function HeaderVideo({ videoSrc = '' }: HeaderVideoProps) {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      
+
       // Only show video on mobile if connection is good
       if (mobile && 'connection' in navigator) {
         const { effectiveType, saveData } = (navigator as any).connection || {};
@@ -37,14 +37,16 @@ function HeaderVideo({ videoSrc = '' }: HeaderVideoProps) {
     setShouldShowVideo(false);
   };
 
-  const baseImageUrl = "https://api.builder.io/api/v1/image/assets/TEMP/aa900ed26675db6e843778c020dcbb13b0f69d38";
-  const imageSizes = "(max-width: 480px) 480px, (max-width: 768px) 768px, (max-width: 1024px) 1024px, (max-width: 1440px) 1440px, 1920px";
+  const baseImageUrl =
+    'https://api.builder.io/api/v1/image/assets/TEMP/aa900ed26675db6e843778c020dcbb13b0f69d38';
+  const imageSizes =
+    '(max-width: 480px) 480px, (max-width: 768px) 768px, (max-width: 1024px) 1024px, (max-width: 1440px) 1440px, 1920px';
   const primaryImageSrc = `${baseImageUrl}?width=${isMobile ? '768' : '1920'}&format=webp`;
 
   return (
     <m.div
       className={clsx(
-        'header-video-container inset-0 z-0 overflow-hidden relative',
+        'header-video-container relative inset-0 z-0 overflow-hidden',
         'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-80px)]'
       )}
       initial={{ opacity: 0, scale: 1.1 }}
@@ -53,9 +55,7 @@ function HeaderVideo({ videoSrc = '' }: HeaderVideoProps) {
     >
       {videoSrc && shouldShowVideo && !isMobile && !videoError ? (
         <video
-          className={clsx(
-            'w-full h-full object-cover'
-          )}
+          className={clsx('h-full w-full object-cover')}
           autoPlay
           muted
           loop

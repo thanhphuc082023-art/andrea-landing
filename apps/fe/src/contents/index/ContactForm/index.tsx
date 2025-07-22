@@ -17,7 +17,7 @@ function ContactForm() {
           </div>
 
           {/* Contact Form */}
-          <form className={clsx('md:space-y-6 space-y-3')}>
+          <form className={clsx('space-y-3 md:space-y-6')}>
             {/* First Row - Name */}
             <div>
               <input
@@ -37,7 +37,7 @@ function ContactForm() {
             </div>
 
             {/* Second Row - Phone and Email */}
-            <div className={clsx('grid md:gap-6 gap-2 grid-cols-2')}>
+            <div className={clsx('grid grid-cols-2 gap-2 md:gap-6')}>
               <div>
                 <input
                   id="phone"
@@ -73,7 +73,9 @@ function ContactForm() {
             </div>
 
             {/* Third Row - Company and Security Code */}
-            <div className={clsx('grid grid-cols-1 md:gap-6 gap-3 md:grid-cols-2')}>
+            <div
+              className={clsx('grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-6')}
+            >
               <div className={clsx('md:col-span-1')}>
                 <input
                   id="company"
@@ -91,8 +93,8 @@ function ContactForm() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 md:gap-6 gap-2 md:col-span-1 md:grid-cols-3">
-                <div className="md:col-span-2 col-span-1">
+              <div className="grid grid-cols-2 gap-2 md:col-span-1 md:grid-cols-3 md:gap-6">
+                <div className="col-span-1 md:col-span-2">
                   <input
                     id="security-code"
                     name="securityCode"
@@ -108,7 +110,7 @@ function ContactForm() {
                     )}
                   />
                 </div>
-                <div className="md:col-span-1 col-span-1">
+                <div className="col-span-1 md:col-span-1">
                   <input
                     id="captcha"
                     name="captcha"

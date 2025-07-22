@@ -6,7 +6,7 @@ function FeaturedProjects() {
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
         {/* Section Title */}
-        <div className={clsx('mb-12 max-sd:mb-14 max-md:mb-11')}>
+        <div className={clsx('max-sd:mb-14 mb-12 max-md:mb-11')}>
           <h2
             className={clsx(
               'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
