@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "figma-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "figma-developer-mcp",
+        "--stdio",
+      ]
+    }
+  },
+  "inputs": []
+}
