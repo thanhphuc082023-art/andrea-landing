@@ -5,7 +5,7 @@ function Error404Contents() {
   return (
     <div
       className={clsx(
-        'background-grid flex h-full items-center justify-center'
+        'background-grid flex h-screen items-center justify-center'
       )}
     >
       <div

@@ -28,6 +28,7 @@ module.exports = {
         playfair: ['var(--font-playfair)', 'Playfair Display', ...defaultTheme.fontFamily.serif],
       },
       borderRadius: {
+        10: '10px',
         15: '15px',
         30: '30px',
       },
@@ -37,7 +38,8 @@ module.exports = {
           dark: colors.slate[800],
         },
         brand: {
-          orange: '#F15A24',
+          orange: '#E5511A', // Darker orange for better contrast (was #F15A24)
+          'orange-light': '#F15A24', // Original orange for backgrounds
         },
         grayECO: '#BCBEC0',
         text: {

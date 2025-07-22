@@ -38,7 +38,7 @@ function Footer() {
             </p>
 
             <div>
-              <h2 className={clsx('mb-3 text-sm font-medium text-orange-500')}>
+              <h2 className={clsx('mb-3 text-sm font-medium text-brand-orange')}>
                 Kết nối với chúng tôi
               </h2>
               <div className={clsx('flex gap-3')}>
@@ -176,7 +176,7 @@ function Footer() {
 
           {/* Thông tin liên hệ */}
           <div className={clsx('lg:col-span-1')}>
-            <h3 className={clsx('mb-3 text-sm font-medium text-orange-500')}>
+            <h3 className={clsx('mb-3 text-sm font-medium text-brand-orange')}>
               Thông tin liên hệ
             </h3>
             <div

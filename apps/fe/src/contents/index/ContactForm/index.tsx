@@ -6,7 +6,7 @@ function ContactForm() {
       <div className={clsx('content-wrapper mx-auto')}>
         <div className={clsx('mx-auto max-w-4xl')}>
           {/* Section Title */}
-          <div className={clsx('mb-16 text-center')}>
+          <div className={clsx('mb-16 text-center max-md:mb-12')}>
             <h2
               className={clsx(
                 'font-playfair text-4xl font-medium text-white lg:text-5xl'
@@ -17,7 +17,7 @@ function ContactForm() {
           </div>
 
           {/* Contact Form */}
-          <form className={clsx('space-y-6')}>
+          <form className={clsx('md:space-y-6 space-y-3')}>
             {/* First Row - Name */}
             <div>
               <input
@@ -35,7 +35,9 @@ function ContactForm() {
                 )}
               />
             </div>
-            <div className={clsx('grid grid-cols-1 gap-6 md:grid-cols-2')}>
+
+            {/* Second Row - Phone and Email */}
+            <div className={clsx('grid md:gap-6 gap-2 grid-cols-2')}>
               <div>
                 <input
                   id="phone"
@@ -71,7 +73,7 @@ function ContactForm() {
             </div>
 
             {/* Third Row - Company and Security Code */}
-            <div className={clsx('grid grid-cols-1 gap-6 md:grid-cols-2')}>
+            <div className={clsx('grid grid-cols-1 md:gap-6 gap-3 md:grid-cols-2')}>
               <div className={clsx('md:col-span-1')}>
                 <input
                   id="company"
@@ -88,8 +90,9 @@ function ContactForm() {
                   )}
                 />
               </div>
-              <div className="grid grid-cols-1 gap-6 md:col-span-1 md:grid-cols-3">
-                <div className="md:col-span-2">
+
+              <div className="grid grid-cols-2 md:gap-6 gap-2 md:col-span-1 md:grid-cols-3">
+                <div className="md:col-span-2 col-span-1">
                   <input
                     id="security-code"
                     name="securityCode"
@@ -105,7 +108,7 @@ function ContactForm() {
                     )}
                   />
                 </div>
-                <div className="md:col-span-1">
+                <div className="md:col-span-1 col-span-1">
                   <input
                     id="captcha"
                     name="captcha"

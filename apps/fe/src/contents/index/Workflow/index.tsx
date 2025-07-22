@@ -15,6 +15,8 @@ function Workflow() {
                 alt="Workflow step 1"
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 40vw"
+                quality={75}
               />
             </div>
           </div>
@@ -27,6 +29,9 @@ function Workflow() {
                 alt="Workflow step 3"
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 20vw"
+                quality={75}
+                loading="lazy"
               />
             </div>
           </div>

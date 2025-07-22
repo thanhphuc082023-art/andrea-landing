@@ -39,12 +39,18 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
     optimizeCss: true,
+    optimizePackageImports: ['framer-motion', 'clsx'],
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   // Performance optimizations
   swcMinify: true,
+  modularizeImports: {
+    'framer-motion': {
+      transform: 'framer-motion/dist/es/{{member}}',
+    },
+  },
   async headers() {
     return [
       {

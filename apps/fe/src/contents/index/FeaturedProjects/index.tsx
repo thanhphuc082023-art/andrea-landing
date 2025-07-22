@@ -6,7 +6,7 @@ function FeaturedProjects() {
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
         {/* Section Title */}
-        <div className={clsx('mb-12')}>
+        <div className={clsx('mb-12 max-sd:mb-14 max-md:mb-11')}>
           <h2
             className={clsx(
               'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
@@ -36,6 +36,8 @@ function FeaturedProjects() {
                   alt="Mitsubishi project"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  quality={75}
                 />
               </div>
 
@@ -73,6 +75,8 @@ function FeaturedProjects() {
                   alt="Mobifone project"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  quality={75}
                 />
               </div>
 

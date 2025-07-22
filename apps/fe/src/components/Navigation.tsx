@@ -27,7 +27,7 @@ function Navbar() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[1000] w-full">
-      <div className="max-sd:h-[60px] h-20 w-full bg-[#EFEFEF]">
+      <div className="max-sd:h-[60px] h-20 w-full bg-[#F5F5F5]">
         <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0" aria-label="Andrea - Trang chủ">
