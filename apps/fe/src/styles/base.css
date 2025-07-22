@@ -3,6 +3,21 @@
 @tailwind base;
 
 @layer base {
+  /* Prevent layout shifts during font loading */
+  html {
+    font-display: swap;
+  }
+
+  /* Hide content until fonts are loaded to prevent FOUT */
+  html:not(.fonts-loaded) {
+    visibility: hidden;
+  }
+
+  /* Show content once fonts are ready */
+  html.fonts-loaded {
+    visibility: visible;
+  }
+
   html {
     -webkit-tap-highlight-color: transparent;
     @apply scroll-smooth;

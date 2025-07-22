@@ -37,7 +37,8 @@ function FeaturedProjects() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 60vw"
-                  quality={75}
+                  quality={85}
+                  priority
                 />
               </div>
 
@@ -76,7 +77,8 @@ function FeaturedProjects() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  quality={75}
+                  quality={85}
+                  loading="eager"
                 />
               </div>
 

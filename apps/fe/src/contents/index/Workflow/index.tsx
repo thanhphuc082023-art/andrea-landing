@@ -16,7 +16,8 @@ function Workflow() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 40vw"
-                quality={75}
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -30,7 +31,7 @@ function Workflow() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 20vw"
-                quality={75}
+                quality={80}
                 loading="lazy"
               />
             </div>
@@ -44,6 +45,8 @@ function Workflow() {
                 alt="Workflow step 2"
                 fill
                 className="object-cover"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -56,6 +59,8 @@ function Workflow() {
                 alt="Workflow step 4"
                 fill
                 className="object-cover"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -68,6 +73,8 @@ function Workflow() {
                 alt="Workflow step 5"
                 fill
                 className="object-cover"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -80,6 +87,8 @@ function Workflow() {
                 alt="Workflow step 6"
                 fill
                 className="object-cover"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -96,6 +105,8 @@ function Workflow() {
                 alt="Workflow step 7"
                 fill
                 className="object-cover"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -108,6 +119,8 @@ function Workflow() {
                 alt="Workflow step 8"
                 fill
                 className="object-cover"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>

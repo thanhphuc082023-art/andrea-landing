@@ -40,12 +40,35 @@ const nextConfig = {
     scrollRestoration: true,
     optimizeCss: true,
     optimizePackageImports: ['framer-motion', 'clsx'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+    // Enable modern JavaScript features
+    legacyBrowsers: false,
+    browsersListForSwc: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   // Performance optimizations
   swcMinify: true,
+  webpack: (config, { dev, isServer }) => {
+    // Enable modern JavaScript features for better performance
+    if (!dev && !isServer) {
+      config.target = ['web', 'es2020'];
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // Ensure modern builds
+        '@babel/runtime': '@babel/runtime',
+      };
+    }
+    return config;
+  },
   modularizeImports: {
     'framer-motion': {
       transform: 'framer-motion/dist/es/{{member}}',
