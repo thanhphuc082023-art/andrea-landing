@@ -1,42 +1,15 @@
 import Script from 'next/script';
-import { memo, useEffect } from 'react';
-
-// Performance optimization helper
-// This component helps preload critical resources and optimize rendering
+import { memo } from 'react';
 
 export function PerformanceOptimizations() {
-  useEffect(() => {
-    // Optimize font loading to prevent layout shifts
-    if (typeof window !== 'undefined' && 'fonts' in document) {
-      document.fonts.ready.then(() => {
-        // Fonts are loaded, layout is stable
-        document.documentElement.classList.add('fonts-loaded');
-      });
-    }
-
-    // Optimize scroll behavior to prevent forced reflows
-    let ticking = false;
-    const optimizeScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          // Batch scroll-related DOM operations here
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', optimizeScroll, { passive: true });
-    return () => window.removeEventListener('scroll', optimizeScroll);
-  }, []);
   return (
     <>
       {/* Preload critical resources */}
       <link
         rel="preload"
-        href="/fonts/playfair-display-latin-400-normal.woff2"
+        href="/fonts/PlayfairDisplay-Regular.ttf"
         as="font"
-        type="font/woff2"
+        type="font/ttf"
         crossOrigin="anonymous"
       />
 

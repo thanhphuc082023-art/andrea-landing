@@ -12,6 +12,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import '@/styles/main.css';
 import '@/styles/header-video.css';
+import FontLoaderEffect from '@/components/FontLoaderEffect';
 
 type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -41,6 +42,7 @@ function App({ Component, pageProps, router }: AppPropsWithLayout) {
       <RootLayout>
         <div className={playfairDisplay.variable}>
           {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          <FontLoaderEffect />
           {getLayout(<Component {...pageProps} />)}
           <div id="scroll-to-top" />
           <ScrollToTopButton />
