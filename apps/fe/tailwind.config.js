@@ -18,6 +18,7 @@ module.exports = {
         'max-sd': { max: '1194px' },
         'max-lg': { max: '1024px' },
         'max-md': { max: '768px' },
+        'max-370': { max: '370px' },
       },
       fontSize: {
         14: '14px',

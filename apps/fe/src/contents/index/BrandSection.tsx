@@ -14,7 +14,7 @@ function BrandSection() {
           <h2
             className={clsx(
               'font-playfair max-sd:text-[65px] text-[85px] text-white max-md:text-[55px]',
-              'font-medium max-md:mb-2'
+              'max-370:!text-[40px] max-370:leading-[55px] font-medium max-md:mb-2'
             )}
           >
             Andrea
@@ -23,13 +23,13 @@ function BrandSection() {
           {/* Subtitle */}
           <h3
             className={clsx(
-              'font-playfair max-sd:text-[28px] max-md: text-[35px] text-white',
+              'font-playfair max-sd:text-[28px] text-white',
               'mb-6 font-medium md:mb-8',
-              'max-sd:leading-[60px] leading-[80px] max-md:leading-[45px]'
+              'max-sd:leading-[60px] max-370:text-[20px] max-370:leading-[30px] leading-[80px] max-md:leading-[45px]'
             )}
           >
             Tư vấn & thiết kế <br className="hidden max-md:block" /> thương hiệu{' '}
-            <span className="text-brand-orange max-sd:text-[40px] max-md: text-[55px] italic">
+            <span className="text-brand-orange max-sd:!text-[40px] max-370:!text-[30px] !text-[55px] italic">
               Cảm xúc
             </span>
           </h3>
