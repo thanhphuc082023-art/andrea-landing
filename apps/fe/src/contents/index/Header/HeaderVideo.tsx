@@ -1,62 +1,44 @@
-/* eslint-disable */
 import clsx from 'clsx';
-import { m } from 'framer-motion';
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import type { GlobalEntity } from '@/types/strapi';
 
 interface HeaderVideoProps {
   videoSrc?: string;
+  serverGlobal?: GlobalEntity;
 }
 
-function HeaderVideo({ videoSrc = '' }: HeaderVideoProps) {
-  const [isMobile, setIsMobile] = useState(false);
-  const [shouldShowVideo, setShouldShowVideo] = useState(false);
-  const [videoError, setVideoError] = useState(false);
+// Pure static component - renders at build time, no client-side JavaScript
+function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
+  // Static video source - determined at build time
+  const finalVideoSrc = videoSrc;
 
-  useEffect(() => {
-    // Check if device is mobile and has good connection
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-
-      // Only show video on mobile if connection is good
-      if (mobile && 'connection' in navigator) {
-        const { effectiveType, saveData } = (navigator as any).connection || {};
-        setShouldShowVideo(effectiveType === '4g' && !saveData);
-      } else if (!mobile) {
-        setShouldShowVideo(true);
-      }
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const handleVideoError = () => {
-    setVideoError(true);
-    setShouldShowVideo(false);
-  };
-
-  const baseImageUrl =
+  // Optimize image loading - use server data if available for better performance
+  const fallbackImageUrl =
     'https://api.builder.io/api/v1/image/assets/TEMP/aa900ed26675db6e843778c020dcbb13b0f69d38';
+
+  // Use site favicon or logo as fallback image if available
+  const strapiImageFallback = serverGlobal?.attributes?.favicon?.url;
+
+  // Use optimized image URL for better performance - static values at build time
   const imageSizes =
     '(max-width: 480px) 480px, (max-width: 768px) 768px, (max-width: 1024px) 1024px, (max-width: 1440px) 1440px, 1920px';
 
-  // Optimize image URL based on device
-  const primaryImageSrc = `${baseImageUrl}?width=${isMobile ? '768' : '1920'}&format=webp&quality=85`;
+  // Static image source - optimized for desktop by default, responsive via CSS
+  const primaryImageSrc =
+    strapiImageFallback ||
+    `${fallbackImageUrl}?width=1920&format=webp&quality=85`;
+
+  // Static video display logic - no client-side JavaScript
+  const shouldShowVideo = Boolean(finalVideoSrc);
 
   return (
-    <m.div
+    <div
       className={clsx(
         'header-video-container relative inset-0 z-0 overflow-hidden',
         'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-80px)]'
       )}
-      initial={{ opacity: 0, scale: 1 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6 }}
     >
-      {/* Always show image first for LCP optimization */}
+      {/* Static image - always rendered at build time for optimal LCP */}
       <Image
         src={primaryImageSrc}
         alt="Header background"
@@ -70,32 +52,25 @@ function HeaderVideo({ videoSrc = '' }: HeaderVideoProps) {
         blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
       />
 
-      {/* Load video after image for better performance */}
-      {videoSrc && shouldShowVideo && !isMobile && !videoError && (
+      {/* Static video element - rendered at build time, auto-plays on desktop */}
+      {finalVideoSrc && shouldShowVideo && (
         <video
           className={clsx(
-            'absolute inset-0 h-full w-full object-cover opacity-0'
+            'absolute inset-0 h-full w-full object-cover',
+            // CSS-only responsive behavior - hide on mobile
+            'max-md:hidden'
           )}
           autoPlay
           muted
           loop
           playsInline
-          preload="none"
-          onCanPlayThrough={() => {
-            // Fade in video once it's ready to play
-            const video = document.querySelector('video');
-            if (video) {
-              video.style.opacity = '1';
-              video.style.transition = 'opacity 0.5s ease-in-out';
-            }
-          }}
-          onError={handleVideoError}
+          preload="metadata"
         >
-          <source src={videoSrc} type="video/mp4" onError={handleVideoError} />
+          <source src={finalVideoSrc} type="video/mp4" />
           <track kind="captions" src="" srcLang="vi" label="Vietnamese" />
         </video>
       )}
-    </m.div>
+    </div>
   );
 }
 

@@ -3,18 +3,35 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import StrapiLogo from '@/components/StrapiLogo';
+import type { StrapiNavigationItem, GlobalEntity } from '@/types/strapi';
 
-function Navbar() {
+interface NavbarProps {
+  // Optional server-side data for static generation
+  serverGlobal?: GlobalEntity;
+}
+
+function Navbar({ serverGlobal = null }: NavbarProps) {
   const [activeItem, setActiveItem] = useState('Về chúng tôi');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navigationItems = [
+  // Default navigation items (fallback)
+  const defaultNavigationItems = [
     { title: 'Về chúng tôi', href: '/about' },
     { title: 'Dịch vụ', href: '/services' },
     { title: 'Dự án', href: '/projects' },
     { title: 'Góc nhìn', href: '/insights' },
     { title: 'Liên hệ', href: '/contact' },
   ];
+
+  // Use server navigation if available, otherwise use client navigation or fallback
+  const navigationItems = serverGlobal?.attributes?.navigation?.header?.length
+    ? serverGlobal.attributes.navigation.header.map(
+        (item: StrapiNavigationItem) => ({
+          title: item.label,
+          href: item.url,
+        })
+      )
+    : defaultNavigationItems;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -40,6 +57,7 @@ function Navbar() {
               height={41}
               className="max-sd:w-[84px] max-sd:h-[31px] h-[41px] w-[110px]"
               fallbackToDefault
+              serverGlobal={serverGlobal}
             />
           </Link>
 

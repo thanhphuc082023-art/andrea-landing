@@ -1,7 +1,6 @@
 import NextHead from 'next/head';
-import { useGlobal } from '@/providers/GlobalProvider';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
-import type { StrapiSEO } from '@/types/strapi';
+import type { GlobalEntity, StrapiSEO } from '@/types/strapi';
 
 interface StrapiHeadProps {
   title?: string;
@@ -10,6 +9,7 @@ interface StrapiHeadProps {
   overrideTitle?: boolean;
   structuredData?: string;
   seo?: StrapiSEO;
+  global?: GlobalEntity;
 }
 
 function StrapiHead({
@@ -19,11 +19,9 @@ function StrapiHead({
   overrideTitle = false,
   structuredData = '',
   seo = {},
+  global = null,
 }: StrapiHeadProps) {
   const currentUrl = useCurrentUrl();
-  const { global, isLoading } = useGlobal();
-
-  // Use Strapi global data as fallback
   const siteName = global?.attributes?.siteName || 'ANDREA';
   const siteDescription =
     global?.attributes?.siteDescription ||

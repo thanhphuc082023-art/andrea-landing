@@ -2,7 +2,6 @@ import Image from 'next/image';
 import clsx from 'clsx';
 
 import AgencyLogo from '@/assets/icons/AgencyLogo';
-import { useGlobal } from '@/providers/GlobalProvider';
 
 interface StrapiLogoProps {
   active?: boolean;
@@ -10,6 +9,7 @@ interface StrapiLogoProps {
   width?: number;
   height?: number;
   fallbackToDefault?: boolean;
+  serverGlobal?: any; // Add server-side global data support
 }
 
 function StrapiLogo({
@@ -18,14 +18,14 @@ function StrapiLogo({
   width = 120,
   height = 40,
   fallbackToDefault = true,
+  serverGlobal = null,
 }: StrapiLogoProps) {
-  const { global, isLoading } = useGlobal();
-
-  const logoUrl = global?.attributes?.logo?.url;
-  const siteName = global?.attributes?.siteName || 'ANDREA';
+  const currentGlobal = serverGlobal || global;
+  const logoUrl = currentGlobal?.attributes?.logo?.url;
+  const siteName = currentGlobal?.attributes?.siteName || 'ANDREA';
 
   // If Strapi logo is available, use it
-  if (logoUrl && !isLoading) {
+  if (logoUrl) {
     return (
       <div className={clsx('flex items-center', className)}>
         <Image
@@ -41,22 +41,10 @@ function StrapiLogo({
   }
 
   // If no logoUrl, show AgencyLogo
-  if (!logoUrl && !isLoading) {
+  if (!logoUrl) {
     return (
       <div className={clsx('flex items-center', className)}>
         <AgencyLogo width={width} height={height} />
-      </div>
-    );
-  }
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className={clsx('flex items-center', className)}>
-        <div
-          className="animate-pulse rounded bg-gray-200 dark:bg-gray-700"
-          style={{ width, height }}
-        />
       </div>
     );
   }

@@ -9,21 +9,30 @@ import { playfairDisplay } from '@/lib/fonts';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
+import type { GlobalEntity } from '@/types/strapi';
 
 import '@/styles/main.css';
 import '@/styles/header-video.css';
 import FontLoaderEffect from '@/components/FontLoaderEffect';
 
 type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode;
+  getLayout?: (page: ReactElement, pageProps?: any) => ReactNode;
 };
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+  pageProps: {
+    serverGlobal?: GlobalEntity;
+    [key: string]: any;
+  };
 };
 
-function getDefaultLayout(page: ReactElement): ReactNode {
-  return <WithNavigationFooter>{page}</WithNavigationFooter>;
+function getDefaultLayout(page: ReactElement, pageProps?: any): ReactNode {
+  return (
+    <WithNavigationFooter serverGlobal={pageProps?.serverGlobal}>
+      {page}
+    </WithNavigationFooter>
+  );
 }
 
 function App({ Component, pageProps, router }: AppPropsWithLayout) {
@@ -32,9 +41,9 @@ function App({ Component, pageProps, router }: AppPropsWithLayout) {
   if (router.query.simpleLayout) {
     getLayout = (page: ReactElement) => <main>{page}</main>;
   } else if (Component.getLayout) {
-    getLayout = Component.getLayout;
+    getLayout = (page: ReactElement) => Component.getLayout!(page, pageProps);
   } else {
-    getLayout = getDefaultLayout;
+    getLayout = (page: ReactElement) => getDefaultLayout(page, pageProps);
   }
 
   return (

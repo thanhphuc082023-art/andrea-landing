@@ -219,9 +219,6 @@ const { global } = useGlobal();
 // Logo with Strapi fallback
 <StrapiLogo width={120} height={40} fallbackToDefault={true} />
 
-// Global info
-<GlobalInfo type="siteName" fallback="Default Site Name" />
-
 // SEO head
 <StrapiHead seo={article?.attributes?.seo} />
 ```

@@ -6,7 +6,6 @@ import ColorAccentProvider from '@/providers/ColorAccentProvider';
 import FocusModeProvider from '@/providers/FocusModeProvider';
 import FramerMotionProvider from '@/providers/FramerMotionProvider';
 import GlobalStateProvider from '@/providers/GlobalStateProvider';
-import GlobalProvider from '@/providers/GlobalProvider';
 
 import type { PropsWithChildren } from 'react';
 
@@ -21,11 +20,9 @@ function Provider({ children = null }: PropsWithChildren) {
         <FocusModeProvider>
           <ColorAccentProvider defaultScheme="violet">
             <GlobalStateProvider>
-              <GlobalProvider>
-                <MDXProvider components={mdxCustomComponents}>
-                  {children}
-                </MDXProvider>
-              </GlobalProvider>
+              <MDXProvider components={mdxCustomComponents}>
+                {children}
+              </MDXProvider>
             </GlobalStateProvider>
           </ColorAccentProvider>
         </FocusModeProvider>

@@ -2,14 +2,22 @@ import clsx from 'clsx';
 
 import HeaderVideo from '@/contents/index/Header/HeaderVideo';
 import NewHeaderTitle from '@/contents/index/Header/NewHeaderTitle';
+import type { GlobalEntity } from '@/types/strapi';
 
-function Header() {
+interface HeaderProps {
+  serverGlobal?: GlobalEntity;
+}
+
+function Header({ serverGlobal = null }: HeaderProps) {
   return (
     <header
       id="page-header"
       className={clsx('relative overflow-hidden', 'max-sd:mt-[60px] mt-20')}
     >
-      <HeaderVideo videoSrc="https://andrea.vn/uploads/videos/intro-website_3.mp4" />
+      <HeaderVideo
+        videoSrc="https://andrea.vn/uploads/videos/intro-website_3.mp4"
+        serverGlobal={serverGlobal}
+      />
 
       {/* Content */}
       <div

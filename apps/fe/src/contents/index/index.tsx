@@ -8,12 +8,17 @@ import Partners from '@/contents/index/Partners';
 import Blog from '@/contents/index/Blog';
 import ContactForm from '@/contents/index/ContactForm';
 import clsx from 'clsx';
+import type { GlobalEntity } from '@/types/strapi';
 
-function IndexContents() {
+interface IndexContentsProps {
+  serverGlobal?: GlobalEntity;
+}
+
+function IndexContents({ serverGlobal = null }: IndexContentsProps) {
   return (
     <>
       <div className={clsx('pb-20 lg:pb-28')}>
-        <Header />
+        <Header serverGlobal={serverGlobal} />
       </div>
       <div className={clsx('mb-20', 'lg:mb-28')}>
         <BrandSection />

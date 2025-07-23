@@ -1,18 +1,22 @@
+import type { GetStaticProps } from 'next';
 import StrapiHead from '@/components/meta/StrapiHead';
-import { useGlobal } from '@/providers/GlobalProvider';
-
+import { getGlobalSettings } from '@/lib/strapi-server';
 import { getBaseUrl } from '@/helpers/url';
-
 import IndexContents from '@/contents/index';
+import type { GlobalEntity } from '@/types/strapi';
 
-function Index() {
-  const { global } = useGlobal();
+interface HomePageProps {
+  serverGlobal?: GlobalEntity;
+}
 
-  // Get SEO data from Strapi global settings
-  const defaultSeo = global?.attributes?.defaultSeo;
-  const siteName = global?.attributes?.siteName || 'ANDREA';
+function HomePage({ serverGlobal = null }: HomePageProps) {
+  const currentGlobal = serverGlobal;
+
+  // Get SEO data from global settings
+  const defaultSeo = currentGlobal?.attributes?.defaultSeo;
+  const siteName = currentGlobal?.attributes?.siteName || 'ANDREA';
   const siteDescription =
-    global?.attributes?.siteDescription ||
+    currentGlobal?.attributes?.siteDescription ||
     'ANDREA is a creative agency specializing in brand design, providing high-quality solutions with a professional team.';
 
   return (
@@ -22,11 +26,41 @@ function Index() {
         description={siteDescription}
         ogImage={`${getBaseUrl()}/assets/images/og-image.png`}
         seo={defaultSeo}
+        global={currentGlobal}
         overrideTitle
       />
-      <IndexContents />
+      <IndexContents serverGlobal={serverGlobal} />
     </>
   );
 }
 
-export default Index;
+// Static generation with ISR (revalidate every hour)
+export const getStaticProps: GetStaticProps = async () => {
+  try {
+    const { global, error } = await getGlobalSettings();
+
+    if (error) {
+      console.error('Error fetching global settings:', error);
+    }
+
+    return {
+      props: {
+        serverGlobal: global || null,
+      },
+      // ISR: Revalidate every 3600 seconds (1 hour)
+      revalidate: 3600,
+    };
+  } catch (error) {
+    console.error('Error in getStaticProps:', error);
+
+    return {
+      props: {
+        serverGlobal: null,
+      },
+      // Still enable ISR even on error
+      revalidate: 3600,
+    };
+  }
+};
+
+export default HomePage;
