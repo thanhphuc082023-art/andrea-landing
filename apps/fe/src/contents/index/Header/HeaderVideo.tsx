@@ -15,7 +15,7 @@ function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
   const imageSizes =
     '(max-width: 480px) 480px, (max-width: 768px) 768px, (max-width: 1024px) 1024px, (max-width: 1440px) 1440px, 1920px';
 
-  const primaryImageSrc = `${fallbackImageUrl}?width=1920&format=webp&quality=90`;
+  const primaryImageSrc = `${fallbackImageUrl}?width=1920&format=webp&quality=65`;
 
   return (
     <div
