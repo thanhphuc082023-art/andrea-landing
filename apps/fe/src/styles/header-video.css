@@ -17,10 +17,6 @@
   .header-video-container {
     contain-intrinsic-size: calc(100vh - 60px);
   }
-  
-  .header-video-container video {
-    display: none; /* Hide video on mobile by default */
-  }
 }
 
 /* Reduce motion for accessibility */

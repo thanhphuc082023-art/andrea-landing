@@ -1,22 +1,17 @@
 import clsx from 'clsx';
-import Image from 'next/image';
 import type { StrapiGlobal } from '@/types/strapi';
 
 interface HeaderVideoProps {
   videoSrc?: string;
+  posterSrc?: string;
   serverGlobal?: StrapiGlobal;
 }
 
-function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
-  const fallbackImageUrl = '/assets/images/hero_homepage.webp'; // Fallback image URL for header background
-
-  // const strapiImageFallback = serverGlobal?.favicon?.url;
-
-  const imageSizes =
-    '(max-width: 480px) 480px, (max-width: 768px) 768px, (max-width: 1024px) 1024px, (max-width: 1440px) 1440px, 1920px';
-
-  const primaryImageSrc = `${fallbackImageUrl}?width=1920&format=webp&quality=65`;
-
+function HeaderVideo({
+  videoSrc = '',
+  posterSrc = '',
+  serverGlobal = null,
+}: HeaderVideoProps) {
   return (
     <div
       className={clsx(
@@ -24,32 +19,31 @@ function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
         'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-80px)]'
       )}
     >
-      <Image
-        src={primaryImageSrc}
-        alt="Header background"
-        fill
-        className="hidden object-cover object-center max-md:block"
-        priority
-        fetchPriority="high"
-        quality={65}
-        sizes={imageSizes}
-        placeholder="blur"
-        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-      />
-      <video
+      {/* Skeleton overlay */}
+      <div
         className={clsx(
-          'absolute inset-0 h-full w-full object-cover',
-          // CSS-only responsive behavior - hide on mobile
-          'max-md:hidden'
+          'absolute inset-0 z-10 animate-pulse bg-gray-200',
+          'skeleton-video'
         )}
+        aria-hidden="true"
+      />
+
+      <video
+        className={clsx('relative z-20 h-full w-full object-cover')}
         autoPlay
         muted
         loop
         playsInline
         preload="metadata"
+        poster={posterSrc}
+        onLoadedData={(e) => {
+          // Ẩn skeleton khi video đã load (client-side)
+          const skeleton = document.querySelector('.skeleton-video');
+          if (skeleton) skeleton.classList.add('hidden');
+        }}
       >
         <source src={videoSrc} type="video/mp4" />
-        <track kind="captions" src="" srcLang="vi" label="Vietnamese" />
+        <track src={videoSrc} kind="captions" label="Vietnamese" />
       </video>
     </div>
   );
