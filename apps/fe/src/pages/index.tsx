@@ -5,6 +5,7 @@ import {
   getStaticPropsWithGlobal,
   type PagePropsWithGlobal,
 } from '@/lib/page-helpers';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
 function HomePage({
   serverGlobal = null,
@@ -21,7 +22,7 @@ function HomePage({
       <StrapiHead
         title={siteName}
         description={siteDescription}
-        ogImage={`${getBaseUrl()}/assets/images/og-image.png`}
+        ogImage={getStrapiMediaUrl(currentGlobal?.defaultSeo?.shareImage)}
         seo={currentGlobal?.defaultSeo}
         global={currentGlobal}
         overrideTitle

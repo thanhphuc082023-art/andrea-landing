@@ -36,8 +36,6 @@ function StrapiHead({
     description ||
     defaultSeo?.metaDescription ||
     siteDescription;
-  const finalOgImage =
-    seo?.metaImage?.url || ogImage || defaultSeo?.metaImage?.url;
   const keywords = seo?.keywords || defaultSeo?.keywords;
   const robots = seo?.metaRobots || defaultSeo?.metaRobots || 'index,follow';
   const viewport =
@@ -77,9 +75,9 @@ function StrapiHead({
       <meta property="og:url" content={canonical} />
       <meta property="og:site_name" content={siteName} />
 
-      {finalOgImage && (
+      {ogImage && (
         <>
-          <meta property="og:image" content={finalOgImage} />
+          <meta property="og:image" content={ogImage} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
           <meta
@@ -93,9 +91,9 @@ function StrapiHead({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={finalTitle} />
       <meta name="twitter:description" content={finalDescription} />
-      {finalOgImage && (
+      {ogImage && (
         <>
-          <meta name="twitter:image" content={finalOgImage} />
+          <meta name="twitter:image" content={ogImage} />
           <meta
             name="twitter:image:alt"
             content={`${finalTitle} - ${siteName}`}
