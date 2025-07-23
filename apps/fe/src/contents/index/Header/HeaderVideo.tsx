@@ -72,7 +72,6 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
         loop
         playsInline
         preload="metadata"
-        poster={mobilePoster || desktopPoster}
         onLoadedData={() => {
           const skeleton = document.querySelector('.skeleton-video');
           if (skeleton) skeleton.classList.add('hidden');
