@@ -1,6 +1,6 @@
 import NextHead from 'next/head';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
-import type { GlobalEntity, StrapiSEO } from '@/types/strapi';
+import type { StrapiGlobal, StrapiSEO } from '@/types/strapi';
 
 interface StrapiHeadProps {
   title?: string;
@@ -9,7 +9,7 @@ interface StrapiHeadProps {
   overrideTitle?: boolean;
   structuredData?: string;
   seo?: StrapiSEO;
-  global?: GlobalEntity;
+  global?: StrapiGlobal;
 }
 
 function StrapiHead({
@@ -22,13 +22,12 @@ function StrapiHead({
   global = null,
 }: StrapiHeadProps) {
   const currentUrl = useCurrentUrl();
-  const siteName = global?.attributes?.siteName || 'ANDREA';
+  const siteName = global?.siteName || 'ANDREA';
   const siteDescription =
-    global?.attributes?.siteDescription ||
-    'Creative agency specializing in brand design';
-  const defaultSeo = global?.attributes?.defaultSeo;
-  const logoUrl = global?.attributes?.logo?.url;
-  const faviconUrl = global?.attributes?.favicon?.url;
+    global?.siteDescription || 'Creative agency specializing in brand design';
+  const defaultSeo = global?.defaultSeo;
+  const logoUrl = global?.logo?.url;
+  const faviconUrl = global?.favicon?.url;
 
   // Combine props with Strapi SEO data
   const finalTitle = seo?.metaTitle || title || siteName;
@@ -105,15 +104,15 @@ function StrapiHead({
       )}
 
       {/* Additional meta tags from global settings */}
-      {global?.attributes?.socialLinks?.twitter && (
+      {global?.socialLinks?.twitter && (
         <>
           <meta
             name="twitter:site"
-            content={`@${global.attributes.socialLinks.twitter.replace('@', '')}`}
+            content={`@${global.socialLinks.twitter.replace('@', '')}`}
           />
           <meta
             name="twitter:creator"
-            content={`@${global.attributes.socialLinks.twitter.replace('@', '')}`}
+            content={`@${global.socialLinks.twitter.replace('@', '')}`}
           />
         </>
       )}

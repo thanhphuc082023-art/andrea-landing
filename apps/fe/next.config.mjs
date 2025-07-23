@@ -19,6 +19,7 @@ const nextConfig = {
   ],
   images: {
     domains: [
+      'joyful-basket-ea764d9c28.media.strapiapp.com',
       'api.builder.io',
       'images.unsplash.com',
       'res.cloudinary.com',

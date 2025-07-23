@@ -8,10 +8,10 @@ import Partners from '@/contents/index/Partners';
 import Blog from '@/contents/index/Blog';
 import ContactForm from '@/contents/index/ContactForm';
 import clsx from 'clsx';
-import type { GlobalEntity } from '@/types/strapi';
+import type { StrapiGlobal } from '@/types/strapi';
 
 interface IndexContentsProps {
-  serverGlobal?: GlobalEntity;
+  serverGlobal?: StrapiGlobal;
 }
 
 function IndexContents({ serverGlobal = null }: IndexContentsProps) {

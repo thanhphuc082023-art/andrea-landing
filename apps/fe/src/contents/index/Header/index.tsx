@@ -2,10 +2,10 @@ import clsx from 'clsx';
 
 import HeaderVideo from '@/contents/index/Header/HeaderVideo';
 import NewHeaderTitle from '@/contents/index/Header/NewHeaderTitle';
-import type { GlobalEntity } from '@/types/strapi';
+import type { StrapiGlobal } from '@/types/strapi';
 
 interface HeaderProps {
-  serverGlobal?: GlobalEntity;
+  serverGlobal?: StrapiGlobal;
 }
 
 function Header({ serverGlobal = null }: HeaderProps) {

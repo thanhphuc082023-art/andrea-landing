@@ -3,20 +3,20 @@ import StrapiHead from '@/components/meta/StrapiHead';
 import { getGlobalSettings } from '@/lib/strapi-server';
 import { getBaseUrl } from '@/helpers/url';
 import IndexContents from '@/contents/index';
-import type { GlobalEntity } from '@/types/strapi';
+import type { StrapiGlobal } from '@/types/strapi';
 
 interface HomePageProps {
-  serverGlobal?: GlobalEntity;
+  serverGlobal?: StrapiGlobal;
 }
 
 function HomePage({ serverGlobal = null }: HomePageProps) {
   const currentGlobal = serverGlobal;
 
   // Get SEO data from global settings
-  const defaultSeo = currentGlobal?.attributes?.defaultSeo;
-  const siteName = currentGlobal?.attributes?.siteName || 'ANDREA';
+  const defaultSeo = currentGlobal?.defaultSeo;
+  const siteName = currentGlobal?.siteName || 'ANDREA';
   const siteDescription =
-    currentGlobal?.attributes?.siteDescription ||
+    currentGlobal?.siteDescription ||
     'ANDREA is a creative agency specializing in brand design, providing high-quality solutions with a professional team.';
 
   return (
