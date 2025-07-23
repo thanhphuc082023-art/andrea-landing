@@ -12,8 +12,8 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
   const mobileVideo =
     getStrapiMediaUrl(heroData?.mobileVideo) ||
     'https://andrea.vn/uploads/videos/intro-website_3.mp4';
-  const desktopPoster = getStrapiMediaUrl(heroData?.desktopPoster) || '';
-  const mobilePoster = getStrapiMediaUrl(heroData?.mobilePoster) || '';
+  // const desktopPoster = getStrapiMediaUrl(heroData?.desktopPoster) || '';
+  // const mobilePoster = getStrapiMediaUrl(heroData?.mobilePoster) || '';
 
   return (
     <div
@@ -47,7 +47,6 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
         loop
         playsInline
         preload="metadata"
-        poster={desktopPoster || mobilePoster}
         onLoadedData={() => {
           const skeleton = document.querySelector('.skeleton-video');
           if (skeleton) skeleton.classList.add('hidden');
@@ -94,7 +93,6 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
           loop
           playsInline
           preload="metadata"
-          poster={desktopPoster || mobilePoster}
           onLoadedData={() => {
             const skeleton = document.querySelector('.skeleton-video');
             if (skeleton) skeleton.classList.add('hidden');
