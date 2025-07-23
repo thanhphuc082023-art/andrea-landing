@@ -30,7 +30,7 @@ function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
         'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-80px)]'
       )}
     >
-      {finalVideoSrc ? (
+      {!finalVideoSrc ? (
         <Image
           src={primaryImageSrc}
           alt="Header background"
