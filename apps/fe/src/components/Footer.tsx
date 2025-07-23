@@ -9,8 +9,8 @@ import {
   NumberDesignElement,
   ZaloIcon,
 } from '@/assets/icons';
-import {  FaBehance, FaLinkedinIn } from 'react-icons/fa';
-import { FaTiktok } from "react-icons/fa6";
+import { FaBehance, FaLinkedinIn } from 'react-icons/fa';
+import { FaTiktok } from 'react-icons/fa6';
 
 function Footer() {
   return (
@@ -38,7 +38,9 @@ function Footer() {
             </p>
 
             <div>
-              <h2 className={clsx('mb-3 text-sm font-medium text-brand-orange')}>
+              <h2
+                className={clsx('text-brand-orange mb-3 text-sm font-semibold')}
+              >
                 Kết nối với chúng tôi
               </h2>
               <div className={clsx('flex gap-3')}>
@@ -124,7 +126,7 @@ function Footer() {
           <div className={clsx('lg:col-span-1')}>
             <h3
               className={clsx(
-                'text-sm font-medium text-slate-900',
+                'text-sm font-semibold text-slate-900',
                 'dark:text-slate-100'
               )}
             >
@@ -138,7 +140,7 @@ function Footer() {
             />
             <p
               className={clsx(
-                'text-sm leading-relaxed text-slate-600',
+                'text-sm leading-relaxed text-black',
                 'dark:text-slate-400'
               )}
             >
@@ -151,7 +153,7 @@ function Footer() {
           <div className={clsx('lg:col-span-1')}>
             <h3
               className={clsx(
-                'mb-3 text-sm font-medium text-slate-900',
+                'mb-3 text-sm font-semibold text-slate-900',
                 'dark:text-slate-100'
               )}
             >
@@ -165,7 +167,7 @@ function Footer() {
             />
             <p
               className={clsx(
-                'text-sm leading-relaxed text-slate-600',
+                'text-sm leading-relaxed text-black',
                 'dark:text-slate-400'
               )}
             >
@@ -176,7 +178,9 @@ function Footer() {
 
           {/* Thông tin liên hệ */}
           <div className={clsx('lg:col-span-1')}>
-            <h3 className={clsx('mb-3 text-sm font-medium text-brand-orange')}>
+            <h3
+              className={clsx('text-brand-orange mb-3 text-sm font-semibold')}
+            >
               Thông tin liên hệ
             </h3>
             <div
@@ -188,17 +192,14 @@ function Footer() {
             <div className={clsx('space-y-2')}>
               <div className={clsx('flex items-start gap-2')}>
                 <div
-                  className={clsx(
-                    'h-5 w-5 text-slate-600',
-                    'dark:text-slate-400'
-                  )}
+                  className={clsx('h-5 w-5 text-black', 'dark:text-slate-400')}
                 >
                   <PhoneIcon />
                 </div>
                 <a
                   href="tel:0906219926"
                   className={clsx(
-                    'text-sm text-slate-600 hover:text-slate-900',
+                    'text-sm text-black hover:text-slate-900',
                     'dark:text-slate-400 dark:hover:text-slate-100'
                   )}
                 >
@@ -209,10 +210,7 @@ function Footer() {
               </div>
               <div className={clsx('flex items-center gap-2')}>
                 <div
-                  className={clsx(
-                    'h-5 w-5 text-slate-600',
-                    'dark:text-slate-400'
-                  )}
+                  className={clsx('h-5 w-5 text-black', 'dark:text-slate-400')}
                 >
                   <WebsiteIcon />
                 </div>
@@ -221,7 +219,7 @@ function Footer() {
                   target="_blank"
                   rel="noreferrer nofollow"
                   className={clsx(
-                    'text-sm text-slate-600 hover:text-slate-900',
+                    'text-sm text-black hover:text-slate-900',
                     'dark:text-slate-400 dark:hover:text-slate-100'
                   )}
                 >
@@ -230,17 +228,14 @@ function Footer() {
               </div>
               <div className={clsx('flex items-center gap-2')}>
                 <div
-                  className={clsx(
-                    'h-5 w-5 text-slate-600',
-                    'dark:text-slate-400'
-                  )}
+                  className={clsx('h-5 w-5 text-black', 'dark:text-slate-400')}
                 >
                   <EmailIcon />
                 </div>
                 <a
                   href="mailto:info@andrea.vn"
                   className={clsx(
-                    'text-sm text-slate-600 hover:text-slate-900',
+                    'text-sm text-black hover:text-slate-900',
                     'dark:text-slate-400 dark:hover:text-slate-100'
                   )}
                 >

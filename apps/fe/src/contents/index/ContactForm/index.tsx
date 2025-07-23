@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 function ContactForm() {
   return (
-    <section className={clsx('bg-gray-900 py-20 lg:py-28')}>
+    <section className={clsx('bg-[#1A253A] py-20 lg:py-28')}>
       <div className={clsx('content-wrapper mx-auto')}>
         <div className={clsx('mx-auto max-w-4xl')}>
           {/* Section Title */}
@@ -28,8 +28,8 @@ function ContactForm() {
                 aria-label="Tên của bạn"
                 className={clsx(
                   'w-full px-4 py-3',
-                  'border border-gray-400/50 bg-transparent text-white',
-                  'placeholder:text-gray-400',
+                  'border border-[#97979780] bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-[#979797]',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                   'transition-colors duration-300'
                 )}
@@ -47,8 +47,8 @@ function ContactForm() {
                   aria-label="Số điện thoại"
                   className={clsx(
                     'w-full px-4 py-3',
-                    'border border-gray-400/50 bg-transparent text-white',
-                    'placeholder:text-gray-400',
+                    'border border-[#97979780] bg-transparent text-white',
+                    'placeholder:font-[400] placeholder:text-[#979797]',
                     'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                     'transition-colors duration-300'
                   )}
@@ -63,8 +63,8 @@ function ContactForm() {
                   aria-label="Email"
                   className={clsx(
                     'w-full px-4 py-3',
-                    'border border-gray-400/50 bg-transparent text-white',
-                    'placeholder:text-gray-400',
+                    'border border-[#97979780] bg-transparent text-white',
+                    'placeholder:font-[400] placeholder:text-[#979797]',
                     'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                     'transition-colors duration-300'
                   )}
@@ -85,8 +85,8 @@ function ContactForm() {
                   aria-label="Tên công ty/ Ngành nghề"
                   className={clsx(
                     'w-full px-4 py-3',
-                    'border border-gray-400/50 bg-transparent text-white',
-                    'placeholder:text-gray-400',
+                    'border border-[#97979780] bg-transparent text-white',
+                    'placeholder:font-[400] placeholder:text-[#979797]',
                     'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                     'transition-colors duration-300'
                   )}
@@ -103,8 +103,8 @@ function ContactForm() {
                     aria-label="Mã bảo mật"
                     className={clsx(
                       'w-full px-4 py-3',
-                      'border border-gray-400/50 bg-transparent text-white',
-                      'placeholder:text-gray-400',
+                      'border border-[#97979780] bg-transparent text-white',
+                      'placeholder:font-[400] placeholder:text-[#979797]',
                       'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                       'transition-colors duration-300'
                     )}
@@ -118,7 +118,7 @@ function ContactForm() {
                     aria-label="Mã xác thực"
                     className={clsx(
                       'w-full px-4 py-3',
-                      'border border-gray-400/50 bg-gray-300 text-gray-600',
+                      'border border-[#97979780] bg-gray-300 text-gray-600',
                       'placeholder:text-gray-500',
                       'cursor-not-allowed'
                     )}
@@ -138,8 +138,8 @@ function ContactForm() {
                 rows={4}
                 className={clsx(
                   'w-full px-4 py-3',
-                  'border border-gray-400/50 bg-transparent text-white',
-                  'placeholder:text-gray-400',
+                  'border border-[#97979780] bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-[#979797]',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                   'resize-none outline-none transition-colors duration-300'
                 )}

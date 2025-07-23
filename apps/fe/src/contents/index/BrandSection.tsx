@@ -48,7 +48,7 @@ function BrandSection() {
           <p
             className={clsx(
               'font-playfair text-lg text-white md:text-xl lg:text-[24px]',
-              'max-sd:leading-[32px] font-medium leading-[39px] tracking-wide',
+              'max-sd:!leading-[32px] font-medium !leading-[39px] tracking-wide',
               'mx-auto max-w-md'
             )}
           >

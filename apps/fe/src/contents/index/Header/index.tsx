@@ -28,7 +28,7 @@ function Header({ serverGlobal = null }: HeaderProps) {
         <div className={clsx('content-wrapper mx-auto')}>
           <div
             className={clsx(
-              'relative flex flex-wrap items-end justify-between gap-[30px] max-md:justify-center max-md:gap-[10px] lg:flex-nowrap'
+              'max-sd:px-[30px] relative flex flex-wrap items-center justify-between gap-[30px] px-[70px] max-lg:justify-center max-lg:gap-[10px] max-lg:px-0 lg:flex-nowrap'
             )}
           >
             {/* Title positioned like in Figma: left side */}
@@ -37,19 +37,18 @@ function Header({ serverGlobal = null }: HeaderProps) {
             </div>
 
             {/* Description luôn bên phải, mọi màn hình */}
-            <div className={clsx('mb-5 max-w-xl')}>
+            <div className={clsx('max-w-xl')}>
               <div
                 className={clsx(
                   'font-sans text-base font-[400] text-black',
-                  'leading-[26px] max-md:text-center dark:text-slate-300'
+                  'leading-[26px] max-lg:text-center dark:text-slate-300'
                 )}
               >
-                <p>
-                  {`Angency tư vấn, thiết kế sáng tạo đa lĩnh vực, chuyên cung cấp
-                  giải pháp thiết kế hình ảnh thương hiệu chất lượng cao, với
-                  đội ngũ thiết kế được đào tạo bài bản kết hợp với các cộng sự,
-                  chuyên gia uy tín trong ngành, chúng tôi "Andrea" đồng hành
-                  cùng bạn xây dựng thương hiệu uy tín và chuyên nghiêp.`}
+                <p className="font-normal">
+                  Agency tư vấn và thiết kế thương hiệu sáng tạo, đa lĩnh vực,
+                  cung cấp các giải pháp thiết kế thương hiệu chuyên sâu, với
+                  đội ngũ nhân sự giàu kinh nghiệm, quy trình làm việc rõ ràng
+                  và chuyên nghiệp.
                 </p>
               </div>
             </div>
