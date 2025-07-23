@@ -11,8 +11,7 @@ interface HeaderVideoProps {
 function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
   const finalVideoSrc = videoSrc;
 
-  const fallbackImageUrl =
-    'https://api.builder.io/api/v1/image/assets/TEMP/aa900ed26675db6e843778c020dcbb13b0f69d38';
+  const fallbackImageUrl = '/assets/images/hero_homepage.webp'; // Fallback image URL for header background
 
   // const strapiImageFallback = serverGlobal?.favicon?.url;
 
@@ -50,7 +49,7 @@ function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
             className="object-cover object-center"
             priority
             fetchPriority="high"
-            quality={65}
+            quality={90}
             sizes={imageSizes}
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
