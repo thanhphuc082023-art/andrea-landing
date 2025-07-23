@@ -7,10 +7,7 @@ interface HeaderVideoProps {
   serverGlobal?: StrapiGlobal;
 }
 
-// Pure static component - renders at build time, no client-side JavaScript
 function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
-  const finalVideoSrc = videoSrc;
-
   const fallbackImageUrl = '/assets/images/hero_homepage.webp'; // Fallback image URL for header background
 
   // const strapiImageFallback = serverGlobal?.favicon?.url;
@@ -27,50 +24,33 @@ function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
         'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-80px)]'
       )}
     >
-      {!finalVideoSrc ? (
-        <Image
-          src={primaryImageSrc}
-          alt="Header background"
-          fill
-          className="object-cover object-center"
-          priority
-          fetchPriority="high"
-          quality={90}
-          sizes={imageSizes}
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-        />
-      ) : (
-        <>
-          <Image
-            src={primaryImageSrc}
-            alt="Header background"
-            fill
-            className="object-cover object-center"
-            priority
-            fetchPriority="high"
-            quality={60}
-            sizes={imageSizes}
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-          />
-          <video
-            className={clsx(
-              'absolute inset-0 h-full w-full object-cover',
-              // CSS-only responsive behavior - hide on mobile
-              'max-md:hidden'
-            )}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-          >
-            <source src={finalVideoSrc} type="video/mp4" />
-            <track kind="captions" src="" srcLang="vi" label="Vietnamese" />
-          </video>
-        </>
-      )}
+      <Image
+        src={primaryImageSrc}
+        alt="Header background"
+        fill
+        className="object-cover object-center"
+        priority
+        fetchPriority="high"
+        quality={65}
+        sizes={imageSizes}
+        placeholder="blur"
+        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+      />
+      <video
+        className={clsx(
+          'absolute inset-0 h-full w-full object-cover',
+          // CSS-only responsive behavior - hide on mobile
+          'max-md:hidden'
+        )}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+      >
+        <source src={videoSrc} type="video/mp4" />
+        <track kind="captions" src="" srcLang="vi" label="Vietnamese" />
+      </video>
     </div>
   );
 }
