@@ -2,6 +2,8 @@ import Image from 'next/image';
 import clsx from 'clsx';
 
 import AgencyLogo from '@/assets/icons/AgencyLogo';
+import { StrapiGlobal } from '@/types/strapi';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
 interface StrapiLogoProps {
   active?: boolean;
@@ -9,7 +11,7 @@ interface StrapiLogoProps {
   width?: number;
   height?: number;
   fallbackToDefault?: boolean;
-  serverGlobal?: any; // Add server-side global data support
+  serverGlobal?: StrapiGlobal;
 }
 
 function StrapiLogo({
@@ -20,11 +22,10 @@ function StrapiLogo({
   fallbackToDefault = true,
   serverGlobal = null,
 }: StrapiLogoProps) {
-  const currentGlobal = serverGlobal || global;
-  const logoUrl = currentGlobal?.attributes?.logo?.url;
-  const siteName = currentGlobal?.attributes?.siteName || 'ANDREA';
+  const currentGlobal = serverGlobal;
+  const logoUrl = getStrapiMediaUrl(currentGlobal?.logo);
+  const siteName = currentGlobal?.siteName || 'ANDREA';
 
-  // If Strapi logo is available, use it
   if (logoUrl) {
     return (
       <div className={clsx('flex items-center', className)}>

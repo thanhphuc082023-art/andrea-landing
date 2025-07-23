@@ -36,7 +36,7 @@ export class StrapiAPI {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${STRAPI_URL}${endpoint}`;
+    const url = `${STRAPI_URL}/api${endpoint}`;
 
     const config: RequestInit = {
       headers: {

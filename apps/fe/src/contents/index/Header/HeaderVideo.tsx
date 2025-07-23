@@ -1,17 +1,20 @@
 import clsx from 'clsx';
-import type { StrapiGlobal } from '@/types/strapi';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
 interface HeaderVideoProps {
-  videoSrc?: string;
-  posterSrc?: string;
-  serverGlobal?: StrapiGlobal;
+  heroData?: any;
 }
 
-function HeaderVideo({
-  videoSrc = '',
-  posterSrc = '',
-  serverGlobal = null,
-}: HeaderVideoProps) {
+function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
+  const desktopVideo =
+    getStrapiMediaUrl(heroData?.desktopVideo) ||
+    'https://andrea.vn/uploads/videos/intro-website_3.mp4';
+  const mobileVideo =
+    getStrapiMediaUrl(heroData?.mobileVideo) ||
+    'https://andrea.vn/uploads/videos/intro-website_3.mp4';
+  const desktopPoster = getStrapiMediaUrl(heroData?.desktopPoster) || '';
+  const mobilePoster = getStrapiMediaUrl(heroData?.mobilePoster) || '';
+
   return (
     <div
       className={clsx(
@@ -33,22 +36,79 @@ function HeaderVideo({
         }}
       />
 
+      {/* Desktop Video - Show on desktop, fallback to any available video */}
       <video
-        className={clsx('relative z-20 h-full w-full object-cover')}
+        className={clsx(
+          'relative z-20 h-full w-full object-cover',
+          'hidden md:block' // Show only on desktop
+        )}
         autoPlay
         muted
         loop
         playsInline
         preload="metadata"
-        poster={posterSrc}
+        poster={desktopPoster || mobilePoster}
         onLoadedData={() => {
           const skeleton = document.querySelector('.skeleton-video');
           if (skeleton) skeleton.classList.add('hidden');
         }}
       >
-        <source src={videoSrc} type="video/mp4" />
-        <track src={videoSrc} kind="captions" label="Vietnamese" />
+        <source src={desktopVideo || mobileVideo} type="video/mp4" />
+        <track
+          src={desktopVideo || mobileVideo}
+          kind="captions"
+          label="Vietnamese"
+        />
       </video>
+
+      {/* Mobile Video - Show on mobile, fallback to desktop if no mobile video */}
+      <video
+        className={clsx(
+          'relative z-20 h-full w-full object-cover',
+          'block md:hidden' // Show only on mobile
+        )}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        poster={mobilePoster || desktopPoster}
+        onLoadedData={() => {
+          const skeleton = document.querySelector('.skeleton-video');
+          if (skeleton) skeleton.classList.add('hidden');
+        }}
+      >
+        <source src={mobileVideo || desktopVideo} type="video/mp4" />
+        <track
+          src={mobileVideo || desktopVideo}
+          kind="captions"
+          label="Vietnamese"
+        />
+      </video>
+
+      {/* Fallback Video nếu không có mobile/desktop riêng */}
+      {!mobileVideo && !desktopVideo && (desktopVideo || mobileVideo) && (
+        <video
+          className={clsx('relative z-20 h-full w-full object-cover')}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={desktopPoster || mobilePoster}
+          onLoadedData={() => {
+            const skeleton = document.querySelector('.skeleton-video');
+            if (skeleton) skeleton.classList.add('hidden');
+          }}
+        >
+          <source src={desktopVideo || mobileVideo} type="video/mp4" />
+          <track
+            src={desktopVideo || mobileVideo}
+            kind="captions"
+            label="Vietnamese"
+          />
+        </video>
+      )}
 
       {/* Scroll Down Button */}
       <button

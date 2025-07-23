@@ -27,6 +27,8 @@ const nextConfig = {
       'strapi.andrea.dev',
       'andrea.dev',
       'andrea-landing.pages.dev',
+      'localhost',
+      'localhost:1337',
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [480, 768, 1024, 1440, 1920],

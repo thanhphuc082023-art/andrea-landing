@@ -1,9 +1,9 @@
 import WithNavigationFooter from '@/components/layouts/WithNavigationFooter';
-import type { GlobalEntity } from '@/types/strapi';
+import type { StrapiGlobal } from '@/types/strapi';
 import type { PropsWithChildren } from 'react';
 
 interface StaticLayoutProps extends PropsWithChildren {
-  serverGlobal?: GlobalEntity;
+  serverGlobal?: StrapiGlobal;
 }
 
 function StaticLayout({ children, serverGlobal = null }: StaticLayoutProps) {

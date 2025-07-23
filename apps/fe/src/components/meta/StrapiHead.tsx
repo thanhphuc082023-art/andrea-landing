@@ -1,6 +1,7 @@
 import NextHead from 'next/head';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
 import type { StrapiGlobal, StrapiSEO } from '@/types/strapi';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
 interface StrapiHeadProps {
   title?: string;
@@ -26,8 +27,7 @@ function StrapiHead({
   const siteDescription =
     global?.siteDescription || 'Creative agency specializing in brand design';
   const defaultSeo = global?.defaultSeo;
-  const logoUrl = global?.logo?.url;
-  const faviconUrl = global?.favicon?.url;
+  const faviconUrl = getStrapiMediaUrl(global?.favicon);
 
   // Combine props with Strapi SEO data
   const finalTitle = seo?.metaTitle || title || siteName;

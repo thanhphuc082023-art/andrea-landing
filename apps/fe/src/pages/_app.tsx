@@ -9,7 +9,7 @@ import { playfairDisplay } from '@/lib/fonts';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
-import type { GlobalEntity } from '@/types/strapi';
+import type { GlobalEntity, NavigationItem } from '@/types/strapi';
 
 import '@/styles/main.css';
 import '@/styles/header-video.css';
@@ -23,13 +23,18 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   pageProps: {
     serverGlobal?: GlobalEntity;
+    menuItems?: NavigationItem[];
+    heroData?: any;
     [key: string]: any;
   };
 };
 
 function getDefaultLayout(page: ReactElement, pageProps?: any): ReactNode {
   return (
-    <WithNavigationFooter serverGlobal={pageProps?.serverGlobal}>
+    <WithNavigationFooter
+      serverGlobal={pageProps?.serverGlobal}
+      menuItems={pageProps?.menuItems}
+    >
       {page}
     </WithNavigationFooter>
   );

@@ -25,7 +25,7 @@ function BrandSection() {
             className={clsx(
               'font-playfair max-sd:text-[28px] text-white',
               'mb-6 font-medium md:mb-8',
-              'max-sd:leading-[60px] max-370:text-[20px] max-370:leading-[30px] leading-[80px] max-md:leading-[45px]'
+              'max-sd:leading-[60px] max-370:text-[20px] max-370:leading-[30px] text-[35px] leading-[80px] max-md:leading-[45px]'
             )}
           >
             Tư vấn & thiết kế <br className="hidden max-md:block" /> thương hiệu{' '}

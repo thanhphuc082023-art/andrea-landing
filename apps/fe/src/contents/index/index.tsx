@@ -8,17 +8,16 @@ import Partners from '@/contents/index/Partners';
 import Blog from '@/contents/index/Blog';
 import ContactForm from '@/contents/index/ContactForm';
 import clsx from 'clsx';
-import type { StrapiGlobal } from '@/types/strapi';
 
 interface IndexContentsProps {
-  serverGlobal?: StrapiGlobal;
+  heroData?: any;
 }
 
-function IndexContents({ serverGlobal = null }: IndexContentsProps) {
+function IndexContents({ heroData = null }: IndexContentsProps) {
   return (
     <>
       <div className={clsx('pb-20 lg:pb-28')}>
-        <Header serverGlobal={serverGlobal} />
+        <Header heroData={heroData} />
       </div>
       <div className={clsx('mb-20', 'lg:mb-28')}>
         <BrandSection />

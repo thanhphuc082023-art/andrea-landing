@@ -3,35 +3,30 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import StrapiLogo from '@/components/StrapiLogo';
-import type { StrapiNavigationItem, GlobalEntity } from '@/types/strapi';
+import { getMenuSettings } from '@/lib/strapi-server';
+import type { NavigationItem, StrapiGlobal } from '@/types/strapi';
+import { GetStaticProps } from 'next';
 
 interface NavbarProps {
   // Optional server-side data for static generation
-  serverGlobal?: GlobalEntity;
+  serverGlobal?: StrapiGlobal;
+  menuItems?: NavigationItem[];
 }
 
-function Navbar({ serverGlobal = null }: NavbarProps) {
+function Navbar({ serverGlobal = null, menuItems = [] }: NavbarProps) {
   const [activeItem, setActiveItem] = useState('Về chúng tôi');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Default navigation items (fallback)
   const defaultNavigationItems = [
-    { title: 'Về chúng tôi', href: '/about' },
-    { title: 'Dịch vụ', href: '/services' },
-    { title: 'Dự án', href: '/projects' },
-    { title: 'Góc nhìn', href: '/insights' },
-    { title: 'Liên hệ', href: '/contact' },
+    { label: 'Về chúng tôi', url: '/about' },
+    { label: 'Dịch vụ', url: '/services' },
+    { label: 'Dự án', url: '/projects' },
+    { label: 'Góc nhìn', url: '/insights' },
+    { label: 'Liên hệ', url: '/contact' },
   ];
 
   // Use server navigation if available, otherwise use client navigation or fallback
-  const navigationItems = serverGlobal?.attributes?.navigation?.header?.length
-    ? serverGlobal.attributes.navigation.header.map(
-        (item: StrapiNavigationItem) => ({
-          title: item.label,
-          href: item.url,
-        })
-      )
-    : defaultNavigationItems;
+  const navigationItems = menuItems.length ? menuItems : defaultNavigationItems;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -65,17 +60,17 @@ function Navbar({ serverGlobal = null }: NavbarProps) {
           <nav className="hidden items-center gap-8 md:flex lg:gap-[58px]">
             {navigationItems.map((item) => (
               <Link
-                key={item.title}
-                href={item.href}
+                key={item.label}
+                href={item.url || '/'}
                 className={clsx(
                   'text-lg transition-colors duration-200',
-                  activeItem === item.title
+                  activeItem === item.label
                     ? 'text-brand-orange hover:text-brand-orange-dark font-bold' // Now uses WCAG AA compliant colors
                     : 'font-normal text-gray-700 hover:text-gray-900'
                 )}
-                onClick={() => setActiveItem(item.title)}
+                onClick={() => setActiveItem(item.label)}
               >
-                {item.title}
+                {item.label}
               </Link>
             ))}
           </nav>
@@ -140,7 +135,7 @@ function Navbar({ serverGlobal = null }: NavbarProps) {
             <nav className="flex h-full flex-col gap-6 px-6 py-8">
               {navigationItems.map((item, index) => (
                 <m.div
-                  key={item.title}
+                  key={item.label}
                   initial={{ x: -50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{
@@ -150,17 +145,17 @@ function Navbar({ serverGlobal = null }: NavbarProps) {
                   }}
                 >
                   <Link
-                    href={item.href}
+                    href={item.url || '/'}
                     className={clsx(
                       'block border-b border-gray-200/50 py-4 text-xl transition-all duration-300',
                       'hover:border-brand-orange/30 hover:translate-x-2',
-                      activeItem === item.title
+                      activeItem === item.label
                         ? 'text-brand-orange translate-x-1 font-bold' // Now uses WCAG AA compliant color
                         : 'font-normal text-gray-700 hover:text-gray-900'
                     )}
-                    onClick={() => handleMobileMenuClick(item.title)}
+                    onClick={() => handleMobileMenuClick(item.label)}
                   >
-                    {item.title}
+                    {item.label}
                   </Link>
                 </m.div>
               ))}
@@ -171,5 +166,25 @@ function Navbar({ serverGlobal = null }: NavbarProps) {
     </header>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  try {
+    const { menu, error } = await getMenuSettings();
+
+    return {
+      props: {
+        menuItems: menu?.attributes?.items || [],
+      },
+      revalidate: 3600, // ISR 1 hour
+    };
+  } catch (error) {
+    return {
+      props: {
+        menuItems: [],
+      },
+      revalidate: 3600,
+    };
+  }
+};
 
 export default Navbar;

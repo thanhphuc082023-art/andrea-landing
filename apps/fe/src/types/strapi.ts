@@ -1,4 +1,3 @@
-// Base Strapi types
 export interface StrapiBaseAttributes {
   createdAt: string;
   updatedAt: string;
@@ -152,16 +151,16 @@ export interface StrapiGlobal {
     address?: string;
   };
   navigation?: {
-    header: StrapiNavigationItem[];
-    footer: StrapiNavigationItem[];
+    header: NavigationItem[];
+    footer: NavigationItem[];
   };
 }
 
-export interface StrapiNavigationItem {
+export interface NavigationItem {
   label: string;
   url: string;
   external?: boolean;
-  children?: StrapiNavigationItem[];
+  children?: NavigationItem[];
 }
 
 // Helper types for API responses
