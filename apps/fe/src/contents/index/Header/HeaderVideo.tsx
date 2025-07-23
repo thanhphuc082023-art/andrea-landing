@@ -28,7 +28,7 @@ function HeaderVideo({ videoSrc = '', serverGlobal = null }: HeaderVideoProps) {
         src={primaryImageSrc}
         alt="Header background"
         fill
-        className="object-cover object-center"
+        className="hidden object-cover object-center max-md:block"
         priority
         fetchPriority="high"
         quality={65}
