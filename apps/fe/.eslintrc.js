@@ -9,5 +9,9 @@ module.exports = {
   rules: {
     'react/jsx-props-no-spreading': 'off',
     'react/jsx-boolean-value': 'off',
+    'react/no-array-index-key': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    'react/require-default-props': 'off',
+    'consistent-return': 'off',
   },
 };

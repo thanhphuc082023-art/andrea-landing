@@ -19,7 +19,7 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
     <div
       className={clsx(
         'header-video-container relative inset-0 z-0 overflow-hidden',
-        'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-80px)]'
+        'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-65px)]'
       )}
     >
       {/* Custom shimmer skeleton */}

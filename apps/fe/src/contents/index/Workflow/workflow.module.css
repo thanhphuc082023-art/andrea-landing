@@ -1,0 +1,45 @@
+/* Custom Keen Slider styles for Workflow component */
+.workflowSlider {
+  overflow: visible;
+}
+
+.workflowSlider .keen-slider__slide {
+  width: 450px !important;
+  min-width: 450px !important;
+  max-width: 450px !important;
+  height: 350px !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.workflowSlider .keen-slider__slide:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .workflowSlider .keen-slider__slide {
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+    height: 240px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .workflowSlider .keen-slider__slide {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    height: 210px !important;
+  }
+}

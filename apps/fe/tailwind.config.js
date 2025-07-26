@@ -47,6 +47,7 @@ module.exports = {
           'orange-light': '#F15A24', // Original orange for backgrounds only
           'orange-dark': '#B8390C', // Darker orange for hover states
         },
+        primary: '#1A253A', // Primary brand color
         grayECO: '#BCBEC0',
         text: {
           primary: '#1A253A',
@@ -77,6 +78,7 @@ module.exports = {
     },
   },
   safelist: [
+    { pattern: /grid-rows-\d+/ },
     // ECMP Colors
     {
       pattern:
@@ -110,4 +112,12 @@ module.exports = {
       root: 'violet',
     }),
   ],
+  corePlugins: {
+    // Đảm bảo các core plugins hoạt động với Safari cũ
+    preflight: true,
+  },
+  // Thêm experimental features nếu cần
+  experimental: {
+    optimizeUniversalDefaults: true,
+  },
 };

@@ -10,10 +10,10 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
 import type { GlobalEntity, NavigationItem } from '@/types/strapi';
+import FontLoaderEffect from '@/components/FontLoaderEffect';
 
 import '@/styles/main.css';
 import '@/styles/header-video.css';
-import FontLoaderEffect from '@/components/FontLoaderEffect';
 
 type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, pageProps?: any) => ReactNode;
@@ -25,6 +25,8 @@ type AppPropsWithLayout = AppProps & {
     serverGlobal?: GlobalEntity;
     menuItems?: NavigationItem[];
     heroData?: any;
+    brandSectionData?: any;
+    footerData?: any;
     [key: string]: any;
   };
 };
@@ -34,6 +36,7 @@ function getDefaultLayout(page: ReactElement, pageProps?: any): ReactNode {
     <WithNavigationFooter
       serverGlobal={pageProps?.serverGlobal}
       menuItems={pageProps?.menuItems}
+      footerData={pageProps?.footerData}
     >
       {page}
     </WithNavigationFooter>

@@ -1,7 +1,9 @@
 import clsx from 'clsx';
 import Image from 'next/image';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
-const partners = [
+// Fallback data for development/testing
+const fallbackPartners = [
   [
     {
       id: 1,
@@ -50,11 +52,23 @@ const partners = [
 
 type Partner = {
   id: number;
-  name: string;
-  logo: string;
+  name?: string;
+  alt?: string;
+  logo?: string;
+  image?: any;
+  position?: number;
 };
 
+interface PartnersProps {
+  partnersData?: any;
+}
+
 function PartnerCard({ partner }: { partner: Partner }) {
+  const logoUrl = partner.logo || getStrapiMediaUrl(partner.image);
+  const altText = partner.alt || partner.name || 'Partner logo';
+
+  if (!logoUrl) return null;
+
   return (
     <div className={clsx('flex items-center justify-center')}>
       <div
@@ -63,8 +77,8 @@ function PartnerCard({ partner }: { partner: Partner }) {
         )}
       >
         <Image
-          src={partner.logo}
-          alt={`${partner.name} logo`}
+          src={logoUrl}
+          alt={altText}
           width={150}
           height={60}
           className="object-contain grayscale filter transition-all duration-300 hover:grayscale-0"
@@ -74,32 +88,37 @@ function PartnerCard({ partner }: { partner: Partner }) {
   );
 }
 
-function Partners() {
+function Partners({ partnersData = {} }: PartnersProps) {
+  const partners = partnersData?.partner_row;
+  if (!partnersData) {
+    return null;
+  }
+
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
         {/* Section Title */}
-        <div className={clsx('max-sd:mb-14 mb-12 max-md:mb-11')}>
+        <div className={clsx('mb-6')}>
           <h2
             className={clsx(
               'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
             )}
           >
-            Đối tác
+            {partnersData?.title || 'Đối tác'}
           </h2>
         </div>
 
         {/* Partners Grid */}
-        <div className={clsx('flex flex-col gap-8 lg:gap-11')}>
-          {partners.map((row, rowIdx) => (
+        <div className={clsx('flex flex-col gap-[42px] lg:gap-11')}>
+          {partners?.map((row) => (
             <div
-              key={`row-${rowIdx + 1}`}
+              key={`row-${row?.id}`}
               className={clsx(
-                'flex items-center justify-end gap-6 border-b border-black/20 pb-8 lg:gap-8'
+                'flex items-center justify-end gap-6 border-b border-black/20 pb-[42px] lg:gap-[145px]'
               )}
             >
-              {row.map((partner) => (
-                <PartnerCard key={partner.id} partner={partner} />
+              {row?.partners?.map((partner) => (
+                <PartnerCard key={partner?.id} partner={partner} />
               ))}
             </div>
           ))}

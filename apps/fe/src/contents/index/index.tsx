@@ -2,7 +2,6 @@ import Header from '@/contents/index/Header';
 import Services from '@/contents/index/Services';
 import BrandSection from '@/contents/index/BrandSection';
 import Workflow from '@/contents/index/Workflow';
-import FeaturedProjects from '@/contents/index/FeaturedProjects';
 import ProjectGrid from '@/contents/index/ProjectGrid';
 import Partners from '@/contents/index/Partners';
 import Blog from '@/contents/index/Blog';
@@ -11,37 +10,39 @@ import clsx from 'clsx';
 
 interface IndexContentsProps {
   heroData?: any;
+  brandSectionData?: any;
+  servicesData?: any[];
+  workflowData?: any[];
+  partnersData?: any[];
 }
 
-function IndexContents({ heroData = null }: IndexContentsProps) {
+function IndexContents({
+  heroData = null,
+  brandSectionData = null,
+  servicesData = [],
+  workflowData = [],
+  partnersData = null,
+}: IndexContentsProps) {
   return (
     <>
-      <div className={clsx('pb-20 lg:pb-28')}>
-        <Header heroData={heroData} />
-      </div>
-      <div className={clsx('mb-20', 'lg:mb-28')}>
-        <BrandSection />
+      <Header heroData={heroData} />
+      <BrandSection brandSectionData={brandSectionData} />
+
+      <div className="py-[75px]">
+        <Services servicesData={servicesData} />
       </div>
 
-      <div>
-        <Services />
+      <div className={clsx('pb-[75px]')}>
+        <Workflow workflowData={workflowData} />
       </div>
 
-      <div className={clsx('py-20 lg:py-28')}>
-        <Workflow />
-      </div>
-
-      <div className={clsx('pb-[60px] md:pb-20 lg:pb-28')}>
-        <FeaturedProjects />
-      </div>
-
-      <div className={clsx('pb-20 lg:pb-28')}>
+      <div className={clsx('pb-[75px]')}>
         <ProjectGrid />
       </div>
 
-      <Partners />
+      <Partners partnersData={partnersData} />
 
-      <div className={clsx('py-20 lg:py-28')}>
+      <div className={clsx('py-[75px]')}>
         <Blog />
       </div>
 

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 import Link from 'next/link';
 import clsx from 'clsx';
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
 import { StrapiAPI } from '@/lib/strapi';
 import { useArticle } from '@/hooks/useStrapi';
 import SEOHead from '@/components/strapi/SEOHead';
@@ -213,7 +213,7 @@ function ArticlePage({ article: initialArticle }: ArticlePageProps) {
             'dark:prose-p:text-gray-300 dark:prose-strong:text-gray-100'
           )}
         >
-          <ReactMarkdown>{content}</ReactMarkdown>
+          <Markdown>{content}</Markdown>
         </div>
 
         {/* Tags */}

@@ -1,5 +1,4 @@
 import StrapiHead from '@/components/meta/StrapiHead';
-import { getBaseUrl } from '@/helpers/url';
 import IndexContents from '@/contents/index';
 import {
   getStaticPropsWithGlobal,
@@ -10,6 +9,11 @@ import { getStrapiMediaUrl } from '@/utils/helper';
 function HomePage({
   serverGlobal = null,
   heroData = null,
+  brandSectionData = null,
+  servicesData = [],
+  workflowData = [],
+  partnersData = null,
+  footerData = null,
 }: PagePropsWithGlobal) {
   const currentGlobal = serverGlobal;
   const siteName = currentGlobal?.siteName || 'ANDREA';
@@ -27,7 +31,13 @@ function HomePage({
         global={currentGlobal}
         overrideTitle
       />
-      <IndexContents heroData={heroData} />
+      <IndexContents
+        heroData={heroData}
+        brandSectionData={brandSectionData}
+        servicesData={servicesData}
+        workflowData={workflowData}
+        partnersData={partnersData}
+      />
     </>
   );
 }

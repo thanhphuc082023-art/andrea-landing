@@ -6,51 +6,163 @@ interface Project {
   title: string;
   description: string;
   image: string;
+  isFeatured?: boolean;
+  isLarge?: boolean; // For the large featured project layout
 }
 
 const projects: Project[] = [
+  // Featured Projects
   {
     id: 1,
+    title: 'MITSUBISHI',
+    description: 'Profile, Quay phim chụp hình',
+    image: '/assets/images/featured-projects/mitsubishi-project.jpg',
+    isFeatured: true,
+    isLarge: true,
+  },
+  {
+    id: 2,
+    title: 'MOBIFONE',
+    description: 'Profile, Catalogue, Thiết kế nhận diện sự kiện',
+    image: '/assets/images/featured-projects/mobifone-project.jpg',
+    isFeatured: true,
+    isLarge: false,
+  },
+  // Regular Projects
+  {
+    id: 3,
     title: 'DECOFI',
     description:
       'Logo, Bộ nhận diện thương hiệu, Profile, Website, Hệ thống chỉ dẫn công trường, Báo cáo thường niên, Thiết kế nhận diện sự kiện',
     image: '/assets/images/projects/project-sample.jpg',
-  },
-  {
-    id: 2,
-    title: 'HSME',
-    description: 'Logo, Bộ nhận diện thương hiệu, Profile, ',
-    image: '/assets/images/projects/project-sample.jpg',
-  },
-  {
-    id: 3,
-    title: 'BĂNG RỪNG NGẬP MẶN',
-    description: 'Thiết kế nhận diện sự kiện, Thiết kế bao bì',
-    image: '/assets/images/projects/project-sample.jpg',
+    isFeatured: false,
   },
   {
     id: 4,
+    title: 'HSME',
+    description: 'Logo, Bộ nhận diện thương hiệu, Profile, ',
+    image: '/assets/images/projects/project-sample.jpg',
+    isFeatured: false,
+  },
+  {
+    id: 5,
+    title: 'BĂNG RỪNG NGẬP MẶN',
+    description: 'Thiết kế nhận diện sự kiện, Thiết kế bao bì',
+    image: '/assets/images/projects/project-sample.jpg',
+    isFeatured: false,
+  },
+  {
+    id: 6,
     title: 'DELAFÉE',
     description:
       'Logo, Bộ nhận diện thương hiệu, Social branding, Thiết kế bao bì',
     image: '/assets/images/projects/project-sample.jpg',
+    isFeatured: false,
   },
   {
-    id: 5,
+    id: 7,
     title: 'LEN SÔNG QUÁN',
     description: 'Logo, Bộ nhận diện thương hiệu, Social branding',
     image: '/assets/images/projects/project-sample.jpg',
+    isFeatured: false,
   },
   {
-    id: 6,
+    id: 8,
     title: 'HUROLUX',
     description:
       'Logo, Bộ nhận diện thương hiệu, Social branding, Thiết kế bao bì',
     image: '/assets/images/projects/project-sample.jpg',
+    isFeatured: false,
   },
 ];
 
-function ProjectCard({ project }: { project: Project }) {
+function FeaturedProjectCard({ project }: { project: Project }) {
+  if (project.isLarge) {
+    return (
+      <div className={clsx('lg:col-span-7')}>
+        <div className={clsx('relative')}>
+          {/* Main Image */}
+          <div
+            className={clsx(
+              'border-brand-orange relative h-[400px] w-full overflow-hidden rounded-2xl border-2 lg:h-[600px]'
+            )}
+          >
+            <Image
+              src={project.image}
+              alt={project.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              quality={85}
+              priority={true}
+            />
+          </div>
+
+          {/* Project Info */}
+          <div className={clsx('mt-6')}>
+            <h3
+              className={clsx(
+                'text-text-primary mb-2 text-2xl font-semibold lg:text-3xl'
+              )}
+            >
+              {project.title}
+            </h3>
+            <p
+              className={clsx(
+                'text-text-secondary text-base font-normal tracking-wide'
+              )}
+            >
+              {project.description}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={clsx('lg:col-span-5')}>
+      <div className={clsx('relative')}>
+        {/* Featured Image */}
+        <div
+          className={clsx(
+            'relative h-[300px] w-full overflow-hidden rounded-2xl lg:h-[300px]'
+          )}
+        >
+          <Image
+            src={project.image}
+            alt={project.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 40vw"
+            quality={85}
+            loading="eager"
+          />
+        </div>
+
+        {/* Project Info */}
+        <div className={clsx('mt-6 lg:mt-8')}>
+          <h3
+            className={clsx(
+              'text-text-primary mb-2 text-2xl font-semibold lg:text-3xl'
+            )}
+          >
+            {project.title}
+          </h3>
+          <p
+            className={clsx(
+              'text-text-secondary text-base font-normal tracking-wide'
+            )}
+          >
+            {project.description}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RegularProjectCard({ project }: { project: Project }) {
   return (
     <div className={clsx('group cursor-pointer')}>
       {/* Project Image */}
@@ -74,7 +186,7 @@ function ProjectCard({ project }: { project: Project }) {
       <div>
         <h3
           className={clsx(
-            'text-text-primary mb-2 text-2xl font-normal lg:text-3xl'
+            'text-text-primary mb-2 text-2xl font-semibold lg:text-3xl'
           )}
         >
           {project.title}
@@ -92,17 +204,42 @@ function ProjectCard({ project }: { project: Project }) {
 }
 
 function ProjectGrid() {
+  const featuredProjects = projects.filter((project) => project.isFeatured);
+  const regularProjects = projects.filter((project) => !project.isFeatured);
+
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
-        {/* Projects Grid - 3 columns, 2 rows */}
+        {/* Featured Projects Section */}
+        <div className={clsx('mb-6')}>
+          <h2
+            className={clsx(
+              'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
+            )}
+          >
+            Dự án tiêu biểu
+          </h2>
+        </div>
+
+        {/* Featured Projects Grid */}
+        <div
+          className={clsx(
+            'mb-[75px] grid grid-cols-1 gap-x-5 gap-y-10 max-md:gap-y-[60px] lg:grid-cols-12'
+          )}
+        >
+          {featuredProjects.map((project) => (
+            <FeaturedProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+
+        {/* Regular Projects Grid - 3 columns, 2 rows */}
         <div
           className={clsx(
             'grid grid-cols-1 gap-x-5 gap-y-10 max-md:gap-y-[60px] md:grid-cols-2 lg:grid-cols-3'
           )}
         >
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+          {regularProjects.map((project) => (
+            <RegularProjectCard key={project.id} project={project} />
           ))}
         </div>
       </div>

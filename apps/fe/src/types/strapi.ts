@@ -171,3 +171,26 @@ export type CategoryEntity = StrapiEntity<StrapiCategory>;
 export type TagEntity = StrapiEntity<StrapiTag>;
 export type PageEntity = StrapiEntity<StrapiPage>;
 export type GlobalEntity = StrapiEntity<StrapiGlobal>;
+export type PartnersEntity = StrapiEntity<StrapiPartners>;
+
+// Partners types
+export interface StrapiPartnerItem {
+  id: number;
+  position: number;
+  name?: string;
+  alt: string;
+  image: {
+    data: StrapiEntity<StrapiMedia>;
+  };
+}
+
+export interface StrapiPartnerRow {
+  id: number;
+  position: number;
+  items: StrapiPartnerItem[];
+}
+
+export interface StrapiPartners {
+  title: string;
+  partner_rows: StrapiPartnerRow[];
+}

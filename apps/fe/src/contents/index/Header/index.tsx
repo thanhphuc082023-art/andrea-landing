@@ -13,25 +13,26 @@ function Header({ heroData = null }: HeaderProps) {
     heroData?.slogan?.subTitle || 'Chúng tôi là Andrea Agency';
   const heroDescription =
     heroData?.slogan?.description ||
-    'Agency tư vấn và thiết kế thương hiệu sáng tạo, đa lĩnh vực, cung cấp các giải pháp thiết kế thương hiệu chuyên sâu, với đội ngũ nhân sự giàu kinh nghiệm, quy trình làm việc rõ ràng và chuyên nghiệp.';
+    `Andrea là Agency tư vấn và thiết kế thương hiệu sáng tạo, chuyên sâu và giàu cảm xúc. Hơn 10 năm kinh nghiệm, với đam mê và tình yêu chúng tôi không chỉ muốn tạo ra logo hay bộ nhận diện mà giúp thương hiệu kết nối với bản chất thật của mình.
+    Chúng tôi tin rằng một thương hiệu có hồn có cảm xúc bắt đầu từ sự thấu hiểu con người, trực giác thiết kế và chiến lược thương hiệu sâu sắc kết hợp với sự thực thi và nội lực mạnh mẽ sẽ giúp thương hiệu phát triển bền vững.`;
 
   return (
     <header
       id="page-header"
-      className={clsx('relative overflow-hidden', 'max-sd:mt-[60px] mt-20')}
+      className={clsx('relative overflow-hidden', 'max-sd:mt-[60px] mt-[65px]')}
     >
       <HeaderVideo heroData={heroData} />
 
       {/* Content */}
       <div
         className={clsx(
-          'max-sd:pt-[105px] relative z-10 pt-[116px] max-md:pt-[84px]'
+          'relative z-10 flex min-h-[509px] items-center py-[75px]'
         )}
       >
         <div className={clsx('content-wrapper mx-auto')}>
           <div
             className={clsx(
-              'max-sd:px-[30px] relative flex flex-wrap items-center justify-between gap-[60px] px-[70px] max-lg:justify-center max-lg:gap-[10px] max-lg:px-0 lg:flex-nowrap'
+              'relative flex flex-wrap items-center justify-between gap-[120px] max-lg:justify-center max-lg:gap-[10px] max-lg:px-0 lg:flex-nowrap'
             )}
           >
             {/* Title positioned like in Figma: left side */}
@@ -40,11 +41,12 @@ function Header({ heroData = null }: HeaderProps) {
             </div>
 
             {/* Description luôn bên phải, mọi màn hình */}
-            <div className={clsx('max-w-[505px]')}>
+            <div className={clsx('max-w-[566px]')}>
               <div
                 className={clsx(
                   'font-sans text-base font-[400] text-black',
-                  'leading-[26px] max-lg:text-center dark:text-slate-300'
+                  'leading-[26px] max-lg:text-center dark:text-slate-300',
+                  'whitespace-pre-line'
                 )}
               >
                 <p className="font-normal">{heroDescription}</p>

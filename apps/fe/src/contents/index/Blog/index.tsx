@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import clsx from 'clsx';
 import Image from 'next/image';
 
@@ -57,7 +58,7 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
           <p className={clsx('mb-2 text-sm text-gray-600')}>{post.date}</p>
           <h3
             className={clsx(
-              'mb-3 text-lg font-medium text-gray-900',
+              'mb-3 text-lg font-semibold text-gray-900',
               'line-clamp-2 leading-tight'
             )}
           >
@@ -129,7 +130,7 @@ function Blog() {
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
         {/* Section Title */}
-        <div className={clsx('max-sd:mb-14 mb-12 max-md:mb-11')}>
+        <div className={clsx('mb-6')}>
           <h2
             className={clsx(
               'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
@@ -153,17 +154,17 @@ function Blog() {
 
         {/* See More Button */}
         <div className={clsx('mt-6 text-center')}>
-          <button
-            type="button"
-            className={clsx(
-              'min-w-[143px] rounded-md px-9 py-2.5',
-              'bg-brand-orange hover:bg-brand-orange-dark text-white',
-              'transition-all duration-300'
-            )}
-            aria-label="Xem thêm bài viết blog"
+          <SubmitButton
+            textColor="text-brand-orange"
+            borderColor="border-brand-orange"
+            beforeBgColor="before:bg-brand-orange"
+            hoverBgColor="hover:bg-brand-orange-dark"
+            hoverTextColor="hover:text-black"
+            focusRingColor="focus:ring-brand-orange"
+            focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
           >
             Xem thêm
-          </button>
+          </SubmitButton>
         </div>
       </div>
     </section>

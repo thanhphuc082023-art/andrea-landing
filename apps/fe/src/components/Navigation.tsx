@@ -3,9 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import StrapiLogo from '@/components/StrapiLogo';
-import { getMenuSettings } from '@/lib/strapi-server';
 import type { NavigationItem, StrapiGlobal } from '@/types/strapi';
-import { GetStaticProps } from 'next';
 
 interface NavbarProps {
   // Optional server-side data for static generation
@@ -39,7 +37,7 @@ function Navbar({ serverGlobal = null, menuItems = [] }: NavbarProps) {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[1000] w-full">
-      <div className="max-sd:h-[60px] h-20 w-full bg-[#F5F5F5]">
+      <div className="max-sd:h-[60px] h-[65px] w-full bg-[#F5F5F5]">
         <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
           <Link
@@ -166,25 +164,5 @@ function Navbar({ serverGlobal = null, menuItems = [] }: NavbarProps) {
     </header>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  try {
-    const { menu, error } = await getMenuSettings();
-
-    return {
-      props: {
-        menuItems: menu?.attributes?.items || [],
-      },
-      revalidate: 3600, // ISR 1 hour
-    };
-  } catch (error) {
-    return {
-      props: {
-        menuItems: [],
-      },
-      revalidate: 3600,
-    };
-  }
-};
 
 export default Navbar;
