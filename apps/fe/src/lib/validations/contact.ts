@@ -30,8 +30,14 @@ export const contactFormSchema = z.object({
 
   captcha: z
     .string()
-    .min(4, 'Mã xác thực phải có 4 ký tự')
-    .max(4, 'Mã xác thực phải có 4 ký tự'),
+    .min(
+      Number(process.env.NEXT_PUBLIC_MAX_LENGTH_CAPTCHA),
+      `Mã xác thực phải có ${process.env.NEXT_PUBLIC_MAX_LENGTH_CAPTCHA} ký tự`
+    )
+    .max(
+      Number(process.env.NEXT_PUBLIC_MAX_LENGTH_CAPTCHA),
+      `Mã xác thực phải có ${process.env.NEXT_PUBLIC_MAX_LENGTH_CAPTCHA} ký tự`
+    ),
 
   captchaId: z.string().optional(),
 });
