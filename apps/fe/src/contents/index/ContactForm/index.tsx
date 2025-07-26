@@ -175,8 +175,8 @@ function ContactForm() {
               <input
                 {...register('name')}
                 type="text"
-                placeholder="Tên khách hàng"
-                aria-label="Tên khách hàng"
+                placeholder="Tên liên hệ"
+                aria-label="Tên liên hệ"
                 className={clsx(
                   'w-full py-1',
                   'border-b border-[#97979780] bg-transparent text-white',
@@ -199,8 +199,8 @@ function ContactForm() {
                 <input
                   {...register('phone')}
                   type="tel"
-                  placeholder="Điện thoại"
-                  aria-label="Điện thoại"
+                  placeholder="Số điện thoại"
+                  aria-label="Số điện thoại"
                   className={clsx(
                     'w-full py-1',
                     'border-b border-[#97979780] bg-transparent text-white',
@@ -247,8 +247,8 @@ function ContactForm() {
                 <input
                   {...register('industry')}
                   type="text"
-                  placeholder="Ngành nghề"
-                  aria-label="Ngành nghề"
+                  placeholder="Tên công ty và Ngành nghề"
+                  aria-label="Tên công ty và Ngành nghề"
                   className={clsx(
                     'w-full py-1',
                     'border-b border-[#97979780] bg-transparent text-white',
@@ -335,8 +335,8 @@ function ContactForm() {
             <div className={clsx('relative')}>
               <input
                 {...register('message')}
-                placeholder="Câu hỏi"
-                aria-label="Câu hỏi"
+                placeholder="Yêu cầu tư vấn và báo giá"
+                aria-label="Yêu cầu tư vấn và báo giá"
                 className={clsx(
                   'w-full py-1',
                   'border-b border-[#97979780] bg-transparent text-white',

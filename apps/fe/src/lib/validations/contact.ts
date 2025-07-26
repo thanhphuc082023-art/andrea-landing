@@ -20,13 +20,13 @@ export const contactFormSchema = z.object({
 
   industry: z
     .string()
-    .min(2, 'Ngành nghề phải có ít nhất 2 ký tự')
-    .max(100, 'Ngành nghề không được quá 100 ký tự'),
+    .min(2, 'Tên công ty và Ngành nghề phải có ít nhất 2 ký tự')
+    .max(100, 'Tên công ty và Ngành nghề không được quá 100 ký tự'),
 
   message: z
     .string()
-    .min(10, 'Câu hỏi phải có ít nhất 10 ký tự')
-    .max(500, 'Câu hỏi không được quá 500 ký tự'),
+    .min(10, 'Yêu cầu tư vấn và báo giá phải có ít nhất 10 ký tự')
+    .max(500, 'Yêu cầu tư vấn và báo giá không được quá 500 ký tự'),
 
   captcha: z
     .string()

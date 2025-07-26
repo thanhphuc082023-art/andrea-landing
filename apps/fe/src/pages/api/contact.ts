@@ -38,11 +38,11 @@ const createEmailTemplate = (data: ContactFormData) => `
         </div>
         <div class="content">
           <div class="field">
-            <div class="label">👤 Tên khách hàng:</div>
+            <div class="label">👤 Tên liên hệ:</div>
             <div class="value">${data.name}</div>
           </div>
           <div class="field">
-            <div class="label">📞 Điện thoại:</div>
+            <div class="label">📞 Số điện thoại:</div>
             <div class="value">${data.phone}</div>
           </div>
           <div class="field">
@@ -50,11 +50,11 @@ const createEmailTemplate = (data: ContactFormData) => `
             <div class="value">${data.email}</div>
           </div>
           <div class="field">
-            <div class="label">🏢 Ngành nghề:</div>
+            <div class="label">🏢 Tên công ty và Ngành nghề:</div>
             <div class="value">${data.industry}</div>
           </div>
           <div class="field">
-            <div class="label">💬 Câu hỏi:</div>
+            <div class="label">💬 Yêu cầu tư vấn và báo giá:</div>
             <div class="value">${data.message}</div>
           </div>
           <div class="field">
