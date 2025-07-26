@@ -38,8 +38,8 @@ SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 
 # Strapi Configuration
-STRAPI_URL=http://localhost:1337
-STRAPI_TOKEN=your-strapi-token
+NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
+STRAPI_API_TOKEN=your-strapi-token
 
 NODE_ENV=development
 ```
@@ -137,7 +137,7 @@ Truy cập `http://localhost:1337/admin` để:
 ## 🚀 Production Deployment
 
 1. **Environment Variables:**
-   - Cập nhật STRAPI_URL cho production
+   - Cập nhật NEXT_PUBLIC_STRAPI_URL cho production
    - Sử dụng SMTP service chuyên nghiệp (SendGrid, Mailgun)
 
 2. **Security Enhancements:**

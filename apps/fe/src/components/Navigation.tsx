@@ -55,7 +55,7 @@ function Navbar({ serverGlobal = null, menuItems = [] }: NavbarProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 md:flex lg:gap-[58px]">
+          <nav className="hidden items-center space-x-8 md:flex lg:space-x-[58px]">
             {navigationItems.map((item) => (
               <Link
                 key={item.label}

@@ -109,7 +109,7 @@ function Footer({ footerData = {} }: FooterProps) {
                           key={phone.href}
                           href={`tel:${phone.href}`}
                           className={clsx(
-                            'text-sm text-black hover:text-slate-900',
+                            'inline-block min-h-[22px] text-sm text-black hover:text-slate-900',
                             'dark:text-slate-400 dark:hover:text-slate-100'
                           )}
                         >
@@ -149,7 +149,7 @@ function Footer({ footerData = {} }: FooterProps) {
                           key={website.href}
                           href={website.href}
                           className={clsx(
-                            'text-sm text-black hover:text-slate-900',
+                            'inline-block min-h-[22px] text-sm text-black hover:text-slate-900',
                             'dark:text-slate-400 dark:hover:text-slate-100'
                           )}
                         >
@@ -189,7 +189,7 @@ function Footer({ footerData = {} }: FooterProps) {
                           key={email.href}
                           href={`mailto:${email.href}`}
                           className={clsx(
-                            'text-sm text-black hover:text-slate-900',
+                            'inline-block min-h-[22px] text-sm text-black hover:text-slate-900',
                             'dark:text-slate-400 dark:hover:text-slate-100'
                           )}
                         >
@@ -215,7 +215,7 @@ function Footer({ footerData = {} }: FooterProps) {
                       <a
                         href="tel:0906219926"
                         className={clsx(
-                          'text-sm text-black hover:text-slate-900',
+                          'inline-block min-h-[22px] text-sm text-black hover:text-slate-900',
                           'dark:text-slate-400 dark:hover:text-slate-100'
                         )}
                       >
@@ -238,7 +238,7 @@ function Footer({ footerData = {} }: FooterProps) {
                         target="_blank"
                         rel="noreferrer nofollow"
                         className={clsx(
-                          'text-sm text-black hover:text-slate-900',
+                          'inline-block min-h-[22px] text-sm text-black hover:text-slate-900',
                           'dark:text-slate-400 dark:hover:text-slate-100'
                         )}
                       >
@@ -257,7 +257,7 @@ function Footer({ footerData = {} }: FooterProps) {
                       <a
                         href="mailto:info@andrea.vn"
                         className={clsx(
-                          'text-sm text-black hover:text-slate-900',
+                          'inline-block min-h-[22px] text-sm text-black hover:text-slate-900',
                           'dark:text-slate-400 dark:hover:text-slate-100'
                         )}
                       >
@@ -275,7 +275,7 @@ function Footer({ footerData = {} }: FooterProps) {
               >
                 {socialMediaTitle}
               </h2>
-              <div className={clsx('flex flex-wrap gap-3')}>
+              <div className={clsx('flex flex-wrap space-x-3')}>
                 {socialMediaLinks.length > 0 ? (
                   socialMediaLinks
                     .sort((a, b) => Number(b.position) - Number(a.position))

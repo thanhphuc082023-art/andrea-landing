@@ -109,12 +109,12 @@ function Partners({ partnersData = {} }: PartnersProps) {
         </div>
 
         {/* Partners Grid */}
-        <div className={clsx('flex flex-col gap-[42px] lg:gap-11')}>
+        <div className={clsx('flex flex-col space-y-[22px] lg:space-y-11')}>
           {partners?.map((row) => (
             <div
               key={`row-${row?.id}`}
               className={clsx(
-                'flex items-center justify-end gap-6 border-b border-black/20 pb-[42px] lg:gap-[145px]'
+                'flex items-center justify-end space-x-6 border-b border-black/20 pb-[22px] lg:space-x-[145px]'
               )}
             >
               {row?.partners?.map((partner) => (

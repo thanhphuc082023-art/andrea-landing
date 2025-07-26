@@ -82,13 +82,14 @@ async function saveToStrapi(data: ContactFormData) {
     };
 
     // Replace with your Strapi URL and endpoint
-    const strapiUrl = process.env.STRAPI_URL || 'http://localhost:1337';
+    const strapiUrl =
+      process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
     const response = await fetch(`${strapiUrl}/api/contact-submissions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         // Add authorization if needed
-        // 'Authorization': `Bearer ${process.env.STRAPI_TOKEN}`,
+        // 'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`,
       },
       body: JSON.stringify(strapiData),
     });
