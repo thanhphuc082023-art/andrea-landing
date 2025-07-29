@@ -79,6 +79,10 @@ module.exports = {
   },
   safelist: [
     { pattern: /grid-rows-\d+/ },
+    { pattern: /col-start-\d+/ },
+    { pattern: /col-end-\d+/ },
+    { pattern: /row-start-\d+/ },
+    { pattern: /row-end-\d+/ },
     // ECMP Colors
     {
       pattern:

@@ -1,21 +1,70 @@
 import clsx from 'clsx';
-import ServiceCard from './ServiceCard';
-// import { ConsultingIcon } from '@/assets/icons/ConsultingIcon';
-// import PackagingIcon from '@/assets/icons/PackagingIcon';
-// import ProfileCatalogueIcon from '@/assets/icons/ProfileCatalogueIcon';
-// import EventIdentityIcon from '@/assets/icons/EventIdentityIcon';
-// import WebDesignIcon from '@/assets/icons/WebDesignIcon';
-// import SocialBrandingIcon from '@/assets/icons/SocialBrandingIcon';
-// import MediaProductionIcon from '@/assets/icons/MediaProductionIcon';
-// import ServiceIcon from '@/assets/icons/ServiceIcon';
-import { getStrapiMediaUrl } from '@/utils/helper';
 
-interface ServicesProps {
-  servicesData?: any;
+import ServiceCard from './ServiceCard';
+
+interface Service {
+  id?: number;
+  position: number;
+  title: string;
+  description: string;
+  slogan?: unknown[];
+  icon?: unknown;
+  iconActive?: unknown;
 }
 
-function Services({ servicesData = [] }: ServicesProps) {
+interface ServicesData {
+  title?: string;
+  items?: Service[];
+}
+
+interface ServicesProps {
+  servicesData?: ServicesData;
+}
+
+function Services({ servicesData = {} }: ServicesProps) {
   const services = servicesData?.items || [];
+
+  // Layout config cho 5 items đầu
+  const layoutConfig = [
+    { colStart: 1, colEnd: 3, rowStart: 1, rowEnd: 7, active: false }, // Item 1
+    { colStart: 3, colEnd: 5, rowStart: 1, rowEnd: 5, active: false }, // Item 2
+    { colStart: 5, colEnd: 7, rowStart: 1, rowEnd: 4, active: false }, // Item 3
+    { colStart: 3, colEnd: 5, rowStart: 5, rowEnd: 7, active: false }, // Item 4
+    { colStart: 5, colEnd: 7, rowStart: 4, rowEnd: 7, active: false }, // Item 5
+  ];
+
+  interface LayoutConfig {
+    colStart: number;
+    colEnd: number;
+    rowStart: number;
+    rowEnd: number;
+    active: boolean;
+  }
+
+  const renderServiceCard = (
+    service: Service,
+    config: LayoutConfig,
+    index: number
+  ) => {
+    if (!service) return null;
+
+    const gridClass = clsx(
+      // Desktop grid positioning
+      `col-start-${config.colStart} col-end-${config.colEnd} row-start-${config.rowStart} row-end-${config.rowEnd}`,
+      // Tablet large (max-sd: 1194px) - simplify to 2x2 grid
+      'max-sd:col-span-2 max-sd:row-span-3',
+      // Tablet (max-lg: 1024px) - stack vertically with larger cards
+      'max-lg:col-span-3 max-lg:row-span-4',
+      // Mobile (max-md: 768px) - single column
+      'max-md:col-span-1 max-md:row-span-auto'
+    );
+
+    return (
+      <div key={`service-${service.id || index}`} className={gridClass}>
+        <ServiceCard service={service} active={config.active} />
+      </div>
+    );
+  };
 
   return (
     <section>
@@ -24,7 +73,8 @@ function Services({ servicesData = [] }: ServicesProps) {
         <div className={clsx('mb-6')}>
           <h2
             className={clsx(
-              'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
+              'font-playfair text-brand-orange font-medium',
+              'max-sd:text-[40px] max-370:text-[28px] text-[50px] max-lg:text-[36px] max-md:text-[35px]'
             )}
           >
             {servicesData?.title || 'Dịch vụ'}
@@ -34,60 +84,77 @@ function Services({ servicesData = [] }: ServicesProps) {
         {/* Services Grid */}
         <div
           className={clsx(
-            'max-sd:grid-cols-4 grid grid-cols-6 gap-6 max-md:grid-cols-1'
+            'grid grid-cols-6 grid-rows-4 gap-6',
+            'max-sd:grid-cols-4 max-sd:gap-4',
+            'max-lg:grid-cols-3 max-lg:gap-4',
+            'max-md:grid-cols-1 max-md:gap-4'
           )}
         >
-          {/* Card lớn chiếm 2 cột, 4 hàng */}
-          <div
-            className={clsx(
-              'max-sd:col-span-2 col-span-2 row-span-4 max-md:col-span-1'
+          {/* Render 5 items đầu với layout cố định */}
+          {services
+            .slice(0, 5)
+            .map((service, index) =>
+              renderServiceCard(service, layoutConfig[index], index)
             )}
-          >
-            <ServiceCard
-              active={true}
-              service={services[0]}
-              iconUrl={getStrapiMediaUrl(services[0]?.iconActive)}
-            />
-          </div>
-          {/* Các card còn lại */}
-          {services.slice(1).map((service, index) => {
-            const remainingServices = services.slice(1);
-            const isLastItem = index === remainingServices.length - 1;
-            let gridClass =
-              'max-sd:col-span-2 col-span-2 row-span-2 max-md:col-span-1';
-            if (isLastItem) {
-              // Vị trí thực tế của last item trong toàn bộ services (bắt đầu từ 1)
-              const lastItemPos = index + 2; // +1 vì slice(1), +1 vì index bắt đầu từ 0
 
-              if (lastItemPos >= 6) {
-                if (
-                  Array.from(
-                    {
-                      length: Math.ceil((services.length - 5) / 3),
-                    },
-                    (_, i) => 6 + i * 3
-                  ).includes(lastItemPos)
-                ) {
-                  gridClass = 'col-span-6 row-span-2 max-md:col-span-1';
-                } else if (
-                  Array.from(
-                    { length: Math.ceil((services.length - 6) / 3) },
-                    (_, i) => 7 + i * 3
-                  ).includes(lastItemPos)
-                ) {
-                  gridClass = 'col-span-4 row-span-2 max-md:col-span-1';
-                } else {
-                  gridClass = 'col-span-2 row-span-2 max-md:col-span-1';
-                }
+          {/* Các item còn lại (từ item 6 trở đi) */}
+          {services.slice(5).map((service, index) => {
+            const actualIndex = index + 6; // Vị trí thực tế trong mảng services
+            const remainingServices = services.slice(5);
+            const isLastItem = index === remainingServices.length - 1;
+
+            let gridClass = clsx(
+              // Desktop default
+              'col-span-2 row-span-3',
+              // Tablet large (max-sd: 1194px)
+              'max-sd:col-span-2 max-sd:row-span-3',
+              // Tablet (max-lg: 1024px)
+              'max-lg:col-span-3 max-lg:row-span-4',
+              // Mobile (max-md: 768px)
+              'max-md:col-span-1 max-md:row-span-auto'
+            );
+
+            if (isLastItem && actualIndex >= 6) {
+              const pattern1 = Array.from(
+                { length: Math.ceil((services.length - 5) / 3) },
+                (_, i) => 6 + i * 3
+              );
+              const pattern2 = Array.from(
+                { length: Math.ceil((services.length - 6) / 3) },
+                (_, i) => 7 + i * 3
+              );
+
+              if (pattern1.includes(actualIndex)) {
+                gridClass = clsx(
+                  // Desktop
+                  'col-span-6 row-span-3',
+                  // Tablet large (max-sd: 1194px)
+                  'max-sd:col-span-4 max-sd:row-span-3',
+                  // Tablet (max-lg: 1024px)
+                  'max-lg:col-span-3 max-lg:row-span-4',
+                  // Mobile (max-md: 768px)
+                  'max-md:col-span-1 max-md:row-span-auto'
+                );
+              } else if (pattern2.includes(actualIndex)) {
+                gridClass = clsx(
+                  // Desktop
+                  'col-span-4 row-span-3',
+                  // Tablet large (max-sd: 1194px)
+                  'max-sd:col-span-4 max-sd:row-span-3',
+                  // Tablet (max-lg: 1024px)
+                  'max-lg:col-span-3 max-lg:row-span-4',
+                  // Mobile (max-md: 768px)
+                  'max-md:col-span-1 max-md:row-span-auto'
+                );
               }
             }
 
             return (
-              <div key={`service-${service.id}`} className={clsx(gridClass)}>
-                <ServiceCard
-                  service={service}
-                  iconUrl={getStrapiMediaUrl(service.icon)}
-                />
+              <div
+                key={`service-${service.id || actualIndex}`}
+                className={gridClass}
+              >
+                <ServiceCard service={service} />
               </div>
             );
           })}

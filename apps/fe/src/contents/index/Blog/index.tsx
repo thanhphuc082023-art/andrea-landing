@@ -1,6 +1,7 @@
-import SubmitButton from '@/components/SubmitButton';
 import clsx from 'clsx';
 import Image from 'next/image';
+
+import SubmitButton from '@/components/SubmitButton';
 
 const blogPosts = [
   {
@@ -158,8 +159,8 @@ function Blog() {
             textColor="text-brand-orange"
             borderColor="border-brand-orange"
             beforeBgColor="before:bg-brand-orange"
-            hoverBgColor="hover:bg-brand-orange-dark"
-            hoverTextColor="hover:text-black"
+            hoverBgColor="hover:bg-brand-orange"
+            hoverTextColor="hover:text-white"
             focusRingColor="focus:ring-brand-orange"
             focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
           >

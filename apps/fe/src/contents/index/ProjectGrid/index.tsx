@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import Image from 'next/image';
 
+import SubmitButton from '@/components/SubmitButton';
+
 interface Project {
   id: number;
   title: string;
@@ -241,6 +243,21 @@ function ProjectGrid() {
           {regularProjects.map((project) => (
             <RegularProjectCard key={project.id} project={project} />
           ))}
+        </div>
+
+        {/* See More Button */}
+        <div className={clsx('mt-9 text-center')}>
+          <SubmitButton
+            textColor="text-brand-orange"
+            borderColor="border-brand-orange"
+            beforeBgColor="before:bg-brand-orange"
+            hoverBgColor="hover:bg-brand-orange"
+            hoverTextColor="hover:text-white"
+            focusRingColor="focus:ring-brand-orange"
+            focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
+          >
+            Xem thêm
+          </SubmitButton>
         </div>
       </div>
     </section>

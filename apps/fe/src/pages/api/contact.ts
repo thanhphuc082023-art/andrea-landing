@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import nodemailer from 'nodemailer';
+
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Form data interface
 interface ContactFormData {

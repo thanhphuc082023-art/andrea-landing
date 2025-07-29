@@ -1,20 +1,23 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
+import { AnimatePresence, m } from 'framer-motion';
+import { LoaderCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import {
-  useForm,
-  SubmitHandler,
   FieldErrors,
+  SubmitHandler,
+  useForm,
   UseFormSetError,
 } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, useEffect } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
-import {
-  contactFormSchema,
-  type ContactFormData,
-} from '@/lib/validations/contact';
-import { useCaptcha } from '@/hooks/useCaptcha';
+
 import SubmitButton from '@/components/SubmitButton';
-import { LoaderCircle } from 'lucide-react';
+
+import { useCaptcha } from '@/hooks/useCaptcha';
+
+import {
+  type ContactFormData,
+  contactFormSchema,
+} from '@/lib/validations/contact';
 
 function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -142,235 +145,237 @@ function ContactForm() {
   };
 
   return (
-    <section className={clsx('relative bg-[#1A253A] py-20 lg:py-28')}>
-      <div className={clsx('content-wrapper mx-auto')}>
-        <div className={clsx('mx-auto max-w-4xl')}>
-          {/* Section Title */}
-          <div className={clsx('mb-16 text-center max-md:mb-12')}>
-            <h2
+    <section
+      className={clsx(
+        'max-sd:h-[500px] relative flex h-[509px] items-center justify-center bg-[#1A253A] p-4'
+      )}
+    >
+      <div className={clsx('mx-auto w-full max-w-[795px]')}>
+        {/* Section Title */}
+        <div className={clsx('mb-16 text-center max-md:mb-12')}>
+          <h2
+            className={clsx(
+              'font-playfair text-4xl font-medium text-white lg:text-5xl'
+            )}
+          >
+            Đồng hành cùng chúng tôi
+          </h2>
+        </div>
+
+        {/* Status Messages - Only show error messages */}
+        {submitStatus.type === 'error' && (
+          <div
+            className={clsx(
+              'mb-6 rounded-lg p-4 text-center',
+              'bg-red-100 text-red-800'
+            )}
+          >
+            {submitStatus.message}
+          </div>
+        )}
+
+        {/* Contact Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className={clsx('space-y-7')}>
+          {/* First Row - Name */}
+          <div className={clsx('relative')}>
+            <input
+              {...register('name')}
+              type="text"
+              placeholder="Tên liên hệ"
+              aria-label="Tên liên hệ"
               className={clsx(
-                'font-playfair text-4xl font-medium text-white lg:text-5xl'
+                'w-full py-1',
+                'border-b border-[#97979780] bg-transparent text-white',
+                'placeholder:font-[400] placeholder:text-[#979797]',
+                'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                'transition-colors duration-300',
+                errors.name && 'border-red-500'
               )}
-            >
-              Đồng hành cùng chúng tôi
-            </h2>
+            />
+            {errors.name && (
+              <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                {errors.name.message}
+              </p>
+            )}
           </div>
 
-          {/* Status Messages - Only show error messages */}
-          {submitStatus.type === 'error' && (
-            <div
-              className={clsx(
-                'mb-6 rounded-lg p-4 text-center',
-                'bg-red-100 text-red-800'
-              )}
-            >
-              {submitStatus.message}
-            </div>
-          )}
-
-          {/* Contact Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className={clsx('space-y-7')}>
-            {/* First Row - Name */}
+          {/* Second Row - Phone and Email */}
+          <div className={clsx('grid grid-cols-2 gap-2 md:gap-4')}>
             <div className={clsx('relative')}>
               <input
-                {...register('name')}
-                type="text"
-                placeholder="Tên liên hệ"
-                aria-label="Tên liên hệ"
+                {...register('phone')}
+                type="tel"
+                placeholder="Số điện thoại"
+                aria-label="Số điện thoại"
                 className={clsx(
                   'w-full py-1',
                   'border-b border-[#97979780] bg-transparent text-white',
                   'placeholder:font-[400] placeholder:text-[#979797]',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                   'transition-colors duration-300',
-                  errors.name && 'border-red-500'
+                  errors.phone && 'border-red-500'
                 )}
               />
-              {errors.name && (
+              {errors.phone && (
                 <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
-                  {errors.name.message}
+                  {errors.phone.message}
                 </p>
               )}
             </div>
-
-            {/* Second Row - Phone and Email */}
-            <div className={clsx('grid grid-cols-2 gap-2 md:gap-4')}>
-              <div className={clsx('relative')}>
-                <input
-                  {...register('phone')}
-                  type="tel"
-                  placeholder="Số điện thoại"
-                  aria-label="Số điện thoại"
-                  className={clsx(
-                    'w-full py-1',
-                    'border-b border-[#97979780] bg-transparent text-white',
-                    'placeholder:font-[400] placeholder:text-[#979797]',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
-                    'transition-colors duration-300',
-                    errors.phone && 'border-red-500'
-                  )}
-                />
-                {errors.phone && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
-              <div className={clsx('relative')}>
-                <input
-                  {...register('email')}
-                  type="email"
-                  placeholder="Email"
-                  aria-label="Email"
-                  className={clsx(
-                    'w-full py-1',
-                    'border-b border-[#97979780] bg-transparent text-white',
-                    'placeholder:font-[400] placeholder:text-[#979797]',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
-                    'transition-colors duration-300',
-                    errors.email && 'border-red-500'
-                  )}
-                />
-                {errors.email && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Third Row - industry and Security Code */}
-            <div
-              className={clsx('grid grid-cols-1 gap-7 md:grid-cols-2 md:gap-4')}
-            >
-              <div className={clsx('relative md:col-span-1')}>
-                <input
-                  {...register('industry')}
-                  type="text"
-                  placeholder="Tên công ty và Ngành nghề"
-                  aria-label="Tên công ty và Ngành nghề"
-                  className={clsx(
-                    'w-full py-1',
-                    'border-b border-[#97979780] bg-transparent text-white',
-                    'placeholder:font-[400] placeholder:text-[#979797]',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
-                    'transition-colors duration-300',
-                    errors.industry && 'border-red-500'
-                  )}
-                />
-                {errors.industry && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
-                    {errors.industry.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="relative md:col-span-1">
-                <input
-                  {...register('captcha')}
-                  type="text"
-                  placeholder="Mã bảo mật"
-                  aria-label="Mã bảo mật"
-                  className={clsx(
-                    'w-full py-1',
-                    'border-b border-[#97979780] bg-transparent text-white',
-                    'placeholder:font-[400] placeholder:text-[#979797]',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
-                    'transition-colors duration-300',
-                    errors.captcha && 'border-red-500'
-                  )}
-                />
-                {errors.captcha && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
-                    {errors.captcha.message}
-                  </p>
-                )}
-
-                <div className="absolute -top-[13px] right-0 flex h-full items-center justify-center">
-                  {captchaData && !captchaLoading && (
-                    <>
-                      {/* Captcha Display */}
-                      <div
-                        className="flex h-[44px] items-center justify-center rounded bg-white"
-                        title="Mã xác thực"
-                        dangerouslySetInnerHTML={{ __html: captchaData.svg }}
-                      />
-                    </>
-                  )}
-                  {captchaLoading && (
-                    <div className="flex h-[44px] min-w-[120px] items-center justify-center rounded bg-white px-4">
-                      <span className="text-gray-500">
-                        <LoaderCircle className="animate-spin" />
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Refresh Button */}
-                  <button
-                    type="button"
-                    onClick={generateCaptcha}
-                    className="justify-centertext-white transition-colorr flex h-[44px] w-[44px] items-center justify-center text-white"
-                    title="Tạo mã xác thực mới"
-                    aria-label="Tạo mã xác thực mới"
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Fourth Row - Message */}
             <div className={clsx('relative')}>
               <input
-                {...register('message')}
-                placeholder="Yêu cầu tư vấn và báo giá"
-                aria-label="Yêu cầu tư vấn và báo giá"
+                {...register('email')}
+                type="email"
+                placeholder="Email"
+                aria-label="Email"
                 className={clsx(
                   'w-full py-1',
                   'border-b border-[#97979780] bg-transparent text-white',
                   'placeholder:font-[400] placeholder:text-[#979797]',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
-                  'resize-none outline-none transition-colors duration-300',
-                  errors.message && 'border-red-500'
+                  'transition-colors duration-300',
+                  errors.email && 'border-red-500'
                 )}
               />
-              {errors.message && (
+              {errors.email && (
                 <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
-                  {errors.message.message}
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Third Row - industry and Security Code */}
+          <div
+            className={clsx('grid grid-cols-1 gap-7 md:grid-cols-2 md:gap-4')}
+          >
+            <div className={clsx('relative md:col-span-1')}>
+              <input
+                {...register('industry')}
+                type="text"
+                placeholder="Tên công ty và Ngành nghề"
+                aria-label="Tên công ty và Ngành nghề"
+                className={clsx(
+                  'w-full py-1',
+                  'border-b border-[#97979780] bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-[#979797]',
+                  'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                  'transition-colors duration-300',
+                  errors.industry && 'border-red-500'
+                )}
+              />
+              {errors.industry && (
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                  {errors.industry.message}
                 </p>
               )}
             </div>
 
-            {/* Submit Button */}
-            <div className={clsx('text-center')}>
-              <SubmitButton
-                isSubmitting={isSubmitting}
-                disabled={isSubmitting}
-                textColor="text-white"
-                borderColor="border-white"
-                beforeBgColor="before:bg-white"
-                hoverBgColor="hover:bg-[#D5D5D5]"
-                hoverTextColor="hover:text-black"
-                focusRingColor="focus:ring-white"
-                focusRingOffsetColor="focus:ring-offset-[#1A253A]"
-              >
-                {isSubmitting ? 'Đang gửi...' : 'Gửi'}
-              </SubmitButton>
+            <div className="relative md:col-span-1">
+              <input
+                {...register('captcha')}
+                type="text"
+                placeholder="Mã bảo mật"
+                aria-label="Mã bảo mật"
+                className={clsx(
+                  'w-full py-1',
+                  'border-b border-[#97979780] bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-[#979797]',
+                  'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                  'transition-colors duration-300',
+                  errors.captcha && 'border-red-500'
+                )}
+              />
+              {errors.captcha && (
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                  {errors.captcha.message}
+                </p>
+              )}
+
+              <div className="absolute -top-[13px] right-0 flex h-full items-center justify-center">
+                {captchaData && !captchaLoading && (
+                  <>
+                    {/* Captcha Display */}
+                    <div
+                      className="flex h-[44px] items-center justify-center rounded bg-white"
+                      title="Mã xác thực"
+                      dangerouslySetInnerHTML={{ __html: captchaData.svg }}
+                    />
+                  </>
+                )}
+                {captchaLoading && (
+                  <div className="flex h-[44px] min-w-[120px] items-center justify-center rounded bg-white px-4">
+                    <span className="text-gray-500">
+                      <LoaderCircle className="animate-spin" />
+                    </span>
+                  </div>
+                )}
+
+                {/* Refresh Button */}
+                <button
+                  type="button"
+                  onClick={generateCaptcha}
+                  className="justify-centertext-white transition-colorr flex h-[44px] w-[44px] items-center justify-center text-white"
+                  title="Tạo mã xác thực mới"
+                  aria-label="Tạo mã xác thực mới"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </form>
-        </div>
+          </div>
+
+          {/* Fourth Row - Message */}
+          <div className={clsx('relative')}>
+            <input
+              {...register('message')}
+              placeholder="Yêu cầu tư vấn và báo giá"
+              aria-label="Yêu cầu tư vấn và báo giá"
+              className={clsx(
+                'w-full py-1',
+                'border-b border-[#97979780] bg-transparent text-white',
+                'placeholder:font-[400] placeholder:text-[#979797]',
+                'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                'resize-none outline-none transition-colors duration-300',
+                errors.message && 'border-red-500'
+              )}
+            />
+            {errors.message && (
+              <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                {errors.message.message}
+              </p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className={clsx('text-center')}>
+            <SubmitButton
+              isSubmitting={isSubmitting}
+              disabled={isSubmitting}
+              textColor="text-brand-orange"
+              borderColor="border-brand-orange"
+              beforeBgColor="before:bg-brand-orange"
+              hoverBgColor="hover:bg-brand-orange"
+              hoverTextColor="hover:text-white"
+              focusRingColor="focus:ring-brand-orange"
+              focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
+            >
+              {isSubmitting ? 'Đang gửi...' : 'Gửi'}
+            </SubmitButton>
+          </div>
+        </form>
       </div>
 
       {/* Success Overlay with Framer Motion */}

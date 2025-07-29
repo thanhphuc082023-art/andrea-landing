@@ -1,17 +1,18 @@
-import Header from '@/contents/index/Header';
-import Services from '@/contents/index/Services';
-import BrandSection from '@/contents/index/BrandSection';
-import Workflow from '@/contents/index/Workflow';
-import ProjectGrid from '@/contents/index/ProjectGrid';
-import Partners from '@/contents/index/Partners';
-import Blog from '@/contents/index/Blog';
-import ContactForm from '@/contents/index/ContactForm';
 import clsx from 'clsx';
+
+import Blog from '@/contents/index/Blog';
+import BrandSection from '@/contents/index/BrandSection';
+import ContactForm from '@/contents/index/ContactForm';
+import Header from '@/contents/index/Header';
+import Partners from '@/contents/index/Partners';
+import ProjectGrid from '@/contents/index/ProjectGrid';
+import Services from '@/contents/index/Services';
+import Workflow from '@/contents/index/Workflow';
 
 interface IndexContentsProps {
   heroData?: any;
   brandSectionData?: any;
-  servicesData?: any[];
+  servicesData?: any;
   workflowData?: any[];
   partnersData?: any[];
 }

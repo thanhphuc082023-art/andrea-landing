@@ -1,5 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import svgCaptcha from 'svg-captcha';
+
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -9,8 +10,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         size: Number(process.env.NEXT_PUBLIC_MAX_LENGTH_CAPTCHA), // characters length
         ignoreChars: '0o1il', // ignore confusing characters
         noise: 2, // noise lines
-        color: true, // use random colors
-        background: '#F2F2F2',
         fontSize: Number(process.env.NEXT_PUBLIC_FONT_SIZE_CAPTCHA),
         width: 120,
         height: 40,
