@@ -48,7 +48,7 @@ export function useArticles(params?: {
   const mutate = () => {}; // Replace with actual mutate function
 
   return {
-    articles: (data?.data || []) as ArticleEntity[],
+    articles: (data?.data?.articles || []) as ArticleEntity[],
     meta: data?.meta,
     isLoading,
     error,
@@ -99,7 +99,7 @@ export function useProjects(params?: {
   const mutate = () => {}; // Replace with actual mutate function
 
   return {
-    projects: (data?.data || []) as ProjectEntity[],
+    projects: (data?.data?.projects || []) as ProjectEntity[],
     meta: data?.meta,
     isLoading,
     error,

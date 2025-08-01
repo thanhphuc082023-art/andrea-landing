@@ -10,7 +10,7 @@ interface StrapiHeadProps {
   overrideTitle?: boolean;
   structuredData?: string;
   seo?: StrapiSEO;
-  global?: StrapiGlobal;
+  global?: StrapiGlobal | null;
 }
 
 function StrapiHead({

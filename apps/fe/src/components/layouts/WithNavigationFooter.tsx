@@ -16,9 +16,9 @@ interface WithNavigationFooterProps extends PropsWithChildren {
 
 function WithNavigationFooter({
   children,
-  serverGlobal = null,
+  serverGlobal = undefined,
   menuItems = [],
-  footerData = null,
+  footerData = undefined,
 }: WithNavigationFooterProps) {
   return (
     <>

@@ -48,6 +48,12 @@ function Callout({
       };
       break;
     default:
+      data = {
+        title: 'Note',
+        icon: <NoteIcon />,
+        modifier: '',
+      };
+      break;
   }
 
   return (

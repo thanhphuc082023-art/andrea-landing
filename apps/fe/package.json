@@ -28,6 +28,7 @@
     "axios": "^1.10.0",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.7",
+    "formidable": "^3.5.4",
     "framer-motion": "7.7.0",
     "front-matter": "^4.0.2",
     "jsonata": "^2.0.1",
@@ -53,6 +54,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/formidable": "^3.4.5",
     "@types/lodash": "^4.14.191",
     "@types/mdx": "^2.0.3",
     "@types/node": "18.11.18",

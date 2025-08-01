@@ -115,7 +115,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
         <div
           className={clsx(
             'flex flex-1 flex-col justify-between',
-            slogan?.length > 0 ? 'gap-10 max-md:gap-6' : ''
+            (slogan?.length ?? 0) > 0 ? 'gap-10 max-md:gap-6' : ''
           )}
         >
           <p
@@ -132,7 +132,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
           >
             {description}
           </p>
-          {slogan?.length > 0 && (
+          {(slogan?.length ?? 0) > 0 && (
             <ul>
               {slogan?.map((item, index) => (
                 <li

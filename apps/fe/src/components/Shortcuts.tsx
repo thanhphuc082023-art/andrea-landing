@@ -15,7 +15,7 @@ const focusToast = {
 };
 
 function Shortcuts() {
-  const toastRef = useRef(null);
+  const toastRef = useRef<string | null>(null);
   const { theme, setTheme } = useTheme();
   const { isQuickAccessOpen, setQuickAccessOpen } = useGlobal();
   const { focusMode, setFocusMode } = useFocusMode();
@@ -34,7 +34,7 @@ function Shortcuts() {
 
   useEffect(() => {
     if (toastRef.current) {
-      toast.remove(toastRef.current.id);
+      toast.remove(toastRef.current);
     }
     if (focusMode) {
       toastRef.current = toast.custom((t) => (

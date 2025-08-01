@@ -56,7 +56,7 @@ function Code({
 
   const copyToClipboard = async () => {
     try {
-      const content = codeRef.current.textContent || '';
+      const content = codeRef.current?.textContent || '';
       await navigator.clipboard.writeText(content);
 
       if (!isCopied) {

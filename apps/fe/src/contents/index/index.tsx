@@ -22,7 +22,7 @@ function IndexContents({
   brandSectionData = null,
   servicesData = [],
   workflowData = [],
-  partnersData = null,
+  partnersData = [],
 }: IndexContentsProps) {
   return (
     <>

@@ -41,10 +41,10 @@ export default function useInsight({
   countView?: boolean;
 }) {
   // #region handle for batch click
-  const timer = useRef<Record<ReactionType, NodeJS.Timeout>>({
-    CLAPPING: null,
-    THINKING: null,
-    AMAZED: null,
+  const timer = useRef<Record<ReactionType, NodeJS.Timeout | undefined>>({
+    CLAPPING: undefined,
+    THINKING: undefined,
+    AMAZED: undefined,
   });
   const count = useRef<Record<ReactionType, number>>({
     CLAPPING: 0,
@@ -73,7 +73,7 @@ export default function useInsight({
     mutate(
       merge({}, data, {
         meta: {
-          shares: data.meta.shares + 1,
+          shares: (data?.meta.shares ?? 0) + 1,
         },
       }),
       false
@@ -98,14 +98,14 @@ export default function useInsight({
     mutate(
       merge({}, data, {
         meta: {
-          reactions: data.meta.reactions + 1,
+          reactions: (data?.meta.reactions ?? 0) + 1,
           reactionsDetail: {
-            [type]: data.meta.reactionsDetail[type] + 1,
+            [type]: (data?.meta.reactionsDetail[type] ?? 0) + 1,
           },
         },
         metaUser: {
           reactionsDetail: {
-            [type]: data.metaUser.reactionsDetail[type] + 1,
+            [type]: (data?.metaUser.reactionsDetail[type] ?? 0) + 1,
           },
         },
       }),
@@ -124,7 +124,7 @@ export default function useInsight({
         contentTitle,
         type,
         count: count.current[type],
-        section,
+        section: section ?? '',
       }).finally(() => {
         // reset the batch click count to zero for the next batch
         count.current[type] = 0;

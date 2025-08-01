@@ -129,10 +129,7 @@ interface ItemsProps {
   children?: ReactElement<typeof Item> | ReactElement<typeof Item>[];
 }
 
-export function Items({
-  date,
-  children = null,
-}: PropsWithChildren<ItemsProps>) {
+export function Items({ date, children }: PropsWithChildren<ItemsProps>) {
   return (
     <div className={clsx('flex flex-row gap-6', 'md:gap-12 lg:gap-24')}>
       <div className={clsx('hidden', 'md:block md:pb-24')}>

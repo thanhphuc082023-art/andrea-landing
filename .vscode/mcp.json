@@ -7,6 +7,7 @@
         "-y",
         "figma-developer-mcp",
         "--stdio",
+        "--figma-api-key=figd_tROJV1J32Pmu4zomQi8YNTPNatVXbZbW9gh5AITB"
       ]
     }
   },

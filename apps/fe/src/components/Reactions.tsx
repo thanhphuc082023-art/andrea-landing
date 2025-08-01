@@ -102,13 +102,15 @@ function Reactions({
     isLoading,
     data: {
       meta: {
-        views,
-        shares,
-        reactions,
-        reactionsDetail: { THINKING, CLAPPING, AMAZED },
-      },
-      metaUser: { reactionsDetail: user },
-    },
+        views = 0,
+        shares = 0,
+        reactions = 0,
+        reactionsDetail: { THINKING = 0, CLAPPING = 0, AMAZED = 0 } = {},
+      } = {},
+      metaUser: {
+        reactionsDetail: user = { THINKING: 0, CLAPPING: 0, AMAZED: 0 },
+      } = { reactionsDetail: { THINKING: 0, CLAPPING: 0, AMAZED: 0 } },
+    } = {},
     addShare,
     addReaction,
   } = useInsight({ slug, contentType, contentTitle, countView: withCountView });

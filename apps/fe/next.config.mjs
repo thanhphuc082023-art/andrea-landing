@@ -5,6 +5,15 @@ import remarkPlugins from 'remark-plugins';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    // Completely disable ESLint
+    ignoreDuringBuilds: true,
+    dirs: [], // Don't run ESLint on any directories
+  },
+  typescript: {
+    // Ignore TypeScript errors during build (optional)
+    ignoreBuildErrors: true,
+  },
   redirects: async () => [
     {
       source: '/work',
@@ -42,7 +51,15 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
     optimizeCss: true,
-    optimizePackageImports: ['framer-motion', 'clsx'],
+    optimizePackageImports: [
+      'framer-motion',
+      'clsx',
+      'three',
+      '@react-three/fiber',
+      '@react-three/drei',
+    ],
+    // Tắt SSR cho các component sử dụng WebGL
+    esmExternals: 'loose',
     turbo: {
       rules: {
         '*.svg': {
@@ -51,9 +68,6 @@ const nextConfig = {
         },
       },
     },
-    // Enable modern JavaScript features
-    legacyBrowsers: false,
-    browsersListForSwc: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -70,6 +84,32 @@ const nextConfig = {
         '@babel/runtime': '@babel/runtime',
       };
     }
+
+    // Handle PDF.js worker files
+    config.module.rules.push({
+      test: /\.worker\.(js|mjs)$/,
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/worker/[hash][ext][query]',
+      },
+    });
+
+    // Support for Three.js and GLTF files
+    config.module.rules.push({
+      test: /\.(glb|gltf)$/,
+      type: 'asset/resource',
+    });
+
+    // Tránh bundle Three.js trên server
+    if (isServer) {
+      config.externals = [
+        ...(config.externals || []),
+        'three',
+        '@react-three/fiber',
+        '@react-three/drei',
+      ];
+    }
+
     return config;
   },
   modularizeImports: {

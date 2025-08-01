@@ -11,7 +11,7 @@ interface StrapiLogoProps {
   width?: number;
   height?: number;
   fallbackToDefault?: boolean;
-  serverGlobal?: StrapiGlobal;
+  serverGlobal?: StrapiGlobal | null;
 }
 
 function StrapiLogo({
@@ -20,7 +20,7 @@ function StrapiLogo({
   width = 120,
   height = 40,
   fallbackToDefault = true,
-  serverGlobal = null,
+  serverGlobal = undefined,
 }: StrapiLogoProps) {
   const currentGlobal = serverGlobal;
   const logoUrl = getStrapiMediaUrl(currentGlobal?.logo);

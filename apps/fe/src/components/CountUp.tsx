@@ -7,7 +7,7 @@ interface CountUpProps {
 }
 
 function CountUp({ from, to }: CountUpProps) {
-  const nodeRef = useRef(null);
+  const nodeRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const node = nodeRef.current;
@@ -16,7 +16,9 @@ function CountUp({ from, to }: CountUpProps) {
       duration: 1.4,
       ease: 'easeOut',
       onUpdate(value) {
-        node.textContent = value.toFixed(0);
+        if (node) {
+          node.textContent = value.toFixed(0);
+        }
       },
     });
 

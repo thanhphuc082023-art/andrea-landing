@@ -12,7 +12,7 @@ function ScrollToTopButton() {
   const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
-    setShowButton(isScrolled);
+    setShowButton(!!isScrolled);
   }, [isScrolled]);
 
   const handleScrollToTop = () => {

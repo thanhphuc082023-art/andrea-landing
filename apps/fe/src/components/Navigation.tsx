@@ -11,7 +11,7 @@ interface NavbarProps {
   menuItems?: NavigationItem[];
 }
 
-function Navbar({ serverGlobal = null, menuItems = [] }: NavbarProps) {
+function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   const [activeItem, setActiveItem] = useState('Về chúng tôi');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

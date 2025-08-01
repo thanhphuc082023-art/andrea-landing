@@ -105,7 +105,9 @@ function ArticleCard({
           <div className="text-text-secondary flex items-center justify-between text-sm dark:text-gray-400">
             {authorName && <span>By {authorName}</span>}
             <time dateTime={publishedAt}>
-              {new Date(publishedAt).toLocaleDateString('vi-VN')}
+              {publishedAt
+                ? new Date(publishedAt).toLocaleDateString('vi-VN')
+                : 'No date'}
             </time>
           </div>
         </div>

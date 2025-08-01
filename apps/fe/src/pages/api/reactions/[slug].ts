@@ -42,7 +42,7 @@ export default async function handler(
           sessionId,
           type,
           count: quota,
-          section,
+          section: section ?? '',
         });
 
         res.status(200).json({ message: 'Success' });
@@ -59,7 +59,7 @@ export default async function handler(
         sessionId,
         type,
         count: quota,
-        section,
+        section: section ?? '',
       });
 
       res.status(200).json({ message: 'Success' });
