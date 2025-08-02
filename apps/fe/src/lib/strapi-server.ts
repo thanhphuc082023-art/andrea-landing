@@ -86,7 +86,15 @@ async function fetchStrapiAPI(
  * Server-side function to fetch global settings directly from Strapi
  */
 export async function getGlobalSettings(): Promise<GlobalResponse> {
-  return fetchStrapiAPI('global', { populate: '*' });
+  return fetchStrapiAPI('global', {
+    populate: {
+      defaultSeo: {
+        populate: 'shareImage',
+      },
+      logo: true,
+      favicon: true,
+    },
+  });
 }
 
 /**
