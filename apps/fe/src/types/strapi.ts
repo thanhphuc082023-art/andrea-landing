@@ -49,6 +49,7 @@ export interface StrapiSEO {
   metaTitle?: string;
   metaDescription?: string;
   metaImage?: StrapiMedia | null;
+  shareImage?: StrapiMedia | null;
   keywords?: string;
   metaRobots?: string;
   structuredData?: any;

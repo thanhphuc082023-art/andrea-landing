@@ -75,11 +75,15 @@ function StrapiHead({
       <meta property="og:url" content={canonical} />
       <meta property="og:site_name" content={siteName} />
 
+      <meta property="og:locale" content="vi_VN" />
+
       {ogImage && (
         <>
           <meta property="og:image" content={ogImage} />
+          <meta property="og:image:secure_url" content={ogImage} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
+          <meta property="og:image:type" content="image/jpeg" />
           <meta
             property="og:image:alt"
             content={`${finalTitle} - ${siteName}`}
@@ -87,13 +91,18 @@ function StrapiHead({
         </>
       )}
 
+      {/* Facebook specific */}
+      <meta property="fb:app_id" content="your-facebook-app-id" />
+
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={finalTitle} />
       <meta name="twitter:description" content={finalDescription} />
+      <meta name="twitter:domain" content={new URL(canonical).hostname} />
       {ogImage && (
         <>
           <meta name="twitter:image" content={ogImage} />
+          <meta name="twitter:image:src" content={ogImage} />
           <meta
             name="twitter:image:alt"
             content={`${finalTitle} - ${siteName}`}
