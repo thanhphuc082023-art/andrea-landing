@@ -41,7 +41,7 @@ function StrapiHead({
   const viewport =
     seo?.metaViewport ||
     defaultSeo?.metaViewport ||
-    'width=device-width, initial-scale=1';
+    'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
   const canonical = seo?.canonicalURL || currentUrl;
 
   const htmlTitle = overrideTitle ? finalTitle : `${finalTitle} — ${siteName}`;
@@ -53,6 +53,7 @@ function StrapiHead({
   return (
     <NextHead>
       <title>{htmlTitle}</title>
+      <meta name="application-name" content={siteName} />
       <meta name="description" content={finalDescription} />
       <meta name="viewport" content={viewport} />
       {keywords && <meta name="keywords" content={keywords} />}
@@ -98,7 +99,8 @@ function StrapiHead({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={finalTitle} />
       <meta name="twitter:description" content={finalDescription} />
-      <meta name="twitter:domain" content={new URL(canonical).hostname} />
+      <meta name="twitter:domain" content={canonical} />
+      <meta name="twitter:url" content={canonical} />
       {ogImage && (
         <>
           <meta name="twitter:image" content={ogImage} />
