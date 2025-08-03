@@ -144,6 +144,19 @@
   position: absolute;
   bottom: 10px;
 }
+
+@media (max-width: 768px) {
+  .flip-book .controls .ctrl {
+    left: 0 !important;
+    width: 100% !important;
+    bottom: 0 !important;
+  }
+
+  .flip-book .controls .ctrl .fnavbar {
+  overflow: scroll;
+  }
+}
+
 .ctrl ul {
   margin: 0;
   padding: 0;

@@ -109,7 +109,7 @@ export default function UploadPage() {
             content="Đăng nhập để tạo E-Profile cá nhân hoá của bạn thành một cuốn sách điện tử."
           />
         </Head>
-        <div className="max-sd:mt-[60px] max-sd:h-[calc(100vh-60px)] mt-[65px] flex h-[calc(100vh-65px)] items-center justify-center bg-gray-100 py-10">
+        <div className="max-sd:mt-[60px] max-sd:h-[calc(100vh-60px)] mt-[65px] flex h-[calc(100vh-65px)] items-center justify-center bg-gray-100 py-10 max-md:px-2">
           <div className="container mx-auto">
             <div className="mb-8 text-center">
               <h1 className="mb-2 text-3xl font-bold text-gray-900">
@@ -275,7 +275,7 @@ export default function UploadPage() {
           content={`Tạo E-Profile cá nhân hoá của bạn thành một cuốn sách điện tử.`}
         />
       </Head>
-      <div className="max-sd:mt-[60px] mt-[65px] min-h-screen bg-gray-100 py-10">
+      <div className="max-sd:mt-[60px] mt-[65px] min-h-screen bg-gray-100 py-10 max-md:px-2">
         <div className="container mx-auto">
           <div className="mb-8 text-center">
             <h1 className="mb-2 text-3xl font-bold text-gray-900">

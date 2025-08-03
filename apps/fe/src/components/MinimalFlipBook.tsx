@@ -1,5 +1,6 @@
 'use client';
 
+import { SpinnerIcon } from '@/components/Icons';
 import React, { useEffect, useRef, useState } from 'react';
 
 declare global {
@@ -16,7 +17,6 @@ interface MinimalFlipBookProps {
 
 export default function MinimalFlipBook({ pdfUrl = '' }: MinimalFlipBookProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [status, setStatus] = useState('Initializing...');
   const [isReady, setIsReady] = useState(false);
   const initStartedRef = useRef(false);
 
@@ -29,8 +29,6 @@ export default function MinimalFlipBook({ pdfUrl = '' }: MinimalFlipBookProps) {
 
   const initFlipBook = async () => {
     try {
-      setStatus('Đang tải scripts...');
-
       // Load all scripts
       await loadScript('/3d-flipbook/js/jquery.min.js');
       (window as any).$ = window.jQuery;
@@ -121,10 +119,8 @@ export default function MinimalFlipBook({ pdfUrl = '' }: MinimalFlipBookProps) {
       await loadScript('/3d-flipbook/js/html2canvas.min.js');
       await loadScript('/3d-flipbook/js/3dflipbook.min.js');
 
-      setStatus('Đang tải FlipBook plugin...');
       await waitForPlugin();
 
-      setStatus('Creating FlipBook...');
       await new Promise((resolve) => setTimeout(resolve, 500)); // Small delay
 
       if (!containerRef.current) {
@@ -159,7 +155,6 @@ export default function MinimalFlipBook({ pdfUrl = '' }: MinimalFlipBookProps) {
         // Ensure proper rendering
         autoSize: true,
         ready: () => {
-          setStatus('Flipbook đã sẵn sàng!');
           setIsReady(true);
 
           // Force a resize after ready
@@ -175,19 +170,14 @@ export default function MinimalFlipBook({ pdfUrl = '' }: MinimalFlipBookProps) {
         },
         error: (error: any) => {
           console.error('❌ FlipBook error:', error);
-          setStatus(`FlipBook error: ${error}`);
         },
-        loadComplete: () => {
-          setStatus('PDF đã tải xong!');
-        },
-        loadError: (error: any) => {
-          console.error('❌ PDF load error:', error);
-          setStatus(`PDF lỗi: ${error}`);
-        },
+        // loadComplete: () => {
+        // },
+        // loadError: (error: any) => {
+        // },
       });
     } catch (error) {
       console.error('❌ Init error:', error);
-      setStatus(`Error: ${error}`);
     }
   };
 
@@ -224,7 +214,12 @@ export default function MinimalFlipBook({ pdfUrl = '' }: MinimalFlipBookProps) {
   };
 
   return (
-    <div className="h-full w-full">
+    <div className="relative h-full w-full">
+      {!isReady && (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          {<SpinnerIcon className="text-brand-orange h-10 w-10 animate-spin" />}
+        </div>
+      )}
       <div
         ref={containerRef}
         className="max-sd:h-[calc(100vh-124px)] max-sd:min-h-[calc(100vh-124px)] relative h-[calc(100vh-129px)] min-h-[calc(100vh-129px)] overflow-hidden"

@@ -100,7 +100,7 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({ book, error }) => {
         />
         <meta property="og:type" content="article" />
       </Head>
-      <div className="max-sd:mt-[60px] mt-[65px] bg-gray-100 p-10">
+      <div className="max-sd:mt-[60px] mt-[65px] bg-gray-100 md:p-10 p-2">
         <div className="mx-auto max-w-full">
           <MinimalFlipBook pdfUrl={pdfUrl} />
         </div>

@@ -155,7 +155,7 @@ const EProfileListPage: React.FC<EProfileListPageProps> = ({
         <Head>
           <title>Lỗi</title>
         </Head>
-        <div className="max-sd:mt-[60px] mt-[65px] min-h-screen bg-gray-100 py-10">
+        <div className="max-sd:mt-[60px] mt-[65px] min-h-screen bg-gray-100 py-10 max-md:px-2">
           <div className="container mx-auto">
             <div className="text-center">
               <h1 className="mb-4 text-3xl font-bold text-gray-900">Lỗi</h1>
@@ -183,7 +183,7 @@ const EProfileListPage: React.FC<EProfileListPageProps> = ({
         />
       </Head>
 
-      <div className="max-sd:mt-[60px] mt-[65px] min-h-screen bg-gray-100 py-10">
+      <div className="max-sd:mt-[60px] mt-[65px] min-h-screen bg-gray-100 py-10 max-md:px-2">
         <div className="container mx-auto">
           {/* Header */}
           <div className="mb-8 text-center">
