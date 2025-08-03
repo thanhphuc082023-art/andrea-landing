@@ -680,3 +680,66 @@ export function ArrowRightIcon({ ...props }: ComponentProps<'svg'>) {
     </svg>
   );
 }
+
+export function LogoutIcon({ ...props }: ComponentProps<'svg'>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z"
+        clipRule="evenodd"
+      />
+      <path
+        fillRule="evenodd"
+        d="M19 10a.75.75 0 00-.75-.75H8.704l1.048-.943a.75.75 0 10-1.004-1.114l-2.5 2.25a.75.75 0 000 1.114l2.5 2.25a.75.75 0 101.004-1.114L8.704 10.75H18.25A.75.75 0 0019 10z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+export function CloudUploadIcon({ ...props }: ComponentProps<'svg'>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 1a4.5 4.5 0 00-4.5 4.5c0 .325.035.642.102.948A3.001 3.001 0 003 9a3 3 0 000 6h4a.75.75 0 000-1.5H3A1.5 1.5 0 013 12a1.5 1.5 0 011.5-1.5h.5a.75.75 0 00.75-.75A3 3 0 0110 6.75a3 3 0 013 3v.25a.75.75 0 00.75.75h.5A1.5 1.5 0 0116 12a1.5 1.5 0 010 3h-4a.75.75 0 000 1.5h4a3 3 0 000-6 3.001 3.001 0 00-2.602-2.552A4.5 4.5 0 0010 1z"
+        clipRule="evenodd"
+      />
+      <path
+        fillRule="evenodd"
+        d="M10 10a.75.75 0 01.75.75v3.5l.97-.97a.75.75 0 111.06 1.06l-2.25 2.25a.75.75 0 01-1.06 0l-2.25-2.25a.75.75 0 111.06-1.06l.97.97v-3.5A.75.75 0 0110 10z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+export function BookIcon({ ...props }: ComponentProps<'svg'>) {
+  return (
+    <svg
+      className="h-16 w-16 text-gray-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+      />
+    </svg>
+  );
+}

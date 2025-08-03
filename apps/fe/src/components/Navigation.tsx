@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { m, AnimatePresence } from 'framer-motion';
 import StrapiLogo from '@/components/StrapiLogo';
 import type { NavigationItem, StrapiGlobal } from '@/types/strapi';
@@ -12,12 +13,14 @@ interface NavbarProps {
 }
 
 function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
-  const [activeItem, setActiveItem] = useState('Về chúng tôi');
+  const router = useRouter();
+  const [activeItem, setActiveItem] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const defaultNavigationItems = [
     { label: 'Về chúng tôi', url: '/about' },
     { label: 'Dịch vụ', url: '/services' },
+    { label: 'E-Profile', url: '/e-profile' },
     { label: 'Dự án', url: '/projects' },
     { label: 'Góc nhìn', url: '/insights' },
     { label: 'Liên hệ', url: '/contact' },
@@ -26,18 +29,42 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   // Use server navigation if available, otherwise use client navigation or fallback
   const navigationItems = menuItems.length ? menuItems : defaultNavigationItems;
 
+  // Set active item based on current path
+  useEffect(() => {
+    const currentPath = router.asPath;
+    const foundItem = navigationItems.find((item) => {
+      if (item.url === '/') return currentPath === '/';
+
+      // Special case for E-Profile - also match /upload/e-profile
+      if (item.url === '/e-profile') {
+        return (
+          currentPath.startsWith('/e-profile') ||
+          currentPath.startsWith('/upload/e-profile')
+        );
+      }
+
+      return currentPath.startsWith(item.url || '');
+    });
+
+    if (foundItem) {
+      setActiveItem(foundItem.label);
+    } else {
+      // Default to first item if no match found
+      setActiveItem(navigationItems[0]?.label || '');
+    }
+  }, [router.asPath, navigationItems]);
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleMobileMenuClick = (title: string) => {
-    setActiveItem(title);
     setIsMobileMenuOpen(false); // Đóng menu sau khi click
   };
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[1000] w-full">
-      <div className="max-sd:h-[60px] h-[65px] w-full bg-[#F5F5F5]">
+      <div className="max-sd:h-[60px] h-[65px] w-full bg-[#F5F5F5] shadow-md">
         <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
           <Link
@@ -66,7 +93,6 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                     ? 'text-brand-orange hover:text-brand-orange-dark font-bold' // Now uses WCAG AA compliant colors
                     : 'font-normal text-gray-700 hover:text-gray-900'
                 )}
-                onClick={() => setActiveItem(item.label)}
               >
                 {item.label}
               </Link>

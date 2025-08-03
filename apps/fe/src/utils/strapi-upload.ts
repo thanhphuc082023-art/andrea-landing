@@ -2,9 +2,14 @@
  * Upload a file to Strapi media library
  * @param file - The file to upload
  * @param path - Optional path for organizing uploads
+ * @param token - Optional JWT token for authentication
  * @returns Promise with upload response data
  */
-export async function upload(file: File, path: string = ''): Promise<any> {
+export async function upload(
+  file: File,
+  path: string = '',
+  token?: string
+): Promise<any> {
   try {
     const formData = new FormData();
     formData.append('files', file);
@@ -13,10 +18,16 @@ export async function upload(file: File, path: string = ''): Promise<any> {
       formData.append('path', path);
     }
 
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`,
       {
         method: 'POST',
+        headers,
         body: formData,
       }
     );

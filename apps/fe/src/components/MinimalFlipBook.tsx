@@ -14,9 +14,7 @@ interface MinimalFlipBookProps {
   pdfUrl?: string;
 }
 
-export default function MinimalFlipBook({
-  pdfUrl = '/sample.pdf',
-}: MinimalFlipBookProps) {
+export default function MinimalFlipBook({ pdfUrl = '' }: MinimalFlipBookProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState('Initializing...');
   const [isReady, setIsReady] = useState(false);
@@ -31,7 +29,7 @@ export default function MinimalFlipBook({
 
   const initFlipBook = async () => {
     try {
-      setStatus('Loading scripts...');
+      setStatus('Đang tải scripts...');
 
       // Load all scripts
       await loadScript('/3d-flipbook/js/jquery.min.js');
@@ -53,19 +51,6 @@ export default function MinimalFlipBook({
       // Wait a bit for PDF.js to initialize
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Configure PDF.js worker - check if pdfjsLib exists and has GlobalWorkerOptions
-      console.log('🔍 Checking PDF.js availability:', {
-        pdfjsLib: !!(window as any).pdfjsLib,
-        PDFJS: !!(window as any).PDFJS,
-        GlobalWorkerOptions: !!(window as any).pdfjsLib?.GlobalWorkerOptions,
-        windowKeys: Object.keys(window).filter((key) =>
-          key.toLowerCase().includes('pdf')
-        ),
-        allScripts: Array.from(document.querySelectorAll('script'))
-          .map((s) => s.src)
-          .filter((src) => src.includes('pdf')),
-      });
-
       // Try multiple approaches to configure PDF.js worker
       let workerConfigured = false;
 
@@ -82,20 +67,13 @@ export default function MinimalFlipBook({
         (window as any).pdfjsLib.GlobalWorkerOptions
       ) {
         (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-        console.log(
-          '✅ PDF.js worker configured with pdfjsLib.GlobalWorkerOptions:',
-          workerSrc
-        );
+
         workerConfigured = true;
       }
 
       // Approach 2: Legacy PDF.js with PDFJS.workerSrc
       if (!workerConfigured && (window as any).PDFJS) {
         (window as any).PDFJS.workerSrc = workerSrc;
-        console.log(
-          '✅ PDF.js worker configured with PDFJS.workerSrc:',
-          workerSrc
-        );
         workerConfigured = true;
       }
 
@@ -106,26 +84,17 @@ export default function MinimalFlipBook({
             key.toLowerCase().includes('pdf') ||
             key.toLowerCase().includes('pdfjs')
         );
-        console.log('🔍 Found PDF-related keys:', pdfKeys);
 
         for (const key of pdfKeys) {
           const obj = (window as any)[key];
           if (obj && typeof obj === 'object') {
             if (obj.GlobalWorkerOptions) {
               obj.GlobalWorkerOptions.workerSrc = workerSrc;
-              console.log(
-                `✅ PDF.js worker configured via ${key}.GlobalWorkerOptions:`,
-                workerSrc
-              );
               workerConfigured = true;
               break;
             }
             if (obj.workerSrc !== undefined) {
               obj.workerSrc = workerSrc;
-              console.log(
-                `✅ PDF.js worker configured via ${key}.workerSrc:`,
-                workerSrc
-              );
               workerConfigured = true;
               break;
             }
@@ -146,17 +115,13 @@ export default function MinimalFlipBook({
         (window as any).pdfjsLib.GlobalWorkerOptions =
           (window as any).pdfjsLib.GlobalWorkerOptions || {};
         (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-        console.log(
-          '✅ Created fallback PDF.js configuration with worker:',
-          workerSrc
-        );
       }
 
       await loadScript('/3d-flipbook/js/three.min.js');
       await loadScript('/3d-flipbook/js/html2canvas.min.js');
       await loadScript('/3d-flipbook/js/3dflipbook.min.js');
 
-      setStatus('Waiting for FlipBook plugin...');
+      setStatus('Đang tải FlipBook plugin...');
       await waitForPlugin();
 
       setStatus('Creating FlipBook...');
@@ -168,8 +133,6 @@ export default function MinimalFlipBook({
 
       const $ = window.jQuery;
       const container = $(containerRef.current);
-
-      console.log('🚀 Creating minimal FlipBook...');
 
       // Minimal FlipBook configuration with proper sizing
       const flipbook = container.FlipBook({
@@ -196,8 +159,7 @@ export default function MinimalFlipBook({
         // Ensure proper rendering
         autoSize: true,
         ready: () => {
-          console.log('🎉 FlipBook ready!');
-          setStatus('FlipBook ready! PDF should be visible now.');
+          setStatus('Flipbook đã sẵn sàng!');
           setIsReady(true);
 
           // Force a resize after ready
@@ -207,7 +169,6 @@ export default function MinimalFlipBook({
               const flipbookInstance = $container.data('FlipBook');
               if (flipbookInstance && flipbookInstance.resize) {
                 flipbookInstance.resize();
-                console.log('🔄 FlipBook resized');
               }
             }
           }, 100);
@@ -217,16 +178,13 @@ export default function MinimalFlipBook({
           setStatus(`FlipBook error: ${error}`);
         },
         loadComplete: () => {
-          console.log('📖 PDF loaded successfully!');
-          setStatus('PDF loaded! FlipBook should show content now.');
+          setStatus('PDF đã tải xong!');
         },
         loadError: (error: any) => {
           console.error('❌ PDF load error:', error);
-          setStatus(`PDF load error: ${error}`);
+          setStatus(`PDF lỗi: ${error}`);
         },
       });
-
-      console.log('✅ FlipBook instance created:', typeof flipbook);
     } catch (error) {
       console.error('❌ Init error:', error);
       setStatus(`Error: ${error}`);
@@ -269,7 +227,7 @@ export default function MinimalFlipBook({
     <div className="h-full w-full">
       <div
         ref={containerRef}
-        className='overflow-hidden relative max-sd:h-[calc(100vh-124px)] h-[calc(100vh-129px)] max-sd:min-h-[calc(100vh-124px)] min-h-[calc(100vh-129px)]'
+        className="max-sd:h-[calc(100vh-124px)] max-sd:min-h-[calc(100vh-124px)] relative h-[calc(100vh-129px)] min-h-[calc(100vh-129px)] overflow-hidden"
       />
     </div>
   );

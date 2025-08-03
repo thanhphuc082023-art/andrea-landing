@@ -246,4 +246,33 @@ For production, make sure to:
 - **Build errors**: Ensure all required fields are filled in Strapi
 - **SEO not working**: Check global settings and component structure
 
+## E-Profile Books Content Type
+
+For the PDF flipbook functionality, create a collection type called `books`:
+
+```javascript
+{
+  "title": "Text (required)",
+  "slug": "UID (required, from title)",
+  "pdfFile": "Media (Single, required)",
+  "thumbnail": "Media (Single, optional)",
+  "pages": "JSON (optional, for cached page images)"
+}
+```
+
+### Fields Configuration:
+
+1. **title**: Text field, required
+2. **slug**: UID field based on title, required, unique
+3. **pdfFile**: Media field, single file, required, accept only PDF files
+4. **thumbnail**: Media field, single file, optional, accept only image files
+5. **pages**: JSON field, optional (used for caching extracted page images)
+
+### API Permissions:
+
+Make sure to enable these permissions for the `books` content type:
+
+- **Public role**: `find`, `findOne` (for reading books)
+- **Authenticated role**: `create`, `update` (for uploading via API)
+
 The integration provides full type safety with TypeScript and follows Next.js best practices for performance and SEO.
