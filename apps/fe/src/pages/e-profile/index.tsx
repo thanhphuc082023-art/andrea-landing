@@ -404,7 +404,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         </button>
 
         {/* Thumbnail */}
-        <div className="mb-4 aspect-[3/4] overflow-hidden bg-gray-100">
+        <div className="mb-4 aspect-[3/4] overflow-hidden border-b bg-gray-100">
           {thumbnailUrl ? (
             <img
               src={thumbnailUrl}
