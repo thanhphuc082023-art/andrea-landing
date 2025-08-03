@@ -13,15 +13,35 @@ const DynamicPdfUploader = dynamic(() => import('@/components/PdfUploader'), {
   ),
 });
 
+// Dynamic import ChunkedUploader for large files
+const DynamicChunkedUploader = dynamic(
+  () => import('@/components/ChunkedUploader'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-10 mx-auto max-w-md border bg-white p-6 shadow-md">
+        <div className="text-center text-gray-600">Đang tải uploader...</div>
+      </div>
+    ),
+  }
+);
+
 export default function UploadPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [useChunkedUpload, setUseChunkedUpload] = useState(true); // Default to chunked upload
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
   });
+
+  const handleUploadComplete = (result: { slug: string; bookId: string }) => {
+    // Handle successful upload
+    console.log('Upload completed:', result);
+    // You can redirect or show success message here
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,9 +284,42 @@ export default function UploadPage() {
             <p className="text-gray-600">
               Tạo E-Profile cá nhân hoá của bạn thành một cuốn sách điện tử.
             </p>
+
+            {/* Upload Method Toggle */}
+            {/* <div className="mt-4 flex justify-center">
+              <div className="flex rounded-lg bg-gray-100 p-1">
+                <button
+                  onClick={() => setUseChunkedUpload(true)}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                    useChunkedUpload
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  Upload File Lớn (Khuyến nghị)
+                </button>
+                <button
+                  onClick={() => setUseChunkedUpload(false)}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                    !useChunkedUpload
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  Upload Trực tiếp (&lt;3.6MB)
+                </button>
+              </div>
+            </div> */}
           </div>
 
-          <DynamicPdfUploader logout={handleLogout} />
+          {useChunkedUpload ? (
+            <DynamicChunkedUploader
+              onUploadComplete={handleUploadComplete}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <DynamicPdfUploader logout={handleLogout} />
+          )}
 
           <div className="mx-auto mt-12 max-w-2xl">
             <h2 className="mb-4 text-center text-xl font-semibold text-gray-800">
@@ -281,8 +334,8 @@ export default function UploadPage() {
                   Tải lên tệp tin
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Chọn tệp PDF của bạn và tùy chọn thêm hình ảnh đại diện. Chúng
-                  tôi hỗ trợ các tệp PDF lên đến 50MB.
+                  Chọn tệp PDF của bạn và tùy chọn thêm hình ảnh đại diện. Hỗ
+                  trợ file lớn lên đến 50MB với công nghệ chunked upload.
                 </p>
               </div>
 
