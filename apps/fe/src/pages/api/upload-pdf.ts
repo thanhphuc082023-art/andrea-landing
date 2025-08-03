@@ -10,10 +10,17 @@ import {
   validateInputs,
 } from '@/utils/helper';
 
+// Constants
+const MAX_PDF_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_THUMBNAIL_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_TOTAL_SIZE = 60 * 1024 * 1024; // 60MB total
+
 // Disable Next.js body parser for file uploads
 export const config = {
   api: {
     bodyParser: false,
+    // Set response and request size limits
+    responseLimit: false,
   },
 };
 
@@ -30,6 +37,36 @@ export const cleanupFiles = (files: Array<{ filepath: string } | null>) => {
   });
 };
 
+// Helper function to validate file sizes
+const validateFileSizes = (pdfFile: any, thumbnailFile: any) => {
+  if (pdfFile && pdfFile.size > MAX_PDF_SIZE) {
+    return {
+      isValid: false,
+      error: `File PDF quá lớn. Kích thước tối đa là ${MAX_PDF_SIZE / (1024 * 1024)}MB.`,
+      status: 413,
+    };
+  }
+
+  if (thumbnailFile && thumbnailFile.size > MAX_THUMBNAIL_SIZE) {
+    return {
+      isValid: false,
+      error: `File thumbnail quá lớn. Kích thước tối đa là ${MAX_THUMBNAIL_SIZE / (1024 * 1024)}MB.`,
+      status: 413,
+    };
+  }
+
+  const totalSize = (pdfFile?.size || 0) + (thumbnailFile?.size || 0);
+  if (totalSize > MAX_TOTAL_SIZE) {
+    return {
+      isValid: false,
+      error: `Tổng kích thước file quá lớn. Tối đa ${MAX_TOTAL_SIZE / (1024 * 1024)}MB.`,
+      status: 413,
+    };
+  }
+
+  return { isValid: true };
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -42,8 +79,15 @@ export default async function handler(
   let thumbnailFile: any = null;
 
   try {
+    // Configure formidable with size limits
+    const form = formidable({
+      maxFileSize: MAX_TOTAL_SIZE,
+      maxTotalFileSize: MAX_TOTAL_SIZE,
+      maxFields: 10,
+      maxFieldsSize: 1024 * 1024, // 1MB for fields
+    });
+
     // Parse form data
-    const form = formidable({});
     const [fields, files] = await form.parse(req);
 
     // Get JWT token from request headers
@@ -61,9 +105,20 @@ export default async function handler(
       ? files.thumbnail[0]
       : files.thumbnail;
 
+    // Validate file sizes first
+    const sizeValidation = validateFileSizes(pdfFile, thumbnailFile);
+    if (!sizeValidation.isValid) {
+      cleanupFiles([pdfFile, thumbnailFile]);
+      return res.status(sizeValidation.status!).json({
+        error: sizeValidation.error,
+        message: 'File size validation failed',
+      });
+    }
+
     // Validate inputs
     const validation = validateInputs(pdfFile, title, thumbnailFile);
     if (!validation.isValid) {
+      cleanupFiles([pdfFile, thumbnailFile]);
       return res.status(validation.status!).json({
         error: validation.error,
         message: validation.message,
@@ -81,6 +136,7 @@ export default async function handler(
     const uploadResponse = await upload(pdfFileObj, 'pdfs', token || undefined);
 
     if (!uploadResponse?.[0]?.id) {
+      cleanupFiles([pdfFile, thumbnailFile]);
       return res.status(500).json({
         error: 'Không thể tải lên PDF. Vui lòng thử lại.',
         message: 'Failed to upload PDF to Strapi',
@@ -156,6 +212,7 @@ export default async function handler(
         errorMessage = 'Không có quyền thực hiện hành động này.';
       }
 
+      cleanupFiles([pdfFile, thumbnailFile]);
       return res.status(createBookResponse.status).json({
         error: errorMessage,
         message: 'Failed to create book entry in Strapi',
@@ -180,12 +237,24 @@ export default async function handler(
     // Clean up files in case of error
     cleanupFiles([pdfFile, thumbnailFile]);
 
-    const errorMessage =
-      error instanceof Error
-        ? getSystemErrorMessage(error)
-        : 'Lỗi hệ thống. Vui lòng thử lại sau.';
+    // Handle specific payload too large errors
+    let errorMessage = 'Lỗi hệ thống. Vui lòng thử lại sau.';
+    let statusCode = 500;
 
-    return res.status(500).json({
+    if (error instanceof Error) {
+      if (
+        error.message.includes('maxFileSize') ||
+        error.message.includes('FUNCTION_PAYLOAD_TOO_LARGE') ||
+        error.message.includes('Request Entity Too Large')
+      ) {
+        errorMessage = 'File quá lớn. Vui lòng chọn file nhỏ hơn 50MB.';
+        statusCode = 413;
+      } else {
+        errorMessage = getSystemErrorMessage(error);
+      }
+    }
+
+    return res.status(statusCode).json({
       error: errorMessage,
       message: 'Internal server error',
     });
