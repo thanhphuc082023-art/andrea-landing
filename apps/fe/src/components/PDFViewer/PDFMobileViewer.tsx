@@ -1,12 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { SpinnerIcon } from '@/components/Icons';
 import ScrollDownButton from '@/components/ScrollDownButton';
 import styles from './PDFMobileViewer.module.css';
-import { getOptimalRenderSettings, type PDFPageData } from './utils/pdfUtils';
+import {
+  getOptimalRenderSettings,
+  type PDFPageData,
+  loadPDFJS,
+  renderPDFPage,
+} from './utils/pdfUtils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 declare global {
@@ -20,12 +25,20 @@ interface PDFMobileViewerProps {
 }
 
 export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
+  // Only essential state that needs to trigger re-renders
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pages, setPages] = useState<PDFPageData[]>([]);
-  const [placeholderPages, setPlaceholderPages] = useState<number[]>([]);
-  const [totalPdfPages, setTotalPdfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  // Use refs instead of state to avoid unnecessary re-renders
+  const pagesRef = useRef<Map<number, PDFPageData>>(new Map());
+  const loadingPagesRef = useRef<Set<number>>(new Set());
+  const pdfDocRef = useRef<any>(null);
+  const renderOptionsRef = useRef(getOptimalRenderSettings());
+  const isInitializedRef = useRef(false);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // KeenSlider setup
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
@@ -39,158 +52,122 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
     },
   });
 
-  // Update slider when placeholder pages change
+  // Force component update when needed
+  const triggerUpdate = useCallback(() => {
+    setForceUpdate((prev) => prev + 1);
+  }, []);
+
+  // Update slider when total pages change
   useEffect(() => {
-    if (instanceRef.current && placeholderPages.length > 0) {
+    if (instanceRef.current && totalPages > 0) {
       instanceRef.current.update();
     }
-  }, [placeholderPages.length]);
+  }, [totalPages]);
 
-  const totalPages = totalPdfPages || pages.length;
+  // Load pages with optimized batching
+  const loadPagesBatch = useCallback(
+    async (pdf: any, startPage: number, endPage: number) => {
+      const actualEndPage = Math.min(endPage, pdf.numPages);
 
-  useEffect(() => {
-    if (pdfUrl) {
-      loadPDF();
-    }
-  }, [pdfUrl]);
+      for (let pageNum = startPage; pageNum <= actualEndPage; pageNum++) {
+        if (
+          pagesRef.current.has(pageNum) ||
+          loadingPagesRef.current.has(pageNum)
+        ) {
+          continue;
+        }
 
-  const loadPDF = async () => {
+        try {
+          loadingPagesRef.current.add(pageNum);
+          const page = await pdf.getPage(pageNum);
+          const pageData = await renderPDFPage(
+            page,
+            pageNum,
+            renderOptionsRef.current
+          );
+
+          pagesRef.current.set(pageNum, pageData);
+          loadingPagesRef.current.delete(pageNum);
+
+          // Trigger update only after every 3 pages to reduce re-renders
+          if (pageNum % 3 === 0 || pageNum === actualEndPage) {
+            triggerUpdate();
+          }
+
+          // Small delay to prevent blocking UI
+          if (pageNum % 2 === 0) {
+            await new Promise((resolve) => setTimeout(resolve, 50));
+          }
+        } catch (error) {
+          console.error(`Failed to load page ${pageNum}:`, error);
+          loadingPagesRef.current.delete(pageNum);
+        }
+      }
+    },
+    [triggerUpdate]
+  );
+
+  const loadPDF = useCallback(async () => {
+    if (isInitializedRef.current) return;
+
     try {
       setIsLoading(true);
       setError(null);
+      isInitializedRef.current = true;
 
-      // Load PDF document first
+      // Load PDF document
       await loadPDFJS();
       const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
       const pdf = await loadingTask.promise;
 
-      setTotalPdfPages(pdf.numPages);
+      pdfDocRef.current = pdf;
+      setTotalPages(pdf.numPages);
 
-      // Create placeholder pages for all pages immediately
-      const allPlaceholderPages = Array.from(
-        { length: pdf.numPages },
-        (_, i) => i + 1
-      );
-      setPlaceholderPages(allPlaceholderPages);
+      // Clear previous data
+      pagesRef.current.clear();
+      loadingPagesRef.current.clear();
 
-      // Initialize pages array with empty slots for all pages
-      const emptyPagesArray = new Array(pdf.numPages).fill(null);
-      setPages(emptyPagesArray);
-
-      // Stop loading state immediately so user can slide
+      // Stop loading immediately to allow sliding
       setIsLoading(false);
 
-      // Update slider to recognize all slides
+      // Update slider
       setTimeout(() => {
         if (instanceRef.current) {
           instanceRef.current.update();
         }
       }, 100);
 
-      const renderOptions = getOptimalRenderSettings();
-
       // Phase 1: Load first 5 pages quickly
-      const pagesToLoadInitially = Math.min(5, pdf.numPages);
-
-      for (let pageNum = 1; pageNum <= pagesToLoadInitially; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const pageData = await renderPage(page, pageNum);
-
-        // Update specific page in array
-        setPages((prevPages) => {
-          const updatedPages = [...prevPages];
-          updatedPages[pageNum - 1] = pageData;
-          return updatedPages;
-        });
-      }
+      await loadPagesBatch(pdf, 1, 5);
 
       // Phase 2: Load remaining pages in background
       if (pdf.numPages > 5) {
-        // Load remaining pages gradually in background
-        const loadRemainingPages = async () => {
-          for (let pageNum = 6; pageNum <= pdf.numPages; pageNum++) {
-            try {
-              const page = await pdf.getPage(pageNum);
-              const pageData = await renderPage(page, pageNum);
-
-              // Update specific page in array
-              setPages((prevPages) => {
-                const updatedPages = [...prevPages];
-                updatedPages[pageNum - 1] = pageData;
-                return updatedPages;
-              });
-
-              // Small delay to prevent blocking UI
-              if (pageNum % 3 === 0) {
-                await new Promise((resolve) => setTimeout(resolve, 100));
-              }
-            } catch (pageError) {
-              console.warn(`Failed to load page ${pageNum}:`, pageError);
-            }
-          }
-        };
-
-        // Start loading remaining pages in background
-        loadRemainingPages();
+        setTimeout(async () => {
+          await loadPagesBatch(pdf, 6, pdf.numPages);
+        }, 500);
       }
     } catch (error) {
       console.error('Error loading PDF:', error);
       setError('Failed to load PDF');
       setIsLoading(false);
+      isInitializedRef.current = false;
     }
-  };
+  }, [pdfUrl, loadPagesBatch]);
 
-  const loadPDFJS = async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (window.pdfjsLib) {
-        resolve();
-        return;
+  useEffect(() => {
+    if (pdfUrl && pdfUrl.trim() !== '') {
+      loadPDF();
+    } else {
+      setError('No PDF URL provided');
+      setIsLoading(false);
+    }
+
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
       }
-
-      const script = document.createElement('script');
-      script.src =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
-      script.onload = () => {
-        // Configure worker
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-        setTimeout(resolve, 100);
-      };
-      script.onerror = () => reject(new Error('Failed to load PDF.js'));
-      document.head.appendChild(script);
-    });
-  };
-
-  const renderPage = async (
-    page: any,
-    pageNumber: number
-  ): Promise<PDFPageData> => {
-    const scale = 2; // For better quality on mobile screens
-    const viewport = page.getViewport({ scale });
-
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    const renderContext = {
-      canvasContext: context,
-      viewport: viewport,
     };
-
-    await page.render(renderContext).promise;
-
-    const imageData = canvas.toDataURL('image/jpeg', 0.9);
-
-    return {
-      pageNumber,
-      canvas,
-      imageData,
-      width: viewport.width,
-      height: viewport.height,
-    };
-  };
+  }, [pdfUrl, loadPDF]);
 
   const goToPage = (pageNumber: number) => {
     if (instanceRef.current && pageNumber >= 1 && pageNumber <= totalPages) {
@@ -211,28 +188,43 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
   };
 
   // Helper function to get page data or placeholder
-  const getPageContent = (pageIndex: number) => {
-    const pageData = pages[pageIndex];
-    if (pageData && pageData.imageData) {
-      return (
-        <img
-          src={pageData.imageData}
-          alt={`Page ${pageData.pageNumber}`}
-          className={styles.pageImage}
-          loading="lazy"
-        />
-      );
-    }
+  const getPageContent = useCallback(
+    (pageIndex: number) => {
+      const pageNumber = pageIndex + 1;
+      const pageData = pagesRef.current.get(pageNumber);
+      const isLoading = loadingPagesRef.current.has(pageNumber);
 
-    // Return white placeholder for unloaded pages
-    return (
-      <div className={`${styles.pageImage} flex items-center justify-center`}>
-        <div className="text-center">
-          <SpinnerIcon className="text-brand-orange mx-auto h-10 w-10 animate-spin" />
+      if (pageData && pageData.imageData) {
+        return (
+          <img
+            src={pageData.imageData}
+            alt={`Page ${pageData.pageNumber}`}
+            className={styles.pageImage}
+            loading="lazy"
+            style={{
+              willChange: 'transform',
+              backfaceVisibility: 'hidden',
+            }}
+          />
+        );
+      }
+
+      // Return loading placeholder for unloaded pages
+      return (
+        <div className={`${styles.pageImage} flex items-center justify-center`}>
+          <div className="text-center">
+            <SpinnerIcon className="text-brand-orange mx-auto h-10 w-10 animate-spin" />
+            {isLoading && (
+              <p className="mt-2 text-sm text-gray-600">
+                Loading page {pageNumber}...
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-    );
-  };
+      );
+    },
+    [forceUpdate]
+  ); // Include forceUpdate to trigger re-render when pages are loaded
 
   if (isLoading) {
     return (
@@ -287,10 +279,14 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
 
       {/* PDF Slider */}
       <div ref={sliderRef} className={`keen-slider ${styles.pageSlider}`}>
-        {placeholderPages.map((pageNum, index) => (
+        {Array.from({ length: totalPages }, (_, index) => (
           <div
-            key={pageNum}
+            key={index + 1}
             className={`keen-slider__slide ${styles.pageSlide}`}
+            style={{
+              willChange: 'transform',
+              backfaceVisibility: 'hidden',
+            }}
           >
             {getPageContent(index)}
           </div>
@@ -300,7 +296,7 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
       {/* Page counter */}
       <div className="absolute left-4 top-4 z-[15] rounded-lg bg-black/70 px-3 py-2 text-white backdrop-blur-sm">
         <span className="text-sm">
-          {currentPage} / {totalPdfPages > 0 ? totalPdfPages : pages.length}
+          {currentPage} / {totalPages}
         </span>
       </div>
 
