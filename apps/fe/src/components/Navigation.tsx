@@ -29,6 +29,25 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   // Use server navigation if available, otherwise use client navigation or fallback
   const navigationItems = menuItems.length ? menuItems : defaultNavigationItems;
 
+  // Prefetch all navigation routes on component mount for faster navigation
+  useEffect(() => {
+    const prefetchRoutes = async () => {
+      for (const item of navigationItems) {
+        if (item.url && item.url !== router.asPath) {
+          try {
+            await router.prefetch(item.url);
+          } catch (error) {
+            console.warn(`Failed to prefetch ${item.url}:`, error);
+          }
+        }
+      }
+    };
+
+    // Small delay to not block initial page load
+    const timer = setTimeout(prefetchRoutes, 1000);
+    return () => clearTimeout(timer);
+  }, [navigationItems, router]);
+
   // Set active item based on current path
   useEffect(() => {
     const currentPath = router.asPath;
@@ -71,6 +90,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
             href="/"
             className="flex-shrink-0"
             aria-label="Andrea - Trang chủ"
+            prefetch
           >
             <StrapiLogo
               width={110}
@@ -87,6 +107,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
               <Link
                 key={item.label}
                 href={item.url || '/'}
+                prefetch={true}
                 className={clsx(
                   'text-lg transition-colors duration-200',
                   activeItem === item.label
@@ -170,6 +191,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                 >
                   <Link
                     href={item.url || '/'}
+                    prefetch={true}
                     className={clsx(
                       'block border-b border-gray-200/50 py-4 text-xl transition-all duration-300',
                       'hover:border-brand-orange/30 hover:translate-x-2',

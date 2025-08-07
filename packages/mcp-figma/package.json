@@ -1,0 +1,26 @@
+{
+  "name": "mcp-figma",
+  "version": "1.0.0",
+  "description": "MCP Figma server for Augment Code integration",
+  "type": "module",
+  "main": "figma-mcp-server.js",
+  "scripts": {
+    "start": "node figma-mcp-server.js",
+    "dev": "node figma-mcp-server.js",
+    "test": "node test-connection.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.1",
+    "figma-js": "^1.16.1-0",
+    "zod": "^3.25.76",
+    "dotenv": "^17.2.1"
+  },
+  "keywords": [
+    "mcp",
+    "figma",
+    "augment-code",
+    "design-system"
+  ],
+  "author": "",
+  "license": "MIT"
+}

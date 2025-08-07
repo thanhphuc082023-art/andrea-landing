@@ -142,7 +142,7 @@
 .flip-book .controls .ctrl {
   font-family: 'Neurial Grotesk', Helvetica, Arial, sans-serif;
   position: absolute;
-  bottom: 10px;
+  bottom: 60px;
 }
 
 @media (max-width: 768px) {

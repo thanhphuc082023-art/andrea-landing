@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { getStrapiMediaUrl } from '@/utils/helper';
+import ScrollDownButton from '@/components/ScrollDownButton';
 
 interface HeaderVideoProps {
   heroData?: any;
@@ -108,62 +109,11 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
       )}
 
       {/* Scroll Down Button */}
-      <button
-        type="button"
-        aria-label="Kéo xuống"
-        onClick={() => {
-          window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
-        }}
-        className={clsx(
-          'group absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center'
-        )}
-      >
-        <span className="flex flex-col items-center space-y-[-12px]">
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-brand-orange animate-chevron opacity-0"
-            style={{ animationDelay: '0s' }}
-            viewBox="0 0 24 24"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-brand-orange animate-chevron opacity-0"
-            style={{ animationDelay: '0.15s' }}
-            viewBox="0 0 24 24"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-brand-orange animate-chevron opacity-0"
-            style={{ animationDelay: '0.3s' }}
-            viewBox="0 0 24 24"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </span>
-        <span className="text-xs text-white drop-shadow">Kéo xuống</span>
-      </button>
+      <ScrollDownButton
+        className={clsx('absolute bottom-6 left-1/2 z-30 -translate-x-1/2')}
+        text="Kéo xuống"
+      />
+
       {/* Shimmer keyframes */}
       <style>{`
         @keyframes shimmer {
@@ -173,20 +123,6 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
           100% {
             background-position: 200% 0;
           }
-        }
-        @keyframes chevronFade {
-          0% {
-            opacity: 0.1;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0.1;
-          }
-        }
-        .animate-chevron {
-          animation: chevronFade 1.2s infinite;
         }
       `}</style>
     </div>
