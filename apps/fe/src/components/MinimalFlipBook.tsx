@@ -1,6 +1,7 @@
 'use client';
 
 import { AdaptivePDFViewer } from './PDFViewer';
+import clsx from 'clsx';
 
 interface MinimalFlipBookProps {
   pdfUrl?: string;
@@ -10,6 +11,7 @@ interface MinimalFlipBookProps {
     phoneNumber?: string;
     downloadUrl?: string;
   };
+  isSimpleLayout?: boolean;
 }
 
 /**
@@ -20,9 +22,17 @@ interface MinimalFlipBookProps {
 export default function MinimalFlipBook({
   pdfUrl = '',
   bookData,
+  isSimpleLayout = false,
 }: MinimalFlipBookProps) {
   return (
-    <div className="max-sd:h-[calc(100vh-60px)] max-sd:min-h-[calc(100vh-60px)] relative h-[calc(100vh-65px)] min-h-[calc(100vh-65px)] overflow-hidden">
+    <div
+      className={clsx(
+        isSimpleLayout
+          ? 'h-screen min-h-screen'
+          : 'max-sd:h-[calc(100vh-60px)] max-sd:min-h-[calc(100vh-60px)] h-[calc(100vh-65px)] min-h-[calc(100vh-65px)]',
+        'relative overflow-hidden'
+      )}
+    >
       <AdaptivePDFViewer pdfUrl={pdfUrl} bookData={bookData} />
     </div>
   );

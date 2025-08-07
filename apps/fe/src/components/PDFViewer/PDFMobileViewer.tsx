@@ -14,6 +14,7 @@ import {
   renderPDFPage,
 } from './utils/pdfUtils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/router';
 
 declare global {
   interface Window {
@@ -41,7 +42,7 @@ export default function PDFMobileViewer({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [forceUpdate, setForceUpdate] = useState(0);
-
+  const router = useRouter();
   // Use refs instead of state to avoid unnecessary re-renders
   const pagesRef = useRef<Map<number, PDFPageData>>(new Map());
   const loadingPagesRef = useRef<Set<number>>(new Set());
@@ -49,6 +50,8 @@ export default function PDFMobileViewer({
   const renderOptionsRef = useRef(getOptimalRenderSettings());
   const isInitializedRef = useRef(false);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isSimpleLayout = router.query.simpleLayout === 'true';
 
   // KeenSlider setup
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
@@ -308,8 +311,8 @@ export default function PDFMobileViewer({
       {/* Action Buttons - Mobile: Horizontal at bottom center */}
       <ActionButtons bookData={bookData} pdfUrl={pdfUrl} isMobile={true} />
 
-      {/* Scroll Down to Next Page Button */}
-      {currentPage < totalPages && (
+      {/* Scroll Down */}
+      {!isSimpleLayout && (
         <ScrollDownButton
           variant="simple"
           text=""

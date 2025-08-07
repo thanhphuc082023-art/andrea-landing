@@ -3,6 +3,7 @@
 import React from 'react';
 import { Globe, Phone, Download } from 'lucide-react';
 import { useRouter } from 'next/router';
+import clsx from 'clsx';
 
 interface ActionButtonsProps {
   bookData?: {
@@ -20,6 +21,7 @@ export default function ActionButtons({
   isMobile = false,
 }: ActionButtonsProps) {
   const router = useRouter();
+  const isSimpleLayout = router.query.simpleLayout === 'true';
 
   const handleWebsiteClick = () => {
     if (bookData?.websiteUrl) {
@@ -47,7 +49,12 @@ export default function ActionButtons({
   if (isMobile) {
     // Mobile: Horizontal buttons at bottom center
     return (
-      <div className="absolute bottom-[60px] left-1/2 z-[15] flex -translate-x-1/2 space-x-4">
+      <div
+        className={clsx(
+          isSimpleLayout ? 'bottom-[20px]' : 'bottom-[60px]',
+          'absolute left-1/2 z-[15] flex -translate-x-1/2 space-x-4'
+        )}
+      >
         {/* Website/Home Button */}
         <button
           onClick={handleWebsiteClick}

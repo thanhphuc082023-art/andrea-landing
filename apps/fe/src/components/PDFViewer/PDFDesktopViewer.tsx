@@ -4,6 +4,7 @@ import { SpinnerIcon } from '@/components/Icons';
 import ScrollDownButton from '@/components/ScrollDownButton';
 import ActionButtons from './ActionButtons';
 import React, { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 
 declare global {
   interface Window {
@@ -30,6 +31,9 @@ export default function PDFDesktopViewer({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
   const initStartedRef = useRef(false);
+  const router = useRouter();
+
+  const isSimpleLayout = router.query.simpleLayout === 'true';
 
   useEffect(() => {
     if (initStartedRef.current) return;
@@ -211,19 +215,17 @@ export default function PDFDesktopViewer({
           <SpinnerIcon className="text-brand-orange h-10 w-10 animate-spin" />
         </div>
       )}
-      <div
-        ref={containerRef}
-        className="relative h-[calc(100vh-65px)] min-h-[calc(100vh-65px)] overflow-hidden"
-      />
+      <div ref={containerRef} className="relative h-full overflow-hidden" />
 
       {/* Action Buttons - Desktop: Vertical at top right */}
       <ActionButtons bookData={bookData} pdfUrl={pdfUrl} isMobile={false} />
-
-      <ScrollDownButton
-        variant="simple"
-        text=""
-        className="absolute bottom-6 left-1/2 z-[10] -translate-x-1/2 opacity-80 hover:opacity-100 max-md:bottom-12"
-      />
+      {!isSimpleLayout && (
+        <ScrollDownButton
+          variant="simple"
+          text=""
+          className="absolute bottom-6 left-1/2 z-[10] -translate-x-1/2 opacity-80 hover:opacity-100 max-md:bottom-12"
+        />
+      )}
     </div>
   );
 }

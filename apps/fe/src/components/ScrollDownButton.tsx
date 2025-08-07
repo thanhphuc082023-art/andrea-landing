@@ -41,6 +41,7 @@ export default function ScrollDownButton({
           strokeLinecap="round"
           strokeLinejoin="round"
           className="animate-chevron-simple text-white"
+          style={{ filter: 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))' }}
           viewBox="0 0 24 24"
         >
           <path d="M6 9l6 6 6-6" />

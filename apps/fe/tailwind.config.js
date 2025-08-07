@@ -47,7 +47,7 @@ module.exports = {
           'orange-light': '#F15A24', // Original orange for backgrounds only
           'orange-dark': '#B8390C', // Darker orange for hover states
         },
-        pdf: '#1f1f1f',
+        pdf: '#1b1b1b',
         primary: '#1A253A', // Primary brand color
         grayECO: '#BCBEC0',
         text: {

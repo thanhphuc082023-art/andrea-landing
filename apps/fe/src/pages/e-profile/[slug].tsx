@@ -38,9 +38,14 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
 }) => {
   const router = useRouter();
 
+  // Check if this is a simple layout for embedding
+  const isSimpleLayout = router.query.simpleLayout === 'true';
+
   if (router.isFallback) {
     return (
-      <div className="max-sd:mt-[60px] mt-[65px] flex min-h-screen items-center justify-center">
+      <div
+        className={`${!isSimpleLayout ? 'max-sd:mt-[60px] mt-[65px]' : ''} flex min-h-screen items-center justify-center`}
+      >
         <div className="border-brand-orange h-32 w-32 animate-spin rounded-full border-b-2" />
       </div>
     );
@@ -51,20 +56,35 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
       <>
         <Head>
           <title>{'Không tìm E-Profile'}</title>
+          {isSimpleLayout && (
+            <>
+              <meta name="robots" content="noindex, nofollow" />
+              <style jsx global>{`
+                body {
+                  margin: 0;
+                  padding: 0;
+                }
+              `}</style>
+            </>
+          )}
         </Head>
-        <div className="max-sd:mt-[60px] mt-[65px] flex min-h-screen items-center justify-center bg-gray-900">
+        <div
+          className={`${!isSimpleLayout ? 'max-sd:mt-[60px] mt-[65px]' : ''} flex min-h-screen items-center justify-center bg-gray-900`}
+        >
           <div className="text-center text-white">
             <h1 className="mb-4 text-2xl font-bold">Không tìm E-Profile</h1>
             <p className="mb-4">
               {error || 'Không thể tìm thấy E-Profile được yêu cầu.'}
             </p>
-            <button
-              type="button"
-              onClick={() => router.push('/e-profile')}
-              className="bg-brand-orange hover:bg-brand-orange-light rounded-md px-4 py-2 font-semibold text-white transition-colors"
-            >
-              Quay về danh sách
-            </button>
+            {!isSimpleLayout && (
+              <button
+                type="button"
+                onClick={() => router.push('/e-profile')}
+                className="bg-brand-orange hover:bg-brand-orange-light rounded-md px-4 py-2 font-semibold text-white transition-colors"
+              >
+                Quay về danh sách
+              </button>
+            )}
           </div>
         </div>
       </>
@@ -90,18 +110,33 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
       <>
         <Head>
           <title>{'PDF không khả dụng'}</title>
+          {isSimpleLayout && (
+            <>
+              <meta name="robots" content="noindex, nofollow" />
+              <style jsx global>{`
+                body {
+                  margin: 0;
+                  padding: 0;
+                }
+              `}</style>
+            </>
+          )}
         </Head>
-        <div className="max-sd:mt-[60px] mt-[65px] flex min-h-screen items-center justify-center bg-gray-900">
+        <div
+          className={`${!isSimpleLayout ? 'max-sd:mt-[60px] mt-[65px]' : ''} flex min-h-screen items-center justify-center bg-gray-900`}
+        >
           <div className="text-center text-white">
             <h1 className="mb-4 text-2xl font-bold">PDF không khả dụng</h1>
             <p className="mb-4">Tệp PDF cho E-Profile này không khả dụng.</p>
-            <button
-              type="button"
-              onClick={() => router.push('/e-profile')}
-              className="bg-brand-orange hover:bg-brand-orange-light rounded-md px-4 py-2 font-semibold text-white transition-colors"
-            >
-              Quay về danh sách
-            </button>
+            {!isSimpleLayout && (
+              <button
+                type="button"
+                onClick={() => router.push('/e-profile')}
+                className="bg-brand-orange hover:bg-brand-orange-light rounded-md px-4 py-2 font-semibold text-white transition-colors"
+              >
+                Quay về danh sách
+              </button>
+            )}
           </div>
         </div>
       </>
@@ -129,10 +164,31 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
           content={`Đọc ${book.title} dưới dạng E-Profile tương tác`}
         />
         <meta property="og:type" content="article" />
+
+        {/* Simple Layout specific meta tags */}
+        {isSimpleLayout && (
+          <>
+            <meta name="robots" content="noindex, nofollow" />
+            <style jsx global>{`
+              body {
+                margin: 0;
+                padding: 0;
+              }
+            `}</style>
+          </>
+        )}
       </Head>
-      <div className="max-sd:mt-[60px] mt-[65px]">
+      <div
+        className={
+          isSimpleLayout ? 'h-screen w-full' : 'max-sd:mt-[60px] mt-[65px]'
+        }
+      >
         <div className="mx-auto max-w-full">
-          <MinimalFlipBook pdfUrl={pdfUrl} bookData={bookData} />
+          <MinimalFlipBook
+            isSimpleLayout={isSimpleLayout}
+            pdfUrl={pdfUrl}
+            bookData={bookData}
+          />
         </div>
       </div>
     </>
