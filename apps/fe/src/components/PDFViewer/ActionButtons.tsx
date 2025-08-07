@@ -17,33 +17,56 @@ interface ActionButtonsProps {
 
 export default function ActionButtons({
   bookData,
-  pdfUrl,
   isMobile = false,
 }: ActionButtonsProps) {
   const router = useRouter();
   const isSimpleLayout = router.query.simpleLayout === 'true';
+  const isInIframe = typeof window !== 'undefined' && window.parent !== window;
+  const isEmbedPage =
+    typeof window !== 'undefined' &&
+    window.location.pathname.startsWith('/embed');
 
   const handleWebsiteClick = () => {
     if (bookData?.websiteUrl) {
+      // Luôn mở website trong tab/window mới
       window.open(bookData.websiteUrl, '_blank', 'noopener,noreferrer');
     } else {
       // Fallback to homepage
-      router.push('/');
+      if (isInIframe || isEmbedPage) {
+        // Nếu trong iframe hoặc embed page, mở homepage trong tab mới
+        window.open(window.location.origin, '_blank', 'noopener,noreferrer');
+      } else {
+        // Trong page bình thường, có thể navigate
+        router.push('/');
+      }
     }
   };
 
   const handlePhoneClick = () => {
     if (bookData?.phoneNumber) {
-      window.open(`tel:${bookData.phoneNumber}`, '_self');
+      // tel: links hoạt động tốt trong iframe
+      window.location.href = `tel:${bookData.phoneNumber}`;
     }
   };
 
   const handleDownloadClick = () => {
-    window.open(
-      bookData.downloadUrl || pdfUrl,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    if (bookData?.downloadUrl) {
+      // Tạo download link tạm thời
+      const link = document.createElement('a');
+      link.href = bookData.downloadUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+
+      // Thêm download attribute nếu có title
+      if (bookData.title) {
+        const fileName = `${bookData.title}.pdf`;
+        link.download = fileName;
+      }
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   if (isMobile) {
