@@ -2,6 +2,7 @@
 
 import { SpinnerIcon } from '@/components/Icons';
 import ScrollDownButton from '@/components/ScrollDownButton';
+import ActionButtons from './ActionButtons';
 import React, { useEffect, useRef, useState } from 'react';
 
 declare global {
@@ -14,10 +15,17 @@ declare global {
 
 interface PDFDesktopViewerProps {
   pdfUrl?: string;
+  bookData?: {
+    title?: string;
+    websiteUrl?: string;
+    phoneNumber?: string;
+    downloadUrl?: string;
+  };
 }
 
 export default function PDFDesktopViewer({
   pdfUrl = '',
+  bookData,
 }: PDFDesktopViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
@@ -207,6 +215,9 @@ export default function PDFDesktopViewer({
         ref={containerRef}
         className="relative h-[calc(100vh-65px)] min-h-[calc(100vh-65px)] overflow-hidden"
       />
+
+      {/* Action Buttons - Desktop: Vertical at top right */}
+      <ActionButtons bookData={bookData} pdfUrl={pdfUrl} isMobile={false} />
 
       <ScrollDownButton
         variant="simple"

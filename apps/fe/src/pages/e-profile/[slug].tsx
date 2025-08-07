@@ -18,6 +18,9 @@ interface BookAttributes {
   thumbnail?: {
     url: string;
   };
+  websiteUrl?: string;
+  phoneNumber?: string;
+  downloadUrl?: string;
 }
 
 interface PDFBookPageProps extends PagePropsWithGlobal {
@@ -74,6 +77,14 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
     ? getStrapiMediaUrl(book.thumbnail)
     : null;
 
+  // Prepare book data for action buttons
+  const bookData = {
+    title: book.title,
+    websiteUrl: book.websiteUrl,
+    phoneNumber: book.phoneNumber,
+    downloadUrl: book.downloadUrl || pdfUrl, // Fallback to PDF URL if no specific download URL
+  };
+
   if (!pdfUrl) {
     return (
       <>
@@ -121,7 +132,7 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
       </Head>
       <div className="max-sd:mt-[60px] mt-[65px]">
         <div className="mx-auto max-w-full">
-          <MinimalFlipBook pdfUrl={pdfUrl} />
+          <MinimalFlipBook pdfUrl={pdfUrl} bookData={bookData} />
         </div>
       </div>
     </>
@@ -201,6 +212,9 @@ export const getStaticProps: GetStaticProps<PDFBookPageProps> = async ({
         pages: bookData.pages || [],
         pdfFile: bookData.pdfFile,
         thumbnail: bookData.thumbnail,
+        websiteUrl: bookData.websiteUrl,
+        phoneNumber: bookData.phoneNumber,
+        downloadUrl: bookData.downloadUrl,
       };
 
       return {

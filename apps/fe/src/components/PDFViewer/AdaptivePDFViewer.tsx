@@ -26,6 +26,12 @@ const PDFMobileViewer = dynamic(() => import('./PDFMobileViewer'), {
 
 interface AdaptivePDFViewerProps {
   pdfUrl?: string;
+  bookData?: {
+    title?: string;
+    websiteUrl?: string;
+    phoneNumber?: string;
+    downloadUrl?: string;
+  };
 }
 
 /**
@@ -35,6 +41,7 @@ interface AdaptivePDFViewerProps {
  */
 export default function AdaptivePDFViewer({
   pdfUrl = '',
+  bookData,
 }: AdaptivePDFViewerProps) {
   const { isMobile, isClient } = useIsMobile();
 
@@ -52,9 +59,9 @@ export default function AdaptivePDFViewer({
   return (
     <div className="relative h-full w-full">
       {isMobile ? (
-        <PDFMobileViewer pdfUrl={pdfUrl} />
+        <PDFMobileViewer pdfUrl={pdfUrl} bookData={bookData} />
       ) : (
-        <PDFDesktopViewer pdfUrl={pdfUrl} />
+        <PDFDesktopViewer pdfUrl={pdfUrl} bookData={bookData} />
       )}
     </div>
   );

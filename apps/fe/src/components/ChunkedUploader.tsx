@@ -15,6 +15,9 @@ export default function ChunkedUploader({
 }: ChunkedUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [downloadUrl, setDownloadUrl] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -132,6 +135,9 @@ export default function ChunkedUploader({
         },
         body: JSON.stringify({
           title: title.trim(),
+          websiteUrl: websiteUrl.trim() || null,
+          phoneNumber: phoneNumber.trim() || null,
+          downloadUrl: downloadUrl.trim() || null,
           pdfUploadId: uploadId,
           thumbnailUploadId,
         }),
@@ -151,6 +157,9 @@ export default function ChunkedUploader({
       // Clear form but keep the success message
       setSelectedFile(null);
       setTitle('');
+      setWebsiteUrl('');
+      setPhoneNumber('');
+      setDownloadUrl('');
       setThumbnailFile(null);
       setUploadProgress(0);
       setPdfFileMessage('');
@@ -274,6 +283,81 @@ export default function ChunkedUploader({
               disabled={loading}
               required
             />
+          </div>
+
+          {/* Website URL Input */}
+          <div>
+            <label
+              htmlFor="websiteUrl"
+              className="mb-2 block font-bold text-gray-800"
+            >
+              Đường dẫn Website
+            </label>
+            <input
+              type="url"
+              id="websiteUrl"
+              value={websiteUrl}
+              onChange={(e) => {
+                setWebsiteUrl(e.target.value);
+                setError('');
+                setUploadMessage('');
+                setGeneratedSlug('');
+              }}
+              placeholder="https://example.com"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Phone Number Input */}
+          <div>
+            <label
+              htmlFor="phoneNumber"
+              className="mb-2 block font-bold text-gray-800"
+            >
+              Số điện thoại
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              value={phoneNumber}
+              onChange={(e) => {
+                setPhoneNumber(e.target.value);
+                setError('');
+                setUploadMessage('');
+                setGeneratedSlug('');
+              }}
+              placeholder="Nhập số điện thoại"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Download URL Input */}
+          <div>
+            <label
+              htmlFor="downloadUrl"
+              className="mb-2 block font-bold text-gray-800"
+            >
+              Đường dẫn tải xuống
+            </label>
+            <input
+              type="url"
+              id="downloadUrl"
+              value={downloadUrl}
+              onChange={(e) => {
+                setDownloadUrl(e.target.value);
+                setError('');
+                setUploadMessage('');
+                setGeneratedSlug('');
+              }}
+              placeholder="Nhập đường dẫn tải xuống"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={loading}
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Để trống nếu sử dụng PDF đã upload làm file tải xuống
+            </p>
           </div>
 
           {/* Thumbnail Upload */}

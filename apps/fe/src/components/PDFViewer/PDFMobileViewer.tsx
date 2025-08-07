@@ -5,6 +5,7 @@ import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { SpinnerIcon } from '@/components/Icons';
 import ScrollDownButton from '@/components/ScrollDownButton';
+import ActionButtons from './ActionButtons';
 import styles from './PDFMobileViewer.module.css';
 import {
   getOptimalRenderSettings,
@@ -22,9 +23,18 @@ declare global {
 
 interface PDFMobileViewerProps {
   pdfUrl?: string;
+  bookData?: {
+    title?: string;
+    websiteUrl?: string;
+    phoneNumber?: string;
+    downloadUrl?: string;
+  };
 }
 
-export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
+export default function PDFMobileViewer({
+  pdfUrl = '',
+  bookData,
+}: PDFMobileViewerProps) {
   // Only essential state that needs to trigger re-renders
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -255,7 +265,7 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
       >
         <ChevronLeft
           className="h-10 w-10 text-white"
-          style={{ filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.8))' }}
+          style={{ filter: 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))' }}
         />
       </button>
 
@@ -268,7 +278,7 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
       >
         <ChevronRight
           className="h-10 w-10 text-white"
-          style={{ filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.8))' }}
+          style={{ filter: 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))' }}
         />
       </button>
 
@@ -294,6 +304,9 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
           {currentPage} / {totalPages}
         </span>
       </div>
+
+      {/* Action Buttons - Mobile: Horizontal at bottom center */}
+      <ActionButtons bookData={bookData} pdfUrl={pdfUrl} isMobile={true} />
 
       {/* Scroll Down to Next Page Button */}
       {currentPage < totalPages && (

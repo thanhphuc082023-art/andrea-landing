@@ -36,7 +36,14 @@ export default async function handler(
   let thumbnailFilePath: string | null = null;
 
   try {
-    const { title, pdfUploadId, thumbnailUploadId } = req.body;
+    const {
+      title,
+      websiteUrl,
+      phoneNumber,
+      downloadUrl,
+      pdfUploadId,
+      thumbnailUploadId,
+    } = req.body;
 
     if (!title || !pdfUploadId) {
       return res.status(400).json({
@@ -138,6 +145,19 @@ export default async function handler(
         pages: [],
       },
     };
+
+    // Add optional fields if provided
+    if (websiteUrl) {
+      bookData.data.websiteUrl = websiteUrl;
+    }
+
+    if (phoneNumber) {
+      bookData.data.phoneNumber = phoneNumber;
+    }
+
+    if (downloadUrl) {
+      bookData.data.downloadUrl = downloadUrl;
+    }
 
     if (thumbnailFileId) {
       bookData.data.thumbnail = thumbnailFileId;
