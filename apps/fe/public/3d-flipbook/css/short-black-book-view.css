@@ -203,6 +203,14 @@
 .ctrl .fnavbar .fnav .fnav-item {
   display: inline-block;
 }
+
+.ctrl .fnavbar .fnav .cmdSave,
+.ctrl .fnavbar .fnav .cmdFastBackward,
+.ctrl .fnavbar .fnav .cmdFastForward,
+.ctrl .fnavbar .fnav .cmdPrint {
+  display: none;
+}
+
 .ctrl .fnavbar .fnav .hidden {
   display: none;
 }
