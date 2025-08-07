@@ -75,3 +75,38 @@ export const getStaticPropsWithGlobal: GetStaticProps<
     };
   }
 };
+
+// Helper function to combine global data with page-specific data
+export const getStaticPropsWithGlobalAndData = async <
+  T extends Record<string, any>,
+>(
+  getPageData: () => Promise<T>
+): Promise<{
+  props: PagePropsWithGlobal & T;
+  revalidate?: number;
+}> => {
+  try {
+    const [globalPropsResult, pageData] = await Promise.all([
+      getStaticPropsWithGlobal(),
+      getPageData(),
+    ]);
+
+    return {
+      props: {
+        ...globalPropsResult.props,
+        ...pageData,
+      },
+      revalidate: 3600,
+    };
+  } catch (error) {
+    console.error('Error in getStaticPropsWithGlobalAndData:', error);
+    const globalPropsResult = await getStaticPropsWithGlobal();
+
+    return {
+      props: {
+        ...globalPropsResult.props,
+      } as PagePropsWithGlobal & T,
+      revalidate: 3600,
+    };
+  }
+};

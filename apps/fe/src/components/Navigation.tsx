@@ -29,22 +29,22 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   // Use server navigation if available, otherwise use client navigation or fallback
   const navigationItems = menuItems.length ? menuItems : defaultNavigationItems;
 
-  // Prefetch all navigation routes on component mount for faster navigation
+  // Prefetch navigation routes for faster navigation (modern approach)
   useEffect(() => {
-    const prefetchRoutes = async () => {
-      for (const item of navigationItems) {
+    const prefetchNavigationRoutes = () => {
+      navigationItems.forEach((item) => {
         if (item.url && item.url !== router.asPath) {
-          try {
-            await router.prefetch(item.url);
-          } catch (error) {
-            console.warn(`Failed to prefetch ${item.url}:`, error);
-          }
+          // Prefetch all navigation routes including homepage
+          router.prefetch(item.url).catch((error) => {
+            // Silently handle errors to avoid console spam
+            console.debug(`Prefetch skipped for ${item.url}:`, error.message);
+          });
         }
-      }
+      });
     };
 
-    // Small delay to not block initial page load
-    const timer = setTimeout(prefetchRoutes, 1000);
+    // Prefetch after initial page load to avoid blocking
+    const timer = setTimeout(prefetchNavigationRoutes, 1500);
     return () => clearTimeout(timer);
   }, [navigationItems, router]);
 
@@ -90,7 +90,6 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
             href="/"
             className="flex-shrink-0"
             aria-label="Andrea - Trang chủ"
-            prefetch
           >
             <StrapiLogo
               width={110}
@@ -107,7 +106,6 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
               <Link
                 key={item.label}
                 href={item.url || '/'}
-                prefetch={true}
                 className={clsx(
                   'text-lg transition-colors duration-200',
                   activeItem === item.label
@@ -191,7 +189,6 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                 >
                   <Link
                     href={item.url || '/'}
-                    prefetch={true}
                     className={clsx(
                       'block border-b border-gray-200/50 py-4 text-xl transition-all duration-300',
                       'hover:border-brand-orange/30 hover:translate-x-2',

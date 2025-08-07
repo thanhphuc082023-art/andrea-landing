@@ -1,8 +1,12 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { getStrapiMediaUrl } from '@/utils/helper';
 import MinimalFlipBook from '@/components/MinimalFlipBook';
+import {
+  getStaticPropsWithGlobalAndData,
+  type PagePropsWithGlobal,
+} from '@/lib/page-helpers';
 
 interface BookAttributes {
   title: string;
@@ -16,13 +20,28 @@ interface BookAttributes {
   };
 }
 
-interface PDFBookPageProps {
+interface PDFBookPageProps extends PagePropsWithGlobal {
   book: BookAttributes | null;
   error?: string;
 }
 
-const PDFBookPage: React.FC<PDFBookPageProps> = ({ book, error }) => {
+const PDFBookPage: React.FC<PDFBookPageProps> = ({
+  book,
+  error,
+  // Global props from getStaticPropsWithGlobal
+  serverGlobal,
+  menuItems,
+  footerData,
+}) => {
   const router = useRouter();
+
+  if (router.isFallback) {
+    return (
+      <div className="max-sd:mt-[60px] mt-[65px] flex min-h-screen items-center justify-center">
+        <div className="border-brand-orange h-32 w-32 animate-spin rounded-full border-b-2" />
+      </div>
+    );
+  }
 
   if (error || !book) {
     return (
@@ -109,12 +128,10 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({ book, error }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const { slug } = params!;
-
+export const getStaticPaths: GetStaticPaths = async () => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/books?filters[slug][$eq]=${slug}&populate=*`,
+      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/books?fields[0]=slug`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -123,44 +140,80 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     );
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.data || data.data.length === 0) {
       return {
-        props: {
-          book: null,
-          error: 'Không tìm thấy E-Profile',
-        },
+        paths: [],
+        fallback: 'blocking',
       };
     }
 
-    const bookData = data.data[0];
-
-    const book: BookAttributes = {
-      title: bookData.title,
-      slug: bookData.slug,
-      pages: bookData.pages || [],
-      pdfFile: bookData.pdfFile,
-      thumbnail: bookData.thumbnail,
-    };
+    const data = await response.json();
+    const paths = data.data.map((book: any) => ({
+      params: { slug: book.slug },
+    }));
 
     return {
-      props: {
-        book,
-      },
+      paths,
+      fallback: 'blocking',
     };
   } catch (error) {
-    console.error('Error fetching book:', error);
+    console.error('Error fetching book paths:', error);
     return {
-      props: {
-        book: null,
-        error: 'Không thể tải E-Profile',
-      },
+      paths: [],
+      fallback: 'blocking',
     };
   }
+};
+
+export const getStaticProps: GetStaticProps<PDFBookPageProps> = async ({
+  params,
+}) => {
+  const { slug } = params!;
+
+  return getStaticPropsWithGlobalAndData(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/books?filters[slug][$eq]=${slug}&populate=*`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.data || data.data.length === 0) {
+        return {
+          book: null,
+          error: 'Không tìm thấy E-Profile',
+        };
+      }
+
+      const bookData = data.data[0];
+
+      const book: BookAttributes = {
+        title: bookData.title,
+        slug: bookData.slug,
+        pages: bookData.pages || [],
+        pdfFile: bookData.pdfFile,
+        thumbnail: bookData.thumbnail,
+      };
+
+      return {
+        book,
+      };
+    } catch (error) {
+      console.error('Error fetching book:', error);
+      return {
+        book: null,
+        error: 'Không thể tải E-Profile',
+      };
+    }
+  });
 };
 
 export default PDFBookPage;

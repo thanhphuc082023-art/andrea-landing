@@ -1,9 +1,13 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getStrapiMediaUrl } from '@/utils/helper';
 import { useDebounce } from '@/hooks/useDebounce';
+import {
+  getStaticPropsWithGlobalAndData,
+  type PagePropsWithGlobal,
+} from '@/lib/page-helpers';
 
 interface Book {
   id: number;
@@ -18,7 +22,7 @@ interface Book {
   createdAt: string;
 }
 
-interface EProfileListPageProps {
+interface EProfileListPageProps extends PagePropsWithGlobal {
   initialBooks: Book[];
   pagination: {
     page: number;
@@ -33,6 +37,10 @@ const EProfileListPage: React.FC<EProfileListPageProps> = ({
   initialBooks,
   pagination: initialPagination,
   error,
+  // Global props from getStaticPropsWithGlobal
+  serverGlobal,
+  menuItems,
+  footerData,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [books, setBooks] = useState<Book[]>(initialBooks);
@@ -449,34 +457,36 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/books?populate=*&sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=12`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+export const getStaticProps: GetStaticProps<
+  EProfileListPageProps
+> = async () => {
+  return getStaticPropsWithGlobalAndData(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/books?populate=*&sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=12`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+      const data = await response.json();
 
-    const data = await response.json();
+      const books: Book[] = data.data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        pdfFile: item.pdfFile,
+        thumbnail: item.thumbnail,
+        createdAt: item.createdAt,
+      }));
 
-    const books: Book[] = data.data.map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      slug: item.slug,
-      pdfFile: item.pdfFile,
-      thumbnail: item.thumbnail,
-      createdAt: item.createdAt,
-    }));
-
-    return {
-      props: {
+      return {
         initialBooks: books,
         pagination: data.meta?.pagination || {
           page: 1,
@@ -484,12 +494,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
           pageCount: 1,
           total: books.length,
         },
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching books:', error);
-    return {
-      props: {
+      };
+    } catch (error) {
+      console.error('Error fetching books:', error);
+      return {
         initialBooks: [],
         pagination: {
           page: 1,
@@ -498,9 +506,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
           total: 0,
         },
         error: 'Không thể tải danh sách E-Profile. Vui lòng thử lại sau.',
-      },
-    };
-  }
+      };
+    }
+  });
 };
 
 export default EProfileListPage;

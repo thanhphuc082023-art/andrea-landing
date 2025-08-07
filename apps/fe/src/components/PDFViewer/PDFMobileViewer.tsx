@@ -214,11 +214,6 @@ export default function PDFMobileViewer({ pdfUrl = '' }: PDFMobileViewerProps) {
         <div className={`${styles.pageImage} flex items-center justify-center`}>
           <div className="text-center">
             <SpinnerIcon className="text-brand-orange mx-auto h-10 w-10 animate-spin" />
-            {isLoading && (
-              <p className="mt-2 text-sm text-gray-600">
-                Loading page {pageNumber}...
-              </p>
-            )}
           </div>
         </div>
       );
