@@ -309,7 +309,7 @@ export default function PDFMobileViewer({
       </div>
 
       {/* Action Buttons - Mobile: Horizontal at bottom center */}
-      <ActionButtons bookData={bookData} pdfUrl={pdfUrl} isMobile={true} />
+      <ActionButtons bookData={bookData} isMobile={true} />
 
       {/* Scroll Down */}
       {!isSimpleLayout && (

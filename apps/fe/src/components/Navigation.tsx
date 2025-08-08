@@ -14,7 +14,6 @@ interface NavbarProps {
 
 function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const defaultNavigationItems = [
@@ -28,6 +27,23 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
 
   // Use server navigation if available, otherwise use client navigation or fallback
   const navigationItems = menuItems.length ? menuItems : defaultNavigationItems;
+
+  // Helper function to check if an item is active
+  const isItemActive = (item: NavigationItem) => {
+    const currentPath = router.asPath;
+
+    if (item.url === '/') return currentPath === '/';
+
+    // Special case for E-Profile - also match /upload/e-profile
+    if (item.url === '/e-profile') {
+      return (
+        currentPath.startsWith('/e-profile') ||
+        currentPath.startsWith('/upload/e-profile')
+      );
+    }
+
+    return currentPath.startsWith(item.url || '');
+  };
 
   // Prefetch navigation routes for faster navigation (modern approach)
   useEffect(() => {
@@ -47,28 +63,6 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
     const timer = setTimeout(prefetchNavigationRoutes, 1500);
     return () => clearTimeout(timer);
   }, [navigationItems, router]);
-
-  // Set active item based on current path
-  useEffect(() => {
-    const currentPath = router.asPath;
-    const foundItem = navigationItems.find((item) => {
-      if (item.url === '/') return currentPath === '/';
-
-      // Special case for E-Profile - also match /upload/e-profile
-      if (item.url === '/e-profile') {
-        return (
-          currentPath.startsWith('/e-profile') ||
-          currentPath.startsWith('/upload/e-profile')
-        );
-      }
-
-      return currentPath.startsWith(item.url || '');
-    });
-
-    if (foundItem) {
-      setActiveItem(foundItem.label);
-    }
-  }, [router.asPath, navigationItems]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -105,8 +99,8 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                 href={item.url || '/'}
                 className={clsx(
                   'text-lg transition-colors duration-200',
-                  activeItem === item.label
-                    ? 'text-brand-orange hover:text-brand-orange-dark font-bold' // Now uses WCAG AA compliant colors
+                  isItemActive(item)
+                    ? 'text-brand-orange hover:text-brand-orange-dark font-bold'
                     : 'font-normal text-gray-700 hover:text-gray-900'
                 )}
               >
@@ -189,8 +183,8 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                     className={clsx(
                       'block border-b border-gray-200/50 py-4 text-xl transition-all duration-300',
                       'hover:border-brand-orange/30 hover:translate-x-2',
-                      activeItem === item.label
-                        ? 'text-brand-orange translate-x-1 font-bold' // Now uses WCAG AA compliant color
+                      isItemActive(item)
+                        ? 'text-brand-orange translate-x-1 font-bold'
                         : 'font-normal text-gray-700 hover:text-gray-900'
                     )}
                     onClick={() => handleMobileMenuClick(item.label)}
