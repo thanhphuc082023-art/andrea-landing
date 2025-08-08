@@ -42,6 +42,92 @@ export default function PDFDesktopViewer({
     initFlipBook();
   }, [pdfUrl]);
 
+  // Manual PDF preloading as backup
+  const preloadPDFPages = async (pdfUrl: string, numPages: number = 15) => {
+    if (!window.pdfjsLib) {
+      console.warn('PDF.js not loaded');
+      return;
+    }
+
+    try {
+      const pdf = await window.pdfjsLib.getDocument(pdfUrl).promise;
+      console.log(`Starting manual preload of ${numPages} pages...`);
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = 1050;
+      canvas.height = 1485;
+
+      for (let i = 1; i <= Math.min(numPages, pdf.numPages); i++) {
+        try {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.0 });
+
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          await page.render({
+            canvasContext: context,
+            viewport: viewport,
+          }).promise;
+
+          console.log(`✅ Manual preload page ${i} complete`);
+        } catch (e) {
+          console.log(`❌ Manual preload page ${i} failed:`, e);
+        }
+      }
+    } catch (e) {
+      console.error('Manual preload failed:', e);
+    }
+  };
+
+  // Force preload useEffect
+  useEffect(() => {
+    if (!isReady || !pdfUrl) return;
+
+    const forcePreload = () => {
+      const flipbookInstance = window
+        .jQuery(containerRef.current)
+        .data('FlipBook');
+
+      if (flipbookInstance && flipbookInstance.book) {
+        const book = flipbookInstance.book;
+        const totalPages = book.getPages();
+
+        console.log('🚀 Force preloading', totalPages, 'pages');
+
+        // Method 1: Direct page loading
+        for (let i = 0; i < Math.min(20, totalPages); i++) {
+          setTimeout(() => {
+            if (book.pageManager && book.pageManager.pageCallback) {
+              try {
+                const pageInfo = book.pageManager.pageCallback(i);
+                if (pageInfo && pageInfo.src) {
+                  // Force load page
+                  const img = new Image();
+                  img.onload = () => console.log(`✅ Preloaded page ${i}`);
+                  img.onerror = () =>
+                    console.log(`❌ Failed to preload page ${i}`);
+                  img.src = pageInfo.src;
+                }
+              } catch (e) {
+                console.log(`Skip page ${i}:`, e.message);
+              }
+            }
+          }, i * 100); // Stagger loading
+        }
+      }
+    };
+
+    // Start force preload after 3 seconds
+    setTimeout(forcePreload, 3000);
+
+    // Start manual preload after 5 seconds
+    setTimeout(() => {
+      preloadPDFPages(pdfUrl, 15);
+    }, 5000);
+  }, [isReady, pdfUrl]);
+
   const initFlipBook = async () => {
     try {
       // Load all scripts
@@ -135,6 +221,18 @@ export default function PDFDesktopViewer({
         width: '100%',
         height: '100%',
         autoSize: true,
+
+        // Tăng cache và preload settings
+        cachedPages: 100,
+        renderInactivePages: true,
+        renderInactivePagesOnMobile: true,
+        renderWhileFlipping: true,
+        preloadPages: 15, // Tăng từ 10 lên 15
+        pagesForPredicting: 15, // Tăng từ 10 lên 15
+
+        // Thêm config này để force preload
+        predictPages: true,
+
         singlePageMode: 0, // Always use double page mode for desktop
         controlsProps: {
           actions: {
@@ -153,8 +251,75 @@ export default function PDFDesktopViewer({
             },
           },
         },
-        ready: () => {
+        ready: (scene) => {
           setIsReady(true);
+
+          // Aggressive preloading strategy
+          const book = scene.book;
+          const totalPages = book.getPages();
+
+          if (book.pageManager) {
+            const originalSetTexture = book.pageManager.setTexture.bind(
+              book.pageManager
+            );
+            book.pageManager.setTexture = function (material, n) {
+              console.log(`📄 Loading page texture: ${n}`);
+              return originalSetTexture(material, n);
+            };
+          }
+
+          // Strategy 1: Immediate preload first batch
+          const immediateLoad = Math.min(8, totalPages);
+          for (let i = 0; i < immediateLoad; i++) {
+            if (book.pageManager) {
+              book.pageManager.setTexture(null, i);
+              console.log(`Immediate preload page ${i}`);
+            }
+          }
+
+          // Strategy 2: Background preload with queue
+          let backgroundIndex = immediateLoad;
+          const backgroundLoader = () => {
+            if (backgroundIndex < totalPages && !book.isProcessing()) {
+              if (book.pageManager) {
+                book.pageManager.setTexture(null, backgroundIndex);
+                console.log(`Background preload page ${backgroundIndex}`);
+              }
+              backgroundIndex++;
+            }
+
+            if (backgroundIndex < totalPages) {
+              setTimeout(backgroundLoader, 150); // Preload every 150ms
+            } else {
+              console.log('✅ All pages preloaded!');
+            }
+          };
+
+          // Start background loading after 2 seconds
+          setTimeout(backgroundLoader, 2000);
+
+          // Strategy 3: Smart preload on page change
+          book.addEventListener('afterAnimation', () => {
+            const currentPage = book.getPage();
+            console.log(`Page changed to: ${currentPage}`);
+
+            // Preload surrounding pages with priority
+            const surroundingPages = [
+              currentPage - 3,
+              currentPage - 2,
+              currentPage - 1,
+              currentPage + 1,
+              currentPage + 2,
+              currentPage + 3,
+              currentPage + 4,
+            ];
+
+            surroundingPages.forEach((pageNum) => {
+              if (pageNum >= 0 && pageNum < totalPages && book.pageManager) {
+                book.pageManager.setTexture(null, pageNum);
+              }
+            });
+          });
 
           // Force a resize after ready
           setTimeout(() => {
@@ -218,7 +383,7 @@ export default function PDFDesktopViewer({
       <div ref={containerRef} className="relative h-full overflow-hidden" />
 
       {/* Action Buttons - Desktop: Vertical at top right */}
-      <ActionButtons bookData={bookData} pdfUrl={pdfUrl} isMobile={false} />
+      <ActionButtons bookData={bookData} isMobile={false} />
       {!isSimpleLayout && (
         <ScrollDownButton
           variant="simple"

@@ -67,9 +67,6 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
 
     if (foundItem) {
       setActiveItem(foundItem.label);
-    } else {
-      // Default to first item if no match found
-      setActiveItem(navigationItems[0]?.label || '');
     }
   }, [router.asPath, navigationItems]);
 
