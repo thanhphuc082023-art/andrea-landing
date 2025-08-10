@@ -147,7 +147,7 @@ function ContactForm() {
   return (
     <section
       className={clsx(
-        'max-sd:h-[500px] relative flex h-[509px] items-center justify-center bg-[#1A253A] p-4'
+        'max-sd:h-[500px] bg-brand-orange relative flex h-[509px] items-center justify-center p-4'
       )}
     >
       <div className={clsx('mx-auto w-full max-w-[795px]')}>
@@ -167,7 +167,7 @@ function ContactForm() {
           <div
             className={clsx(
               'mb-6 rounded-lg p-4 text-center',
-              'bg-red-100 text-red-800'
+              'border border-white/20 bg-white/10 text-white backdrop-blur-sm'
             )}
           >
             {submitStatus.message}
@@ -185,15 +185,15 @@ function ContactForm() {
               aria-label="Tên liên hệ"
               className={clsx(
                 'w-full py-1',
-                'border-b border-[#97979780] bg-transparent text-white',
-                'placeholder:font-[400] placeholder:text-[#979797]',
+                'border-b border-white bg-transparent text-white',
+                'placeholder:font-[400] placeholder:text-white',
                 'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                 'transition-colors duration-300',
                 errors.name && 'border-red-500'
               )}
             />
             {errors.name && (
-              <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+              <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
                 {errors.name.message}
               </p>
             )}
@@ -209,15 +209,15 @@ function ContactForm() {
                 aria-label="Số điện thoại"
                 className={clsx(
                   'w-full py-1',
-                  'border-b border-[#97979780] bg-transparent text-white',
-                  'placeholder:font-[400] placeholder:text-[#979797]',
+                  'border-b border-white bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-white',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                   'transition-colors duration-300',
                   errors.phone && 'border-red-500'
                 )}
               />
               {errors.phone && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
                   {errors.phone.message}
                 </p>
               )}
@@ -230,15 +230,15 @@ function ContactForm() {
                 aria-label="Email"
                 className={clsx(
                   'w-full py-1',
-                  'border-b border-[#97979780] bg-transparent text-white',
-                  'placeholder:font-[400] placeholder:text-[#979797]',
+                  'border-b border-white bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-white',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                   'transition-colors duration-300',
                   errors.email && 'border-red-500'
                 )}
               />
               {errors.email && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
                   {errors.email.message}
                 </p>
               )}
@@ -257,15 +257,15 @@ function ContactForm() {
                 aria-label="Tên công ty và Ngành nghề"
                 className={clsx(
                   'w-full py-1',
-                  'border-b border-[#97979780] bg-transparent text-white',
-                  'placeholder:font-[400] placeholder:text-[#979797]',
+                  'border-b border-white bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-white',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                   'transition-colors duration-300',
                   errors.industry && 'border-red-500'
                 )}
               />
               {errors.industry && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
                   {errors.industry.message}
                 </p>
               )}
@@ -279,15 +279,15 @@ function ContactForm() {
                 aria-label="Mã bảo mật"
                 className={clsx(
                   'w-full py-1',
-                  'border-b border-[#97979780] bg-transparent text-white',
-                  'placeholder:font-[400] placeholder:text-[#979797]',
+                  'border-b border-white bg-transparent text-white',
+                  'placeholder:font-[400] placeholder:text-white',
                   'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                   'transition-colors duration-300',
                   errors.captcha && 'border-red-500'
                 )}
               />
               {errors.captcha && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
                   {errors.captcha.message}
                 </p>
               )}
@@ -345,15 +345,15 @@ function ContactForm() {
               aria-label="Yêu cầu tư vấn và báo giá"
               className={clsx(
                 'w-full py-1',
-                'border-b border-[#97979780] bg-transparent text-white',
-                'placeholder:font-[400] placeholder:text-[#979797]',
+                'border-b border-white bg-transparent text-white',
+                'placeholder:font-[400] placeholder:text-white',
                 'focus:border-brand-orange rounded-none outline-none focus:ring-0',
                 'resize-none outline-none transition-colors duration-300',
                 errors.message && 'border-red-500'
               )}
             />
             {errors.message && (
-              <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-400">
+              <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
                 {errors.message.message}
               </p>
             )}
@@ -364,13 +364,13 @@ function ContactForm() {
             <SubmitButton
               isSubmitting={isSubmitting}
               disabled={isSubmitting}
-              textColor="text-brand-orange"
-              borderColor="border-brand-orange"
-              beforeBgColor="before:bg-brand-orange"
-              hoverBgColor="hover:bg-brand-orange"
-              hoverTextColor="hover:text-white"
+              textColor="text-white"
+              borderColor="border-white"
+              beforeBgColor="before:bg-white"
+              hoverBgColor="hover:bg-white"
+              hoverTextColor="hover:text-brand-orange"
               focusRingColor="focus:ring-brand-orange"
-              focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
+              focusRingOffsetColor="focus:ring-offset-white-dark"
             >
               {isSubmitting ? 'Đang gửi...' : 'Gửi'}
             </SubmitButton>

@@ -1,3 +1,4 @@
+import { getStaticPropsLayout } from '@/lib/page-helpers';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -369,3 +370,5 @@ export default function UploadPage() {
     </>
   );
 }
+
+export const getStaticProps = getStaticPropsLayout;

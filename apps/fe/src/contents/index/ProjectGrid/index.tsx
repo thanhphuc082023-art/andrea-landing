@@ -82,11 +82,11 @@ function FeaturedProjectCard({ project }: { project: Project }) {
   if (project.isLarge) {
     return (
       <div className={clsx('lg:col-span-7')}>
-        <div className={clsx('relative')}>
+        <div className={clsx('group relative cursor-pointer')}>
           {/* Main Image */}
           <div
             className={clsx(
-              'border-brand-orange relative h-[400px] w-full overflow-hidden rounded-2xl border-2 lg:h-[600px]'
+              'group-hover:border-brand-orange relative h-[400px] w-full overflow-hidden rounded-2xl border-2 border-transparent transition-all duration-200 lg:h-[600px]'
             )}
           >
             <Image
@@ -101,10 +101,10 @@ function FeaturedProjectCard({ project }: { project: Project }) {
           </div>
 
           {/* Project Info */}
-          <div className={clsx('mt-6')}>
+          <div className={clsx('mt-4')}>
             <h3
               className={clsx(
-                'text-text-primary mb-2 text-2xl font-semibold lg:text-3xl'
+                'text-text-primary mb-2 text-[22px] font-semibold lg:text-[22px]'
               )}
             >
               {project.title}
@@ -124,11 +124,11 @@ function FeaturedProjectCard({ project }: { project: Project }) {
 
   return (
     <div className={clsx('lg:col-span-5')}>
-      <div className={clsx('relative')}>
+      <div className={clsx('group relative cursor-pointer')}>
         {/* Featured Image */}
         <div
           className={clsx(
-            'relative h-[300px] w-full overflow-hidden rounded-2xl lg:h-[300px]'
+            'group-hover:border-brand-orange relative h-[300px] w-full overflow-hidden rounded-2xl border-2 border-transparent transition-all duration-200 lg:h-[300px]'
           )}
         >
           <Image
@@ -143,11 +143,9 @@ function FeaturedProjectCard({ project }: { project: Project }) {
         </div>
 
         {/* Project Info */}
-        <div className={clsx('mt-6 lg:mt-8')}>
+        <div className={clsx('mt-4 lg:mt-6')}>
           <h3
-            className={clsx(
-              'text-text-primary mb-2 text-2xl font-semibold lg:text-3xl'
-            )}
+            className={clsx('text-text-primary mb-2 text-[22px] font-semibold')}
           >
             {project.title}
           </h3>
@@ -166,11 +164,11 @@ function FeaturedProjectCard({ project }: { project: Project }) {
 
 function RegularProjectCard({ project }: { project: Project }) {
   return (
-    <div className={clsx('group cursor-pointer')}>
+    <div className={clsx('group relative cursor-pointer')}>
       {/* Project Image */}
       <div
         className={clsx(
-          'relative mb-6 h-[300px] w-full overflow-hidden rounded-2xl'
+          'group-hover:border-brand-orange relative mb-4 h-[300px] w-full overflow-hidden rounded-2xl border-2 border-transparent transition-all duration-200'
         )}
       >
         <Image
@@ -187,9 +185,7 @@ function RegularProjectCard({ project }: { project: Project }) {
       {/* Project Info */}
       <div>
         <h3
-          className={clsx(
-            'text-text-primary mb-2 text-2xl font-semibold lg:text-3xl'
-          )}
+          className={clsx('text-text-primary mb-2 text-[22px] font-semibold')}
         >
           {project.title}
         </h3>
@@ -216,7 +212,7 @@ function ProjectGrid() {
         <div className={clsx('mb-6')}>
           <h2
             className={clsx(
-              'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
+              'font-playfair text-brand-orange max-sd:text-[40px] text-[42px] font-medium max-md:text-[35px]'
             )}
           >
             Dự án tiêu biểu

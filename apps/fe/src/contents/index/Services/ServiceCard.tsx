@@ -57,16 +57,16 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
               className={clsx(
                 'text-text-primary shrink-0 leading-normal',
                 'dark:text-white',
-                'text-2xl font-semibold max-lg:text-xl max-md:text-lg'
+                'text-[18px] font-semibold max-md:text-lg'
               )}
             >
               {position}.
             </h3>
             <h3
               className={clsx(
-                'text-text-primary max-w-[63%] leading-normal',
+                'text-text-primary max-w-[80%] leading-normal',
                 'flex-1 dark:text-white',
-                'text-2xl font-semibold max-lg:text-xl max-md:text-lg'
+                'text-[18px] font-semibold max-md:text-lg'
               )}
             >
               {title}

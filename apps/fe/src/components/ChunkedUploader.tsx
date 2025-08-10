@@ -17,6 +17,7 @@ export default function ChunkedUploader({
   const [title, setTitle] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [facebookUrl, setFacebookUrl] = useState('');
   const [downloadUrl, setDownloadUrl] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -72,6 +73,15 @@ export default function ChunkedUploader({
       });
 
       if (!response.ok) {
+        // Check if unauthorized - clear token
+        if (response.status === 401) {
+          localStorage.removeItem('strapiToken');
+          localStorage.removeItem('strapiUser');
+          throw new Error(
+            'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'
+          );
+        }
+
         throw new Error(`Failed to upload chunk ${chunkIndex + 1}`);
       }
 
@@ -137,14 +147,27 @@ export default function ChunkedUploader({
           title: title.trim(),
           websiteUrl: websiteUrl.trim() || null,
           phoneNumber: phoneNumber.trim() || null,
+          facebookUrl: facebookUrl.trim() || null,
           downloadUrl: downloadUrl.trim() || null,
           pdfUploadId: uploadId,
           thumbnailUploadId,
+          originalFileName: selectedFile.name,
+          originalThumbnailName: thumbnailFile?.name,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
+
+        // Check if unauthorized - clear token and redirect to login
+        if (response.status === 401) {
+          localStorage.removeItem('strapiToken');
+          localStorage.removeItem('strapiUser');
+          // Trigger logout callback to redirect user to login
+          onLogout();
+          return;
+        }
+
         throw new Error(errorData.error || 'Không thể tạo E-Profile');
       }
 
@@ -159,6 +182,7 @@ export default function ChunkedUploader({
       setTitle('');
       setWebsiteUrl('');
       setPhoneNumber('');
+      setFacebookUrl('');
       setDownloadUrl('');
       setThumbnailFile(null);
       setUploadProgress(0);
@@ -183,6 +207,12 @@ export default function ChunkedUploader({
         if (error.message.includes('Failed to fetch')) {
           errorMessage =
             'Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng.';
+        } else if (error.message.includes('Phiên đăng nhập đã hết hạn')) {
+          errorMessage = error.message;
+          // Auto logout after showing error
+          setTimeout(() => {
+            onLogout();
+          }, 2000);
         } else {
           errorMessage = `${error.message}`;
         }
@@ -328,6 +358,30 @@ export default function ChunkedUploader({
                 setGeneratedSlug('');
               }}
               placeholder="Nhập số điện thoại"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Facebook URL Input */}
+          <div>
+            <label
+              htmlFor="facebookUrl"
+              className="mb-2 block font-bold text-gray-800"
+            >
+              Đường dẫn Facebook
+            </label>
+            <input
+              type="url"
+              id="facebookUrl"
+              value={facebookUrl}
+              onChange={(e) => {
+                setFacebookUrl(e.target.value);
+                setError('');
+                setUploadMessage('');
+                setGeneratedSlug('');
+              }}
+              placeholder="https://facebook.com/yourpage"
               className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={loading}
             />

@@ -76,6 +76,37 @@ export const getStaticPropsWithGlobal: GetStaticProps<
   }
 };
 
+export const getStaticPropsLayout: GetStaticProps<
+  PagePropsWithGlobal
+> = async () => {
+  try {
+    const [globalResult, menuResult, footerResult] = await Promise.all([
+      getGlobalSettings(),
+      getMenuSettings(),
+      getFooterSettings(),
+    ]);
+
+    return {
+      props: {
+        serverGlobal: globalResult.data || null,
+        menuItems: menuResult.data || [],
+        footerData: footerResult.data || null,
+      },
+      revalidate: 3600, // ISR 1 hour
+    };
+  } catch (error) {
+    console.error('Error in getStaticProps:', error);
+    return {
+      props: {
+        serverGlobal: null,
+        menuItems: [],
+        footerData: null,
+      },
+      revalidate: 3600,
+    };
+  }
+};
+
 // Helper function to combine global data with page-specific data
 export const getStaticPropsWithGlobalAndData = async <
   T extends Record<string, any>,
@@ -86,10 +117,10 @@ export const getStaticPropsWithGlobalAndData = async <
   revalidate?: number;
 }> => {
   try {
-    const [globalPropsResult, pageData] = await Promise.all([
-      getStaticPropsWithGlobal(),
+    const [globalPropsResult, pageData] = (await Promise.all([
+      getStaticPropsLayout({} as any),
       getPageData(),
-    ]);
+    ])) as any;
 
     return {
       props: {
@@ -100,7 +131,7 @@ export const getStaticPropsWithGlobalAndData = async <
     };
   } catch (error) {
     console.error('Error in getStaticPropsWithGlobalAndData:', error);
-    const globalPropsResult = await getStaticPropsWithGlobal();
+    const globalPropsResult = (await getStaticPropsLayout({} as any)) as any;
 
     return {
       props: {

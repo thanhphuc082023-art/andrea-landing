@@ -2,8 +2,8 @@
 
 @layer components {
   .content-wrapper {
-    @apply mx-auto max-w-[1440px] px-[29px] lg:px-[80px];
-    @apply lg:px-[80px];
+    @apply mx-auto max-w-[1440px];
+    @apply px-[8px] md:px-[29px] lg:px-[80px];
   }
 
   .content-wrapper-max {

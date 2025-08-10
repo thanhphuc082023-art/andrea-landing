@@ -125,35 +125,43 @@
 }
 
 .flip-book .controls {
-  position: relative;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
 }
 
 .flip-book .controls .fnavbar {
-  margin: 0 auto;
-  opacity: 0.3;
-  transition: opacity 2s ease-in-out 3s;
+  margin: 0;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
 }
 
 .flip-book .controls .fnavbar:hover {
   opacity: 1;
-  transition: opacity 1s ease;
+  transition: opacity 0.3s ease;
 }
 
 .flip-book .controls .ctrl {
   font-family: 'Neurial Grotesk', Helvetica, Arial, sans-serif;
-  position: absolute;
-  bottom: 60px;
+  position: relative;
+  bottom: auto;
 }
 
 @media (max-width: 768px) {
+  .flip-book .controls {
+    bottom: 20px !important;
+    right: 20px !important;
+  }
+
   .flip-book .controls .ctrl {
-    left: 0 !important;
-    width: 100% !important;
-    bottom: 0 !important;
+    position: relative !important;
+    width: auto !important;
+    bottom: auto !important;
   }
 
   .flip-book .controls .ctrl .fnavbar .fnav {
-    justify-content: center;
+    justify-content: flex-end;
   }
 
   .flip-book .controls .ctrl .fnavbar .fnav .cmdFastBackward,
@@ -166,10 +174,10 @@
   .flip-book .controls .ctrl .fnavbar .fnav .fnav-item:has(.pages) {
     display: none !important;
   }
+}
 
-  .ctrl .fnavbar .fnav .dropup .menu {
-    right: 0;
-  }
+.ctrl .fnavbar .fnav .dropup .menu {
+  right: 0;
 }
 
 .ctrl ul {
@@ -178,22 +186,18 @@
 }
 .ctrl .fnavbar {
   text-align: center;
-  background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
   background-repeat: repeat-x;
-  padding: 3px;
   overflow: visible;
-  background-color: #3c3c3c;
-
-  border-radius: 4px;
 }
 .ctrl .fnavbar a {
   text-decoration: none;
-  font-size: 14px;
+  font-size: 24px;
 }
 .ctrl .fnavbar .fnav {
   font-size: 0;
   display: flex;
   text-align: left;
+  flex-direction: column;
 }
 .ctrl .fnavbar .fnav li {
   font-size: 12pt;
@@ -201,7 +205,9 @@
   width: auto;
 }
 .ctrl .fnavbar .fnav .fnav-item {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ctrl .fnavbar .fnav .cmdSave,
@@ -248,9 +254,11 @@
   top: 100%;
   box-shadow: 3px 0 3px #222;
 }
-.ctrl .fnavbar .fnav .icon-caret {
-  width: 26px;
-  display: inline-block;
+
+.ctrl .fnavbar .menu li a {
+  font-size: 12px;
+}
+.ctrl .fnavbar .menu .icon {
 }
 .ctrl .fnavbar .fnav .dropdown .caret {
   display: inline-block;
@@ -305,8 +313,8 @@
 
 .ctrl .fnavbar .menu .icon {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   text-align: center;
 }
 

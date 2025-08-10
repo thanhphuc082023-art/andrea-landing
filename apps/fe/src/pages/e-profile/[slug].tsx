@@ -72,10 +72,9 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
           className={`${!isSimpleLayout ? 'max-sd:mt-[60px] mt-[65px]' : ''} flex min-h-screen items-center justify-center bg-gray-900`}
         >
           <div className="text-center text-white">
-            <h1 className="mb-4 text-2xl font-bold">Không tìm E-Profile</h1>
-            <p className="mb-4">
+            <h1 className="mb-4 text-2xl font-bold">
               {error || 'Không thể tìm thấy E-Profile được yêu cầu.'}
-            </p>
+            </h1>
             {!isSimpleLayout && (
               <button
                 type="button"
@@ -90,7 +89,6 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
       </>
     );
   }
-
   // Get PDF URL
   const pdfUrl = getStrapiMediaUrl(book.pdfFile);
   const thumbnailUrl = book.thumbnail
@@ -261,7 +259,7 @@ export const getStaticProps: GetStaticProps<PDFBookPageProps> = async ({
       }
 
       const bookData = data.data[0];
-
+      console.log(data);
       const book: BookAttributes = {
         title: bookData.title,
         slug: bookData.slug,

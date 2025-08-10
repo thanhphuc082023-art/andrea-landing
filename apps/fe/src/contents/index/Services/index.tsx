@@ -74,7 +74,7 @@ function Services({ servicesData = {} }: ServicesProps) {
           <h2
             className={clsx(
               'font-playfair text-brand-orange font-medium',
-              'max-sd:text-[40px] max-370:text-[28px] text-[50px] max-lg:text-[36px] max-md:text-[35px]'
+              'max-sd:text-[40px] max-370:text-[28px] text-[42px] max-lg:text-[36px] max-md:text-[35px]'
             )}
           >
             {servicesData?.title || 'Dịch vụ'}

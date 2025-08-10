@@ -480,12 +480,12 @@ function Footer({ footerData = {} }: FooterProps) {
               alt={
                 footerData?.signatureIcon?.alternativeText || 'Signature Icon'
               }
-              className="transform-origin-bottom-right absolute bottom-0 right-[20px] transform object-contain max-md:translate-x-[12.5%] max-md:translate-y-[12.5%] max-md:scale-75"
+              className="transform-origin-bottom-right absolute bottom-0 right-[65px] transform object-contain max-md:translate-x-[12.5%] max-md:translate-y-[12.5%] max-md:scale-75"
             />
           ) : (
             <div
               className={clsx(
-                'absolute bottom-0 right-[20px] flex items-center justify-center'
+                'absolute bottom-0 right-[65px] flex items-center justify-center'
               )}
             >
               <NumberDesignElement

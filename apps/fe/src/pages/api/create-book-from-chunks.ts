@@ -40,9 +40,12 @@ export default async function handler(
       title,
       websiteUrl,
       phoneNumber,
+      facebookUrl,
       downloadUrl,
       pdfUploadId,
       thumbnailUploadId,
+      originalFileName,
+      originalThumbnailName,
     } = req.body;
 
     if (!title || !pdfUploadId) {
@@ -77,7 +80,7 @@ export default async function handler(
     const pdfBuffer = fs.readFileSync(pdfFilePath);
     const pdfFileObj = createFileFromBuffer(
       pdfBuffer,
-      'document.pdf',
+      originalFileName || 'document.pdf',
       'application/pdf'
     );
 
@@ -106,7 +109,7 @@ export default async function handler(
         const thumbnailBuffer = fs.readFileSync(thumbnailFilePath);
         const thumbnailFileObj = createFileFromBuffer(
           thumbnailBuffer,
-          'thumbnail.jpg',
+          originalThumbnailName || 'thumbnail.jpg',
           'image/jpeg'
         );
 
@@ -153,6 +156,10 @@ export default async function handler(
 
     if (phoneNumber) {
       bookData.data.phoneNumber = phoneNumber;
+    }
+
+    if (facebookUrl) {
+      bookData.data.facebookUrl = facebookUrl;
     }
 
     if (downloadUrl) {
