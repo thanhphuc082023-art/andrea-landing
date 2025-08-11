@@ -28,6 +28,7 @@ const nextConfig = {
   ],
   images: {
     domains: [
+      'tremendous-delight-4e1d7b6669.strapiapp.com',
       'joyful-basket-ea764d9c28.media.strapiapp.com',
       'api.builder.io',
       'images.unsplash.com',
