@@ -144,21 +144,23 @@ export default function ActionButtons({
         )}
       >
         {/* Website/Home Button */}
-        <TooltipWrapper
-          content={bookData?.websiteUrl || ''}
-          disabled={isMobile}
-        >
-          <button
-            onClick={handleWebsiteClick}
-            className="group flex h-10 w-10 items-center justify-center rounded-full text-white backdrop-blur-sm transition-all duration-300 hover:scale-110"
-            aria-label={bookData?.websiteUrl || ''}
+        {bookData?.websiteUrl && (
+          <TooltipWrapper
+            content={bookData?.websiteUrl || ''}
+            disabled={isMobile}
           >
-            <Globe
-              style={{ filter: 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))' }}
-              className="h-6 w-6 transition-transform group-hover:scale-110"
-            />
-          </button>
-        </TooltipWrapper>
+            <button
+              onClick={handleWebsiteClick}
+              className="group flex h-10 w-10 items-center justify-center rounded-full text-white backdrop-blur-sm transition-all duration-300 hover:scale-110"
+              aria-label={bookData?.websiteUrl || ''}
+            >
+              <Globe
+                style={{ filter: 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))' }}
+                className="h-6 w-6 transition-transform group-hover:scale-110"
+              />
+            </button>
+          </TooltipWrapper>
+        )}
 
         {/* Phone Button */}
         {bookData?.phoneNumber && (
@@ -218,18 +220,20 @@ export default function ActionButtons({
   return (
     <div className="absolute right-4 top-4 z-[15] flex flex-col space-y-3">
       {/* Website/Home Button */}
-      <TooltipWrapper content={bookData?.websiteUrl || ''}>
-        <button
-          onClick={handleWebsiteClick}
-          className="group flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110"
-          aria-label={bookData?.websiteUrl || ''}
-        >
-          <Globe
-            style={{ filter: 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))' }}
-            className="h-6 w-6 transition-transform group-hover:scale-110"
-          />
-        </button>
-      </TooltipWrapper>
+      {bookData?.websiteUrl && (
+        <TooltipWrapper content={bookData?.websiteUrl || ''}>
+          <button
+            onClick={handleWebsiteClick}
+            className="group flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110"
+            aria-label={bookData?.websiteUrl || ''}
+          >
+            <Globe
+              style={{ filter: 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))' }}
+              className="h-6 w-6 transition-transform group-hover:scale-110"
+            />
+          </button>
+        </TooltipWrapper>
+      )}
 
       {/* Phone Button */}
       {bookData?.phoneNumber && (
