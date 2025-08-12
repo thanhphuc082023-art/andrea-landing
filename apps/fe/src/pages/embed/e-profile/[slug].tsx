@@ -217,7 +217,7 @@ export default function EmbedBookPage({ book, error }: EmbedBookPageProps) {
         `}</style>
       </Head>
 
-      <div className="h-screen w-full">
+      <div className="h-screen w-full bg-pdf">
         <MinimalFlipBook isSimpleLayout pdfUrl={pdfUrl} bookData={bookData} />
       </div>
     </>

@@ -7,6 +7,7 @@ import {
   getStaticPropsWithGlobalAndData,
   type PagePropsWithGlobal,
 } from '@/lib/page-helpers';
+import clsx from 'clsx';
 
 interface BookAttributes {
   title: string;
@@ -177,9 +178,10 @@ const PDFBookPage: React.FC<PDFBookPageProps> = ({
         )}
       </Head>
       <div
-        className={
+        className={clsx(
+          'bg-pdf',
           isSimpleLayout ? 'h-screen w-full' : 'max-sd:mt-[60px] mt-[65px]'
-        }
+        )}
       >
         <div className="mx-auto max-w-full">
           <MinimalFlipBook

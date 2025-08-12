@@ -30,11 +30,15 @@ interface PDFMobileViewerProps {
     phoneNumber?: string;
     downloadUrl?: string;
   };
+  isHideActions?: boolean;
+  isHideScrollDown?: boolean;
 }
 
 export default function PDFMobileViewer({
   pdfUrl = '',
   bookData,
+  isHideActions = false,
+  isHideScrollDown = false,
 }: PDFMobileViewerProps) {
   // Only essential state that needs to trigger re-renders
   const [isLoading, setIsLoading] = useState(true);
@@ -258,7 +262,7 @@ export default function PDFMobileViewer({
   }
 
   return (
-    <div className="bg-pdf relative h-full w-full">
+    <div className="relative h-full w-full">
       {/* Left Navigation Button */}
       <button
         onClick={prevPage}
@@ -309,10 +313,10 @@ export default function PDFMobileViewer({
       </div>
 
       {/* Action Buttons - Mobile: Horizontal at bottom center */}
-      <ActionButtons bookData={bookData} isMobile={true} />
+      {!isHideActions && <ActionButtons bookData={bookData} isMobile={true} />}
 
       {/* Scroll Down */}
-      {!isSimpleLayout && (
+      {!isSimpleLayout && !isHideScrollDown && (
         <ScrollDownButton
           variant="simple"
           text=""

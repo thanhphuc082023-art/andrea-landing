@@ -22,11 +22,15 @@ interface PDFDesktopViewerProps {
     phoneNumber?: string;
     downloadUrl?: string;
   };
+  isHideActions?: boolean;
+  isHideScrollDown?: boolean;
 }
 
 export default function PDFDesktopViewer({
   pdfUrl = '',
   bookData,
+  isHideActions = false,
+  isHideScrollDown = false,
 }: PDFDesktopViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
@@ -374,7 +378,7 @@ export default function PDFDesktopViewer({
   };
 
   return (
-    <div className="bg-pdf relative h-full w-full">
+    <div className="relative h-full w-full">
       {!isReady && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <SpinnerIcon className="text-brand-orange h-10 w-10 animate-spin" />
@@ -383,8 +387,8 @@ export default function PDFDesktopViewer({
       <div ref={containerRef} className="relative h-full overflow-hidden" />
 
       {/* Action Buttons - Desktop: Vertical at top right */}
-      <ActionButtons bookData={bookData} isMobile={false} />
-      {!isSimpleLayout && (
+      {!isHideActions && <ActionButtons bookData={bookData} isMobile={false} />}
+      {!isSimpleLayout && !isHideScrollDown && (
         <ScrollDownButton
           variant="simple"
           text=""

@@ -86,6 +86,8 @@ export interface StrapiProject {
   projectUrl?: string;
   githubUrl?: string;
   featured: boolean;
+  featuredImage?: StrapiMedia | null;
+  gallery?: StrapiMedia[];
   images?: {
     data: StrapiMedia[];
   };
@@ -94,6 +96,20 @@ export interface StrapiProject {
   };
   seo?: StrapiSEO;
   status?: 'draft' | 'in-progress' | 'completed';
+  client?: string;
+  year?: number;
+  overview?: string;
+  challenge?: string;
+  solution?: string;
+  results?: Array<{
+    title: string;
+    description: string;
+  }>;
+  metrics?: Array<{
+    value: string;
+    label: string;
+    description?: string;
+  }>;
 }
 
 export interface StrapiAuthor {

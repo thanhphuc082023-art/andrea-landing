@@ -12,6 +12,8 @@ interface MinimalFlipBookProps {
     downloadUrl?: string;
   };
   isSimpleLayout?: boolean;
+  isHideActions?: boolean;
+  isHideScrollDown?: boolean;
 }
 
 /**
@@ -23,6 +25,8 @@ export default function MinimalFlipBook({
   pdfUrl = '',
   bookData,
   isSimpleLayout = false,
+  isHideActions = false,
+  isHideScrollDown = false,
 }: MinimalFlipBookProps) {
   return (
     <div
@@ -33,7 +37,12 @@ export default function MinimalFlipBook({
         'relative overflow-hidden'
       )}
     >
-      <AdaptivePDFViewer pdfUrl={pdfUrl} bookData={bookData} />
+      <AdaptivePDFViewer
+        isHideActions={isHideActions}
+        isHideScrollDown={isHideScrollDown}
+        pdfUrl={pdfUrl}
+        bookData={bookData}
+      />
     </div>
   );
 }

@@ -32,6 +32,8 @@ interface AdaptivePDFViewerProps {
     phoneNumber?: string;
     downloadUrl?: string;
   };
+  isHideActions?: boolean;
+  isHideScrollDown?: boolean;
 }
 
 /**
@@ -42,6 +44,8 @@ interface AdaptivePDFViewerProps {
 export default function AdaptivePDFViewer({
   pdfUrl = '',
   bookData,
+  isHideActions = false,
+  isHideScrollDown = false,
 }: AdaptivePDFViewerProps) {
   const { isMobile, isClient } = useIsMobile();
 
@@ -59,9 +63,19 @@ export default function AdaptivePDFViewer({
   return (
     <div className="relative h-full w-full">
       {isMobile ? (
-        <PDFMobileViewer pdfUrl={pdfUrl} bookData={bookData} />
+        <PDFMobileViewer
+          isHideActions={isHideActions}
+          isHideScrollDown={isHideScrollDown}
+          pdfUrl={pdfUrl}
+          bookData={bookData}
+        />
       ) : (
-        <PDFDesktopViewer pdfUrl={pdfUrl} bookData={bookData} />
+        <PDFDesktopViewer
+          isHideActions={isHideActions}
+          isHideScrollDown={isHideScrollDown}
+          pdfUrl={pdfUrl}
+          bookData={bookData}
+        />
       )}
     </div>
   );
