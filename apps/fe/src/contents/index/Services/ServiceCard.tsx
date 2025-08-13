@@ -55,7 +55,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
           <div className="flex w-full gap-1">
             <h3
               className={clsx(
-                'text-text-primary shrink-0 leading-normal',
+                'text-text-primary group-hover:text-brand-orange shrink-0 leading-normal transition-all duration-300',
                 'dark:text-white',
                 'text-[18px] font-semibold max-md:text-lg'
               )}
@@ -64,7 +64,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
             </h3>
             <h3
               className={clsx(
-                'text-text-primary max-w-[80%] leading-normal',
+                'text-text-primary group-hover:text-brand-orange max-w-[80%] leading-normal transition-all duration-300',
                 'flex-1 dark:text-white',
                 'text-[18px] font-semibold max-md:text-lg'
               )}
@@ -121,7 +121,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
           <p
             className={clsx(
               'font-normal leading-6 tracking-wide',
-              'text-[#7D7D7D]',
+              'text-text-primary',
               // Responsive text sizes
               'text-base max-lg:text-sm max-md:text-sm'
             )}
@@ -139,7 +139,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                   key={`${item}-${id}-${index + 1}`}
                   className={clsx(
                     'font-normal leading-6 tracking-wide',
-                    'group-hover:text-brand-orange text-[#979797] transition-colors duration-300',
+                    'group-hover:text-brand-orange text-text-primary transition-colors duration-300',
                     'mt-1',
                     // Responsive text sizes
                     'text-base max-lg:text-sm max-md:text-sm'
