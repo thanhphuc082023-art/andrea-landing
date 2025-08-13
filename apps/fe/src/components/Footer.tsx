@@ -172,7 +172,7 @@ function Footer({ footerData = {} }: FooterProps) {
               {contactInfoTitle}
             </h3>
             <div className={clsx('space-y-1')}>
-              {contactInfo?.phone && (
+              {contactInfo?.phone && contactInfo.phone.length > 0 && (
                 <div className={clsx('flex items-start gap-2')}>
                   {/* <div
                       className={clsx(
@@ -212,7 +212,7 @@ function Footer({ footerData = {} }: FooterProps) {
                 </div>
               )}
 
-              {contactInfo?.website && (
+              {contactInfo?.website && contactInfo.website.length > 0 && (
                 <div className={clsx('flex items-start gap-2')}>
                   {/* <div
                       className={clsx(
@@ -252,7 +252,7 @@ function Footer({ footerData = {} }: FooterProps) {
                 </div>
               )}
 
-              {contactInfo?.email && (
+              {contactInfo?.email && contactInfo.email.length > 0 && (
                 <div className={clsx('flex items-start gap-2')}>
                   {/* <div
                       className={clsx(
