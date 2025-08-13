@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 import HeaderVideo from '@/contents/index/Header/HeaderVideo';
 
@@ -17,10 +18,17 @@ function ProjectHero({ heroData = null, project = null }: ProjectHeroProps) {
   const projectYear = project?.year || new Date().getFullYear();
   const projectUrl = project?.projectUrl || '';
 
+  const router = useRouter();
+
+  const mode = router.query.mode;
+
   return (
     <header
       id="project-header"
-      className={clsx('relative overflow-hidden', 'max-sd:mt-[60px] mt-[65px]')}
+      className={clsx(
+        'relative overflow-hidden',
+        mode === 'edit' || mode === 'create' ? '' : 'max-sd:mt-[60px] mt-[65px]'
+      )}
     >
       {/* Background Video - giống homepage */}
       <HeaderVideo heroData={heroData} />
@@ -31,11 +39,7 @@ function ProjectHero({ heroData = null, project = null }: ProjectHeroProps) {
           'relative z-10 flex min-h-[511px] items-center py-[75px]'
         )}
       >
-        <div
-          className={clsx(
-            'mx-auto w-full max-w-[1440px] px-[72px] max-lg:px-6'
-          )}
-        >
+        <div className={clsx('content-wrapper')}>
           <div
             className={clsx(
               'flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-[120px]',
@@ -65,7 +69,7 @@ function ProjectHero({ heroData = null, project = null }: ProjectHeroProps) {
             </div>
 
             {/* Right side - Project Description */}
-            <div className="flex-1">
+            <div className="max-w-[642px] max-lg:flex-1">
               <h2 className="mb-4 text-2xl font-bold text-[#484848] dark:text-gray-300">
                 {projectIntroTitle}
               </h2>

@@ -10,7 +10,7 @@ export const sampleProject = {
   ],
   projectIntroTitle: 'Giới thiệu dự án:',
   credits: {
-    title: 'Thanks for watching',
+    title: 'Cảm ơn bạn đã xem',
     date: '2023',
     projectManager:
       'Project Manager: Nguyễn Văn A\nGraphic Designer: Trần Thị B\nShowcase: Andrea Studio',

@@ -152,17 +152,18 @@ const legacyShowcaseData: any[] = [
 const ShowcaseItem = memo(
   ({ item, priority = false }: { item: ShowcaseItem; priority?: boolean }) => {
     const commonClasses =
-      'h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]';
+      'object-cover transition-transform duration-700 group-hover:scale-[1.02]';
 
     if (item.type === 'video') {
       return (
         <video
           src={item.src}
-          className={commonClasses}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           controls
           muted
           loop
           playsInline
+          autoPlay
         />
       );
     }
@@ -195,8 +196,7 @@ const ShowcaseItem = memo(
       <Image
         src={item.src}
         alt={item.alt}
-        width={item.width}
-        height={item.height}
+        fill
         className={commonClasses}
         sizes={
           item.width > 1000
@@ -218,7 +218,7 @@ const ShowcaseSection = memo(
       src: item.src || '',
       alt: item.alt || item.title || '',
       width: item.width || 1300,
-      height: item.height || 800,
+      height: item.height || 600, // Default height for better UX
       type: item.type || 'image',
       bookData: item.bookData || {},
       colSpan: item.colSpan || 1,
@@ -246,7 +246,15 @@ const ShowcaseSection = memo(
 
       return (
         <div key={section.id} className="group">
-          <div className="relative h-full overflow-hidden bg-white shadow-sm">
+          <div
+            className="relative overflow-hidden bg-white shadow-sm"
+            style={{
+              height:
+                transformedItem.type === 'video'
+                  ? `${Math.min(transformedItem.height || 600, 600)}px`
+                  : `${transformedItem.height || 600}px`,
+            }}
+          >
             <ShowcaseItem item={transformedItem} priority={index === 0} />
           </div>
         </div>
@@ -271,7 +279,15 @@ const ShowcaseSection = memo(
               key={itemIndex}
               className={`group ${transformedItem.colSpan ? `lg:col-span-${transformedItem.colSpan}` : ''}`}
             >
-              <div className="relative h-full overflow-hidden bg-white shadow-sm">
+              <div
+                className="relative overflow-hidden bg-white shadow-sm"
+                style={{
+                  height:
+                    transformedItem.type === 'video'
+                      ? `${Math.min(transformedItem.height || 400, 400)}px`
+                      : `${transformedItem.height || 400}px`,
+                }}
+              >
                 <ShowcaseItem item={transformedItem} />
               </div>
             </div>
@@ -288,8 +304,8 @@ function ProjectShowcase({
   project = null,
   showcaseData,
 }: ProjectShowcaseProps) {
-  // Use showcaseData from admin if available, otherwise fallback to legacy data
-  const sections = showcaseData || legacyShowcaseData;
+  // Use showcaseData from admin if available, otherwise use project.showcase, fallback to legacy data
+  const sections = showcaseData || project?.showcase || legacyShowcaseData;
 
   return (
     <section className="content-wrapper">

@@ -1,17 +1,19 @@
+import ProjectCredits from '@/contents/project-detail/ProjectCredits';
 import ProjectHero from './ProjectHero';
 import ProjectShowcase from './ProjectShowcase';
-import ProjectCredits from './ProjectCredits';
 import ContactForm from '@/contents/index/ContactForm';
 import NextProjects from '@/contents/project-detail/NextProjects';
 
 interface ProjectDetailContentsProps {
   heroData?: any;
   project?: any;
+  showcaseData?: any[];
 }
 
 function ProjectDetailContents({
   heroData = null,
   project = null,
+  showcaseData,
 }: ProjectDetailContentsProps) {
   return (
     <>
@@ -19,7 +21,7 @@ function ProjectDetailContents({
       <ProjectHero heroData={heroData} project={project} />
 
       {/* Project Showcase */}
-      <ProjectShowcase project={project} />
+      <ProjectShowcase project={project} showcaseData={showcaseData} />
 
       {/* Project Credits */}
       <ProjectCredits project={project} />

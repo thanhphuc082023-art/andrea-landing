@@ -3,6 +3,10 @@ import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import {
+  useSessionCleanup,
+  sessionCleanupConfigs,
+} from '@/hooks/useSessionCleanup';
 
 // Dynamic import PdfUploader để tránh SSR
 const DynamicPdfUploader = dynamic(() => import('@/components/PdfUploader'), {
@@ -28,6 +32,9 @@ const DynamicChunkedUploader = dynamic(
 );
 
 export default function UploadPage() {
+  // Session cleanup on unmount
+  useSessionCleanup(sessionCleanupConfigs.auth);
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

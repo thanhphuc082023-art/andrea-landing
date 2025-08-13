@@ -8,8 +8,15 @@ import {
   XCircleIcon,
   BookIcon,
 } from './Icons';
+import {
+  useSessionCleanup,
+  sessionCleanupConfigs,
+} from '@/hooks/useSessionCleanup';
 
 const PdfUploader = ({ logout }: { logout: () => void }) => {
+  // Session cleanup on unmount
+  useSessionCleanup(sessionCleanupConfigs.auth);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [title, setTitle] = useState<string>('');

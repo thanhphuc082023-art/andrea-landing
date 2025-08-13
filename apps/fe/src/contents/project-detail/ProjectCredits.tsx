@@ -5,13 +5,18 @@ interface ProjectCreditsProps {
 }
 
 function ProjectCredits({ project = null }: ProjectCreditsProps) {
-  // Default credits data - can be made dynamic if needed
+  // Use project credits data if available, otherwise use defaults
   const credits = {
-    date: '01/07/2025',
-    projectManager: 'Mai Xuân Hưng',
-    graphicDesigner: 'Mnghi',
-    showcase: 'MNghi',
+    title: project?.credits?.title || 'Thanks for watching',
+    creditLabel: project?.credits?.creditLabel || 'Credit:',
+    date: project?.credits?.date || '01/07/2025',
+    projectManager: project?.credits?.projectManager || 'Mai Xuân Hưng',
   };
+
+  // Parse projectManager string into array of credits
+  const creditsList = credits.projectManager
+    ? credits.projectManager.split('\n').filter((line) => line.trim())
+    : [];
 
   return (
     <section className={clsx('content-wrapper pt-[82px] max-lg:pt-12')}>
@@ -26,26 +31,27 @@ function ProjectCredits({ project = null }: ProjectCreditsProps) {
               'max-lg:text-4xl max-lg:leading-[1.2] max-md:text-3xl'
             )}
           >
-            Thanks for watching
+            {credits.title}
           </h2>
 
           {/* Credits Content */}
           <div
             className={clsx(
-              'mt-[26px] max-w-[480px] text-center text-[17px] font-normal leading-7 text-[#979797] dark:text-gray-400',
-              'max-lg:mt-6 max-lg:text-base'
+              'mt-[26px] max-w-[480px] text-center text-[17px] font-normal leading-7 text-[#979797] dark:text-gray-400'
             )}
           >
             {/* Date */}
-            <div className="mb-4">{credits.date}</div>
+            {credits.date && <div className="mb-4">{credits.date}</div>}
 
             {/* Credits Section */}
-            <div className="space-y-1">
-              <div className="font-bold">Credit:</div>
-              <div>Project manager: {credits.projectManager}</div>
-              <div>Graphic Designer: {credits.graphicDesigner}</div>
-              <div>Showcase: {credits.showcase}</div>
-            </div>
+            {creditsList.length > 0 && (
+              <div className="space-y-1">
+                <div className="font-bold">{credits.creditLabel}</div>
+                {creditsList.map((credit, index) => (
+                  <div key={index}>{credit}</div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

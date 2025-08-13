@@ -7,14 +7,34 @@ interface HeaderVideoProps {
 }
 
 function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
+  // Handle different video data formats
+  const getVideoUrl = (videoData: any) => {
+    if (!videoData) return null;
+
+    // If it's a string URL
+    if (typeof videoData === 'string') {
+      return videoData;
+    }
+
+    // If it's an object with url property (from form)
+    if (videoData.url) {
+      return videoData.url;
+    }
+
+    // If it's a Strapi media object
+    if (videoData.url) {
+      return getStrapiMediaUrl(videoData.url);
+    }
+
+    return null;
+  };
+
   const desktopVideo =
-    getStrapiMediaUrl(heroData?.desktopVideo) ||
+    getVideoUrl(heroData?.desktopVideo) ||
     'https://andrea.vn/uploads/videos/intro-website_3.mp4';
   const mobileVideo =
-    getStrapiMediaUrl(heroData?.mobileVideo) ||
+    getVideoUrl(heroData?.mobileVideo) ||
     'https://andrea.vn/uploads/videos/intro-website_3.mp4';
-  // const desktopPoster = getStrapiMediaUrl(heroData?.desktopPoster) || '';
-  // const mobilePoster = getStrapiMediaUrl(heroData?.mobilePoster) || '';
 
   return (
     <div
@@ -52,13 +72,14 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
           const skeleton = document.querySelector('.skeleton-video');
           if (skeleton) skeleton.classList.add('hidden');
         }}
+        onError={(e) => {
+          console.error('Desktop video error:', e);
+          const skeleton = document.querySelector('.skeleton-video');
+          if (skeleton) skeleton.classList.add('hidden');
+        }}
       >
-        <source src={desktopVideo || mobileVideo} type="video/mp4" />
-        <track
-          src={desktopVideo || mobileVideo}
-          kind="captions"
-          label="Vietnamese"
-        />
+        <source src={desktopVideo} type="video/mp4" />
+        <track src={desktopVideo} kind="captions" label="Vietnamese" />
       </video>
 
       {/* Mobile Video - Show on mobile, fallback to desktop if no mobile video */}
@@ -76,13 +97,14 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
           const skeleton = document.querySelector('.skeleton-video');
           if (skeleton) skeleton.classList.add('hidden');
         }}
+        onError={(e) => {
+          console.error('Mobile video error:', e);
+          const skeleton = document.querySelector('.skeleton-video');
+          if (skeleton) skeleton.classList.add('hidden');
+        }}
       >
-        <source src={mobileVideo || desktopVideo} type="video/mp4" />
-        <track
-          src={mobileVideo || desktopVideo}
-          kind="captions"
-          label="Vietnamese"
-        />
+        <source src={mobileVideo} type="video/mp4" />
+        <track src={mobileVideo} kind="captions" label="Vietnamese" />
       </video>
 
       {/* Fallback Video nếu không có mobile/desktop riêng */}
@@ -95,6 +117,11 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
           playsInline
           preload="metadata"
           onLoadedData={() => {
+            const skeleton = document.querySelector('.skeleton-video');
+            if (skeleton) skeleton.classList.add('hidden');
+          }}
+          onError={(e) => {
+            console.error('Fallback video error:', e);
             const skeleton = document.querySelector('.skeleton-video');
             if (skeleton) skeleton.classList.add('hidden');
           }}

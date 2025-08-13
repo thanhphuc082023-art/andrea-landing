@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BookIcon, DocumentIcon, XCircleIcon } from './Icons';
+import {
+  useSessionCleanup,
+  sessionCleanupConfigs,
+} from '@/hooks/useSessionCleanup';
 
 interface ChunkedUploaderProps {
   onUploadComplete: (result: { slug: string; bookId: string }) => void;
@@ -13,6 +17,9 @@ export default function ChunkedUploader({
   onUploadComplete,
   onLogout,
 }: ChunkedUploaderProps) {
+  // Session cleanup on unmount
+  useSessionCleanup(sessionCleanupConfigs.auth);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');

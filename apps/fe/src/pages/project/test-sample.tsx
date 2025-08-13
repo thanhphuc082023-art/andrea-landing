@@ -15,5 +15,4 @@ function TestSamplePage() {
   );
 }
 
-
-export default TestSamplePage
+export default TestSamplePage;

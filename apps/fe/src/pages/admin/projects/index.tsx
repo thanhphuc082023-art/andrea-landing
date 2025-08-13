@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import Image from 'next/image';
 import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
   EyeIcon,
 } from '@heroicons/react/24/outline';
-import ProjectForm from '@/components/admin/ProjectForm';
-import MediaUploader from '@/components/admin/MediaUploader';
-import { type ProjectFormData, type ShowcaseSection } from '@/types/project';
 
 interface Project {
   id: number;
@@ -16,19 +15,31 @@ interface Project {
   slug: string;
   status: string;
   featured: boolean;
+  thumbnail?: {
+    url: string;
+    name: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export default function AdminProjects() {
+  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showProjectForm, setShowProjectForm] = useState(false);
-  const [showMediaUploader, setShowMediaUploader] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   useEffect(() => {
     fetchProjects();
+  }, []);
+
+  // Refresh projects when returning from form pages
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchProjects();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   const fetchProjects = async () => {
@@ -46,49 +57,12 @@ export default function AdminProjects() {
     }
   };
 
-  const handleCreateProject = async (data: ProjectFormData) => {
-    try {
-      const response = await fetch('/api/admin/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-        setShowProjectForm(false);
-      } else {
-        console.error('Failed to create project');
-      }
-    } catch (error) {
-      console.error('Error creating project:', error);
-    }
+  const handleCreateProject = () => {
+    router.push('/admin/projects/create');
   };
 
-  const handleUpdateProject = async (data: ProjectFormData) => {
-    if (!editingProject) return;
-
-    try {
-      const response = await fetch(`/api/admin/projects/${editingProject.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-        setShowProjectForm(false);
-        setEditingProject(null);
-      } else {
-        console.error('Failed to update project');
-      }
-    } catch (error) {
-      console.error('Error updating project:', error);
-    }
+  const handleUpdateProject = (project: Project) => {
+    router.push(`/admin/projects/${project.id}/edit`);
   };
 
   const handleDeleteProject = async (id: number) => {
@@ -110,8 +84,7 @@ export default function AdminProjects() {
   };
 
   const handleEditProject = (project: Project) => {
-    setEditingProject(project);
-    setShowProjectForm(true);
+    router.push(`/admin/projects/${project.id}/edit`);
   };
 
   const getStatusBadge = (status: string) => {
@@ -137,7 +110,7 @@ export default function AdminProjects() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="mt-[65px] flex min-h-screen items-center justify-center bg-gray-50 max-md:mt-[60px]">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-indigo-600"></div>
           <p className="mt-4 text-gray-600">Đang tải...</p>
@@ -147,7 +120,7 @@ export default function AdminProjects() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mt-[65px] min-h-screen bg-gray-50 max-md:mt-[60px]">
       <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="px-4 py-6 sm:px-0">
@@ -161,7 +134,7 @@ export default function AdminProjects() {
               </p>
             </div>
             <button
-              onClick={() => setShowProjectForm(true)}
+              onClick={handleCreateProject}
               className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <PlusIcon className="mr-2 h-5 w-5" />
@@ -186,7 +159,7 @@ export default function AdminProjects() {
                 </p>
                 <div className="mt-6">
                   <button
-                    onClick={() => setShowProjectForm(true)}
+                    onClick={handleCreateProject}
                     className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >
                     <PlusIcon className="mr-2 h-5 w-5" />
@@ -202,11 +175,23 @@ export default function AdminProjects() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
-                              <span className="font-medium text-indigo-600">
-                                {project.title.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
+                            {project.thumbnail ? (
+                              <div className="h-10 w-10 overflow-hidden rounded-full">
+                                <Image
+                                  src={project.thumbnail.url}
+                                  alt={project.title}
+                                  width={40}
+                                  height={40}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+                                <span className="font-medium text-indigo-600">
+                                  {project.title.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            )}
                           </div>
                           <div className="ml-4">
                             <div className="flex items-center">
@@ -264,38 +249,6 @@ export default function AdminProjects() {
           </div>
         </div>
       </div>
-
-      {/* Project Form Modal */}
-      <ProjectForm
-        isOpen={showProjectForm}
-        onClose={() => {
-          setShowProjectForm(false);
-          setEditingProject(null);
-        }}
-        onSubmit={editingProject ? handleUpdateProject : handleCreateProject}
-        initialData={
-          editingProject
-            ? {
-                ...editingProject,
-                status: editingProject.status as
-                  | 'draft'
-                  | 'in-progress'
-                  | 'completed',
-              }
-            : undefined
-        }
-        isLoading={false}
-      />
-
-      {/* Media Uploader Modal */}
-      <MediaUploader
-        isOpen={showMediaUploader}
-        onClose={() => setShowMediaUploader(false)}
-        onUpload={(files) => {
-          console.log('Uploaded files:', files);
-          setShowMediaUploader(false);
-        }}
-      />
     </div>
   );
 }

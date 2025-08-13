@@ -40,7 +40,7 @@ export default function EmbedTestPage() {
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="content-wrapper">
           <div className="mb-8">
             <h1 className="mb-4 text-3xl font-bold text-gray-900">
               E-Profile Embed Test

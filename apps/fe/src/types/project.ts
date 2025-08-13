@@ -60,6 +60,7 @@ export interface ProjectFormData {
     projectManager: string;
   };
   heroVideo?: File | null;
+  thumbnail?: File | null;
 }
 
 export interface ShowcaseSection {

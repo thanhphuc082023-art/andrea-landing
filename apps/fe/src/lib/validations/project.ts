@@ -52,10 +52,12 @@ export const projectFormSchema = z.object({
   projectMetaInfo: z.array(z.string()).optional(),
   credits: z.object({
     title: z.string().min(1, 'Tiêu đề credits là bắt buộc'),
+    creditLabel: z.string().optional(),
     date: z.string().min(1, 'Ngày tháng là bắt buộc'),
     projectManager: z.string().min(1, 'Credits là bắt buộc'),
   }),
   heroVideo: z.any().optional(),
+  thumbnail: z.any().optional(),
 });
 
 export type ProjectFormData = z.infer<typeof projectFormSchema>;
