@@ -54,7 +54,7 @@ export const projects: Project[] = [
     title: 'DELAFÉE',
     description:
       'Logo, Bộ nhận diện thương hiệu, Social branding, Thiết kế bao bì',
-    image: '/assets/images/featured-projects/delafree.jpg',
+    image: '/assets/images/featured-projects/delafee.jpg',
     isFeatured: false,
     slug: 'delafee',
   },
