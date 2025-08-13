@@ -2,10 +2,12 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { memo } from 'react';
 import MinimalFlipBook from '@/components/MinimalFlipBook';
+import { type ShowcaseSection } from '@/types/project';
 
 // Types
 interface ProjectShowcaseProps {
   project?: any;
+  showcaseData?: ShowcaseSection[];
 }
 
 interface ShowcaseItem {
@@ -23,15 +25,8 @@ interface ShowcaseItem {
   };
 }
 
-interface ShowcaseSection {
-  id: string;
-  items: ShowcaseItem[];
-  layout: 'single' | 'grid';
-  gridCols?: number;
-}
-
-// Data moved to separate file for better maintainability
-const showcaseData: ShowcaseSection[] = [
+// Legacy data for backward compatibility
+const legacyShowcaseData: any[] = [
   {
     id: 'moodboard',
     layout: 'single',
@@ -73,7 +68,7 @@ const showcaseData: ShowcaseSection[] = [
     layout: 'single',
     items: [
       {
-        src: 'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf', // URL to your HTML file
+        src: 'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf',
         alt: 'Interactive 3D FlipBook Portfolio',
         width: 1300,
         height: 800,
@@ -151,91 +146,6 @@ const showcaseData: ShowcaseSection[] = [
       },
     ],
   },
-  {
-    id: 'additional-1',
-    layout: 'single',
-    items: [
-      {
-        src: 'https://api.builder.io/api/v1/image/assets/TEMP/adda31fa59c292418f39460a5a1c7e17856f7a45?width=2602',
-        alt: 'Additional project showcase section',
-        width: 1300,
-        height: 630,
-      },
-    ],
-  },
-  {
-    id: 'additional-2',
-    layout: 'single',
-    items: [
-      {
-        src: 'https://api.builder.io/api/v1/image/assets/TEMP/6d1e23fb2acdcc203d186bb8cf1396a6eceec58d?width=2602',
-        alt: 'Additional project showcase section 2',
-        width: 1301,
-        height: 558,
-      },
-    ],
-  },
-  {
-    id: 'additional-3',
-    layout: 'single',
-    items: [
-      {
-        src: 'https://api.builder.io/api/v1/image/assets/TEMP/6118edd92ff11a0ac7f998a08429a89b67c38012?width=2600',
-        alt: 'Additional project showcase section 3',
-        width: 1300,
-        height: 800,
-      },
-    ],
-  },
-  {
-    id: 'additional-4',
-    layout: 'single',
-    items: [
-      {
-        src: 'https://api.builder.io/api/v1/image/assets/TEMP/c2466bdb67294577597ec5f42d934d8822b8e88f?width=2600',
-        alt: 'Additional project showcase section 4',
-        width: 1300,
-        height: 800,
-      },
-    ],
-  },
-  {
-    id: 'additional-5',
-    layout: 'single',
-    items: [
-      {
-        src: 'https://api.builder.io/api/v1/image/assets/TEMP/69c14e46d1db67de2a2dd5f04e7a103bbd640f36?width=2600',
-        alt: 'Additional project showcase section 5',
-        width: 1300,
-        height: 638,
-      },
-    ],
-  },
-  {
-    id: 'additional-6',
-    layout: 'single',
-    items: [
-      {
-        src: 'https://api.builder.io/api/v1/image/assets/TEMP/e93b41a0ebe440653cae0bab043a858852d020a4?width=2600',
-        alt: 'Additional project showcase section 6',
-        width: 1300,
-        height: 638,
-      },
-    ],
-  },
-  {
-    id: 'video-section',
-    layout: 'single',
-    items: [
-      {
-        src: 'https://api.builder.io/api/v1/video/assets/TEMP/your-video-url-here',
-        alt: 'Additional project showcase video section',
-        width: 1300,
-        height: 673,
-        type: 'video',
-      },
-    ],
-  },
 ];
 
 // Memoized components for better performance
@@ -265,12 +175,14 @@ const ShowcaseItem = memo(
               item.src ||
               'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf'
             }
-            bookData={{
-              title: 'Project Title',
-              websiteUrl: 'https://example.com',
-              phoneNumber: '+1234567890',
-              downloadUrl: '/download-file.pdf',
-            }}
+            bookData={
+              item.bookData || {
+                title: 'Project Title',
+                websiteUrl: 'https://example.com',
+                phoneNumber: '+1234567890',
+                downloadUrl: '/download-file.pdf',
+              }
+            }
             isSimpleLayout={false}
             isHideActions
             isHideScrollDown
@@ -300,15 +212,34 @@ const ShowcaseItem = memo(
 ShowcaseItem.displayName = 'ShowcaseItem';
 
 const ShowcaseSection = memo(
-  ({ section, index }: { section: ShowcaseSection; index: number }) => {
+  ({ section, index }: { section: any; index: number }) => {
+    // Transform admin data structure to match expected format
+    const transformItem = (item: any) => ({
+      src: item.src || '',
+      alt: item.alt || item.title || '',
+      width: item.width || 1300,
+      height: item.height || 800,
+      type: item.type || 'image',
+      bookData: item.bookData || {},
+      colSpan: item.colSpan || 1,
+    });
+
     if (section.layout === 'single') {
-      const item = section.items[0];
+      // Handle both admin structure (items array) and legacy structure
+      const items = Array.isArray(section.items)
+        ? section.items
+        : [section.items];
+      const item = items[0];
+
+      if (!item) return null;
+
+      const transformedItem = transformItem(item);
 
       // Special handling for flipbook sections
-      if (item.type === 'flipbook') {
+      if (transformedItem.type === 'flipbook') {
         return (
           <div key={section.id}>
-            <ShowcaseItem item={item} priority={index === 0} />
+            <ShowcaseItem item={transformedItem} priority={index === 0} />
           </div>
         );
       }
@@ -316,27 +247,36 @@ const ShowcaseSection = memo(
       return (
         <div key={section.id} className="group">
           <div className="relative h-full overflow-hidden bg-white shadow-sm">
-            <ShowcaseItem item={item} priority={index === 0} />
+            <ShowcaseItem item={transformedItem} priority={index === 0} />
           </div>
         </div>
       );
     }
 
+    // Handle grid layout
+    const items = Array.isArray(section.items)
+      ? section.items
+      : [section.items];
+    const gridCols = section.gridCols || 2;
+
     return (
       <div
         key={section.id}
-        className={`grid grid-cols-1 lg:grid-cols-${section.gridCols}`}
+        className={`grid grid-cols-1 lg:grid-cols-${gridCols}`}
       >
-        {section.items.map((item, itemIndex) => (
-          <div
-            key={itemIndex}
-            className={`group ${item.colSpan ? `lg:col-span-${item.colSpan}` : ''}`}
-          >
-            <div className="relative h-full overflow-hidden bg-white shadow-sm">
-              <ShowcaseItem item={item} />
+        {items.map((item: any, itemIndex: number) => {
+          const transformedItem = transformItem(item);
+          return (
+            <div
+              key={itemIndex}
+              className={`group ${transformedItem.colSpan ? `lg:col-span-${transformedItem.colSpan}` : ''}`}
+            >
+              <div className="relative h-full overflow-hidden bg-white shadow-sm">
+                <ShowcaseItem item={transformedItem} />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   }
@@ -344,11 +284,17 @@ const ShowcaseSection = memo(
 
 ShowcaseSection.displayName = 'ShowcaseSection';
 
-function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
+function ProjectShowcase({
+  project = null,
+  showcaseData,
+}: ProjectShowcaseProps) {
+  // Use showcaseData from admin if available, otherwise fallback to legacy data
+  const sections = showcaseData || legacyShowcaseData;
+
   return (
     <section className="content-wrapper">
       <div>
-        {showcaseData.map((section, index) => (
+        {sections.map((section, index) => (
           <ShowcaseSection key={section.id} section={section} index={index} />
         ))}
       </div>

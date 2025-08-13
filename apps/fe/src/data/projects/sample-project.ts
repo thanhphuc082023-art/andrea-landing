@@ -9,6 +9,12 @@ export const sampleProject = {
     'Hạng mục: Tư vấn chiến lược, Thiết kế logo, Nhận diện thương hiệu',
   ],
   projectIntroTitle: 'Giới thiệu dự án:',
+  credits: {
+    title: 'Thanks for watching',
+    date: '2023',
+    projectManager:
+      'Project Manager: Nguyễn Văn A\nGraphic Designer: Trần Thị B\nShowcase: Andrea Studio',
+  },
   seo: {
     metaTitle: 'Băng rừng ngập mặn - Dự án thiết kế triển lãm',
     metaDescription:

@@ -4,21 +4,23 @@ export const projects: Project[] = [
   // Featured Projects
   {
     id: 1,
-    title: 'MITSUBISHI',
-    description: 'Profile, Quay phim chụp hình',
-    image: '/assets/images/featured-projects/mitsubishi-project.jpg',
+    title: 'HOROLUX',
+    description:
+      'Logo, Bộ nhận diện thương hiệu, Social branding, Thiết kế bao bì',
+    image: '/assets/images/featured-projects/horolux.jpg',
     isFeatured: true,
     isLarge: true,
-    slug: 'mitsubishi',
+    slug: 'horolux',
   },
   {
     id: 2,
-    title: 'MOBIFONE',
-    description: 'Profile, Catalogue, Thiết kế nhận diện sự kiện',
-    image: '/assets/images/featured-projects/mobifone-project.jpg',
+    title: 'BĂNG RỪNG NGẬP MẶN',
+    description:
+      'Logo, Bộ nhận diện thương hiệu, Social branding, Thiết kế bao bì',
+    image: '/assets/images/featured-projects/rungngapman.jpg',
     isFeatured: true,
     isLarge: false,
-    slug: 'mobifone',
+    slug: 'rungngapman',
   },
   // Regular Projects
   {
