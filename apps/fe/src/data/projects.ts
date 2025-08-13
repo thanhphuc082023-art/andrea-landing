@@ -28,7 +28,7 @@ export const projects: Project[] = [
     title: 'DECOFI',
     description:
       'Logo, Bộ nhận diện thương hiệu, Profile, Website, Hệ thống chỉ dẫn công trường, Báo cáo thường niên, Thiết kế nhận diện sự kiện',
-    image: '/assets/images/featured-projects/decofi.jpg',
+    image: '/assets/images/featured-projects/decofi-catalog.jpg',
     isFeatured: false,
     slug: 'decofi',
   },
