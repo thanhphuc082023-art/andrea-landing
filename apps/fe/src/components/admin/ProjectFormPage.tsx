@@ -14,12 +14,15 @@ import {
   useSessionCleanup,
   sessionCleanupConfigs,
 } from '@/hooks/useSessionCleanup';
+import { useState } from 'react';
 
 interface ProjectFormPageProps {
   onSubmit: (data: ProjectFormData) => void;
   initialData?: Partial<ProjectFormData>;
   categories?: Array<{ id: number; name: string }>;
   isLoading?: boolean;
+  uploadProgress?: number;
+  onLogout?: () => void;
 }
 
 export default function ProjectFormPage({
@@ -27,8 +30,15 @@ export default function ProjectFormPage({
   initialData,
   categories = [],
   isLoading = false,
+  uploadProgress: externalUploadProgress,
+  onLogout,
 }: ProjectFormPageProps) {
   const router = useRouter();
+  const [internalUploadProgress, setInternalUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Use external upload progress if provided, otherwise use internal
+  const uploadProgress = externalUploadProgress ?? internalUploadProgress;
 
   // Session cleanup on unmount - disable auto cleanup to preserve data for preview
   const { cleanup } = useSessionCleanup({
@@ -99,6 +109,32 @@ export default function ProjectFormPage({
     }
   };
 
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    } else {
+      localStorage.removeItem('strapiToken');
+      localStorage.removeItem('strapiUser');
+      router.push('/admin/projects/create');
+    }
+  };
+
+  // Enhanced form submission
+  const handleEnhancedFormSubmit = async (data: ProjectFormData) => {
+    setIsUploading(true);
+    setInternalUploadProgress(0);
+    console.log('handleEnhancedFormSubmit', data);
+    try {
+      // Submit form data directly
+      await onSubmit({ ...data, showcase: showcaseSections });
+    } catch (error) {
+      console.error('Form submission error:', error);
+    } finally {
+      setIsUploading(false);
+      setInternalUploadProgress(0);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -138,18 +174,34 @@ export default function ProjectFormPage({
               </button>
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || isUploading || uploadProgress > 0}
                 className="inline-flex items-center rounded-md border border-transparent bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={handleSubmit(handleFormSubmit)}
+                onClick={handleSubmit(handleEnhancedFormSubmit)}
               >
-                {isLoading
-                  ? 'Đang lưu...'
+                {isLoading || isUploading || uploadProgress > 0
+                  ? `Đang ${uploadProgress > 0 ? 'upload...' : isUploading ? 'upload...' : 'lưu...'}`
                   : initialData
                     ? 'Cập nhật'
                     : 'Tạo dự án'}
               </button>
             </div>
           </div>
+
+          {/* Upload Progress */}
+          {(isUploading || uploadProgress > 0) && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>Tiến trình upload</span>
+                <span>{Math.round(uploadProgress)}%</span>
+              </div>
+              <div className="mt-1 h-2 w-full rounded-full bg-gray-200">
+                <div
+                  className="h-2 rounded-full bg-blue-600 transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -159,7 +211,7 @@ export default function ProjectFormPage({
           <Tab.Panels className="mt-6">
             <Tab.Panel>
               <form
-                onSubmit={handleSubmit(handleFormSubmit)}
+                onSubmit={handleSubmit(handleEnhancedFormSubmit)}
                 className="space-y-8"
               >
                 {/* Hero Section */}
@@ -173,12 +225,14 @@ export default function ProjectFormPage({
                   setNewMetaInfo={setNewMetaInfo}
                   addMetaInfo={addMetaInfo}
                   removeMetaInfo={removeMetaInfo}
+                  onLogout={handleLogout}
                 />
 
                 {/* Showcase Section */}
                 <ShowcaseSection
                   showcaseSections={showcaseSections}
                   setShowcaseSections={setShowcaseSections}
+                  onLogout={handleLogout}
                 />
 
                 {/* Credits Section */}
@@ -190,6 +244,8 @@ export default function ProjectFormPage({
                   setNewCredit={setNewCredit}
                   addCredit={addCredit}
                   removeCredit={removeCredit}
+                  setValue={setValue}
+                  watch={watch}
                 />
 
                 {/* Project Settings Section */}

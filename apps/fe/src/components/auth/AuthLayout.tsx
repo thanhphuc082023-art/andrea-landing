@@ -1,5 +1,4 @@
-import { getStaticPropsLayout } from '@/lib/page-helpers';
-import dynamic from 'next/dynamic';
+import { ReactNode } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -8,45 +7,29 @@ import {
   sessionCleanupConfigs,
 } from '@/hooks/useSessionCleanup';
 
-// Dynamic import PdfUploader để tránh SSR
-const DynamicPdfUploader = dynamic(() => import('@/components/PdfUploader'), {
-  ssr: false,
-  loading: () => (
-    <div className="rounded-10 mx-auto max-w-md border bg-white p-6 shadow-md">
-      <div className="text-center text-gray-600">Đang tải...</div>
-    </div>
-  ),
-});
+interface AuthLayoutProps {
+  children: ReactNode;
+  title?: string;
+  description?: string;
+  backUrl?: string;
+  backText?: string;
+}
 
-// Dynamic import ChunkedUploader for large files
-const DynamicChunkedUploader = dynamic(
-  () => import('@/components/ChunkedUploader'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="rounded-10 mx-auto max-w-md border bg-white p-6 shadow-md">
-        <div className="text-center text-gray-600">Đang tải uploader...</div>
-      </div>
-    ),
-  }
-);
-
-export default function UploadPage() {
+export default function AuthLayout({
+  children,
+  title = 'Đăng nhập',
+  description = 'Vui lòng đăng nhập để tiếp tục',
+  backUrl = '/',
+  backText = 'Quay về trang chủ',
+}: AuthLayoutProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [useChunkedUpload, setUseChunkedUpload] = useState(true); // Default to chunked upload
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
   });
-
-  const handleUploadComplete = (result: { slug: string; bookId: string }) => {
-    // Handle successful upload
-    console.log('Upload completed:', result);
-    // You can redirect or show success message here
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,21 +91,14 @@ export default function UploadPage() {
     return (
       <>
         <Head>
-          <title>Đăng nhập - Tạo E-Profile</title>
-          <meta
-            name="description"
-            content="Đăng nhập để tạo E-Profile cá nhân hoá của bạn thành một cuốn sách điện tử."
-          />
+          <title>{title}</title>
+          <meta name="description" content={description} />
         </Head>
         <div className="max-sd:mt-[60px] max-sd:h-[calc(100vh-60px)] mt-[65px] flex h-[calc(100vh-65px)] items-center justify-center bg-gray-100 py-10 max-md:px-2">
           <div className="container mx-auto">
             <div className="mb-8 text-center">
-              <h1 className="mb-2 text-3xl font-bold text-gray-900">
-                Đăng nhập
-              </h1>
-              <p className="text-gray-600">
-                Vui lòng đăng nhập để tạo E-Profile
-              </p>
+              <h1 className="mb-2 text-3xl font-bold text-gray-900">{title}</h1>
+              <p className="text-gray-600">{description}</p>
             </div>
 
             <div className="mx-auto max-w-md">
@@ -247,7 +223,7 @@ export default function UploadPage() {
             </div>
 
             <Link
-              href="/e-profile"
+              href={backUrl}
               className="mx-auto mt-4 flex max-w-md items-center justify-center text-blue-600 hover:text-blue-800"
             >
               <svg
@@ -263,7 +239,7 @@ export default function UploadPage() {
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              Quay về danh sách
+              {backText}
             </Link>
           </div>
         </div>
@@ -274,105 +250,13 @@ export default function UploadPage() {
   return (
     <>
       <Head>
-        <title>Tạo E-Profile</title>
-        <meta
-          name="description"
-          content={`Tạo E-Profile cá nhân hoá của bạn thành một cuốn sách điện tử.`}
-        />
+        <title>{title}</title>
+        <meta name="description" content={description} />
       </Head>
-      <div className="max-sd:mt-[60px] mt-[65px] min-h-screen bg-gray-100 py-10 max-md:px-2">
-        <div className="container mx-auto">
-          <div className="mb-8 text-center">
-            <h1 className="mb-2 text-3xl font-bold text-gray-900">
-              Tạo E-Profile
-            </h1>
-            <p className="text-gray-600">
-              Tạo E-Profile cá nhân hoá của bạn thành một cuốn sách điện tử.
-            </p>
-
-            {/* Upload Method Toggle */}
-            {/* <div className="mt-4 flex justify-center">
-              <div className="flex rounded-lg bg-gray-100 p-1">
-                <button
-                  onClick={() => setUseChunkedUpload(true)}
-                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                    useChunkedUpload
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
-                >
-                  Upload File Lớn (Khuyến nghị)
-                </button>
-                <button
-                  onClick={() => setUseChunkedUpload(false)}
-                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                    !useChunkedUpload
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
-                >
-                  Upload Trực tiếp (&lt;3.6MB)
-                </button>
-              </div>
-            </div> */}
-          </div>
-
-          {useChunkedUpload ? (
-            <DynamicChunkedUploader
-              onUploadComplete={handleUploadComplete}
-              onLogout={handleLogout}
-            />
-          ) : (
-            <DynamicPdfUploader logout={handleLogout} />
-          )}
-
-          <div className="mx-auto mt-12 max-w-2xl">
-            <h2 className="mb-4 text-center text-xl font-semibold text-gray-800">
-              Cách thức hoạt động
-            </h2>
-            <div className="grid gap-6 md:grid-cols-3">
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                  <span className="font-bold text-blue-600">1</span>
-                </div>
-                <h3 className="mb-2 font-semibold text-gray-800">
-                  Tải lên tệp tin
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Chọn tệp PDF của bạn và tùy chọn thêm hình ảnh đại diện. Hỗ
-                  trợ file lớn lên đến 50MB với công nghệ chunked upload.
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                  <span className="font-bold text-green-600">2</span>
-                </div>
-                <h3 className="mb-2 font-semibold text-gray-800">
-                  Trích xuất trang
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Mỗi trang được tự động trích xuất và chuyển đổi thành hình ảnh
-                  chất lượng cao.
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                  <span className="font-bold text-purple-600">3</span>
-                </div>
-                <h3 className="mb-2 font-semibold text-gray-800">E-Profile</h3>
-                <p className="text-sm text-gray-600">
-                  Xem sách của bạn dưới dạng E-Profile tương tác với hiệu ứng
-                  lật trang chân thực.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen">
+        {/* Main content */}
+        <div className="mt-[65px] max-md:mt-[60px]">{children}</div>
       </div>
     </>
   );
 }
-
-export const getStaticProps = getStaticPropsLayout;

@@ -32,7 +32,7 @@ function Header({ heroData = null }: HeaderProps) {
         <div className={clsx('content-wrapper mx-auto')}>
           <div
             className={clsx(
-              'relative flex flex-wrap items-center justify-between space-x-[120px] max-lg:justify-center max-lg:space-x-[10px] max-lg:px-0 lg:flex-nowrap'
+              'relative flex flex-wrap items-center justify-between space-x-[120px] max-lg:justify-center max-lg:space-x-[10px] max-lg:px-0 max-md:space-x-0 max-md:space-y-[20px] lg:flex-nowrap'
             )}
           >
             {/* Title positioned like in Figma: left side */}

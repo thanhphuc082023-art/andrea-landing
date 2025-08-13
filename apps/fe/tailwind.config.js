@@ -43,7 +43,7 @@ module.exports = {
           dark: colors.slate[800],
         },
         brand: {
-          orange: '#D2440E', // WCAG AA compliant orange (contrast ratio 4.5:1 on white)
+          orange: '#EE4823', // WCAG AA compliant orange (contrast ratio 4.5:1 on white)
           'orange-light': '#F15A24', // Original orange for backgrounds only
           'orange-dark': '#B8390C', // Darker orange for hover states
         },

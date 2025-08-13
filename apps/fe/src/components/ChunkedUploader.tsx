@@ -17,9 +17,6 @@ export default function ChunkedUploader({
   onUploadComplete,
   onLogout,
 }: ChunkedUploaderProps) {
-  // Session cleanup on unmount
-  useSessionCleanup(sessionCleanupConfigs.auth);
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');

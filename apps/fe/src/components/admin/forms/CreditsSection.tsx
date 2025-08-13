@@ -1,4 +1,9 @@
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import {
+  UseFormRegister,
+  FieldErrors,
+  UseFormSetValue,
+  UseFormWatch,
+} from 'react-hook-form';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { type ProjectFormData } from '@/lib/validations/project';
 
@@ -10,6 +15,8 @@ interface CreditsSectionProps {
   setNewCredit: (value: string) => void;
   addCredit: () => void;
   removeCredit: (credit: string) => void;
+  setValue: UseFormSetValue<ProjectFormData>;
+  watch: UseFormWatch<ProjectFormData>;
 }
 
 export default function CreditsSection({
@@ -20,7 +27,37 @@ export default function CreditsSection({
   setNewCredit,
   addCredit,
   removeCredit,
+  setValue,
+  watch,
 }: CreditsSectionProps) {
+  // Watch current projectManager value
+  const currentProjectManager = watch('credits.projectManager') || '';
+
+  // Update projectManager when credits array changes
+  const updateProjectManager = (newCredits: string[]) => {
+    const projectManagerText = newCredits.join('\n');
+    setValue('credits.projectManager', projectManagerText);
+  };
+
+  // Enhanced addCredit function
+  const handleAddCredit = () => {
+    if (newCredit.trim()) {
+      addCredit();
+      const updatedCredits = [...credits, newCredit.trim()];
+      updateProjectManager(updatedCredits);
+      setNewCredit('');
+    }
+  };
+
+  // Enhanced removeCredit function
+  const handleRemoveCredit = (creditToRemove: string) => {
+    removeCredit(creditToRemove);
+    const updatedCredits = credits.filter(
+      (credit) => credit !== creditToRemove
+    );
+    updateProjectManager(updatedCredits);
+  };
+
   return (
     <div className="rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-6 shadow-sm">
       <div className="mb-4 flex items-center">
@@ -61,7 +98,7 @@ export default function CreditsSection({
             htmlFor="credits.creditLabel"
             className="block text-sm font-medium text-gray-700"
           >
-            Nhãn Credits
+            Nhãn Credits <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -69,6 +106,11 @@ export default function CreditsSection({
             placeholder="Nhập nhãn credits (VD: Credit:, Team:, Thành viên:)"
             className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
+          {errors.credits?.creditLabel && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.credits.creditLabel.message}
+            </p>
+          )}
           <p className="mt-1 text-xs text-gray-500">
             Nhãn hiển thị trước danh sách credits (mặc định: "Credit:")
           </p>
@@ -104,14 +146,14 @@ export default function CreditsSection({
               value={newCredit}
               onChange={(e) => setNewCredit(e.target.value)}
               onKeyPress={(e) =>
-                e.key === 'Enter' && (e.preventDefault(), addCredit())
+                e.key === 'Enter' && (e.preventDefault(), handleAddCredit())
               }
               placeholder="Nhập credit..."
               className="flex-1 rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
             <button
               type="button"
-              onClick={addCredit}
+              onClick={handleAddCredit}
               className="inline-flex items-center rounded-md border border-transparent bg-gradient-to-r from-emerald-600 to-teal-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
             >
               <PlusIcon className="h-4 w-4" />
@@ -126,7 +168,7 @@ export default function CreditsSection({
                 {credit}
                 <button
                   type="button"
-                  onClick={() => removeCredit(credit)}
+                  onClick={() => handleRemoveCredit(credit)}
                   className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-emerald-400 hover:bg-emerald-200 hover:text-emerald-500"
                 >
                   <XMarkIcon className="h-3 w-3" />
@@ -138,6 +180,20 @@ export default function CreditsSection({
             Mỗi dòng sẽ được hiển thị như một credit riêng biệt
           </p>
         </div>
+
+        {/* Hidden input for projectManager to satisfy validation */}
+        <input
+          type="hidden"
+          {...register('credits.projectManager')}
+          value={currentProjectManager}
+        />
+
+        {/* Show validation error for projectManager */}
+        {errors.credits?.projectManager && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.credits.projectManager.message}
+          </p>
+        )}
       </div>
     </div>
   );

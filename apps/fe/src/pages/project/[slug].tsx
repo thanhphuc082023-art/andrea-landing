@@ -13,12 +13,14 @@ import type { ProjectEntity } from '@/types/strapi';
 
 interface ProjectPageProps extends PagePropsWithGlobal {
   project: ProjectEntity['attributes'] | null;
+  showcaseData?: any[];
 }
 
 function ProjectPage({
   serverGlobal = null,
   heroData = null,
   project = null,
+  showcaseData,
   footerData = null,
 }: ProjectPageProps) {
   const router = useRouter();
@@ -63,7 +65,11 @@ function ProjectPage({
         seo={project?.seo}
         global={currentGlobal}
       />
-      <ProjectDetailContents heroData={heroData} project={project} />
+      <ProjectDetailContents
+        heroData={heroData}
+        project={project}
+        showcaseData={showcaseData}
+      />
     </>
   );
 }
@@ -117,6 +123,7 @@ export const getStaticProps: GetStaticProps<ProjectPageProps> = async ({
             'seo.metaImage',
             'technologies',
             'category',
+            'showcaseSections',
           ],
           publicationState: 'live',
         }
@@ -142,8 +149,12 @@ export const getStaticProps: GetStaticProps<ProjectPageProps> = async ({
           })) || [],
       };
 
+      // Extract showcase data
+      const showcaseData = project.attributes.showcaseSections || [];
+
       return {
         project: transformedProject,
+        showcaseData,
       };
     });
   } catch (error) {

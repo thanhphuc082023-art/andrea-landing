@@ -3,7 +3,7 @@
 @layer components {
   .content-wrapper {
     @apply mx-auto max-w-[1440px];
-    @apply px-[8px] md:px-[29px] lg:px-[80px];
+    @apply px-[30px] lg:px-[80px];
   }
 
   .content-wrapper-max {

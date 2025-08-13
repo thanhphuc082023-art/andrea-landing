@@ -1,180 +1,182 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-// Mock data for development - replace with actual Strapi API calls
-const mockProjects = [
-  {
-    id: 1,
-    title: 'Dự án thiết kế website Mitsubishi',
-    description:
-      'Thiết kế và phát triển website chính thức cho Mitsubishi Motors Vietnam',
-    content:
-      'Dự án bao gồm thiết kế UI/UX, phát triển frontend và backend, tích hợp hệ thống quản lý nội dung.',
-    slug: 'mitsubishi-website',
-    technologies: ['React', 'Node.js', 'MongoDB', 'AWS'],
-    featured: true,
-    status: 'completed',
-    client: 'Mitsubishi Motors Vietnam',
-    year: '2023',
-    overview: 'Website chính thức với đầy đủ tính năng bán hàng và quản lý',
-    challenge: 'Tích hợp nhiều hệ thống bên thứ 3 và đảm bảo hiệu suất cao',
-    solution: 'Sử dụng kiến trúc microservices và CDN để tối ưu tốc độ',
-    categoryId: 'Web Development',
-    featuredImage: null,
-    gallery: [],
-    results: [
-      {
-        title: 'Tăng 40% traffic',
-        description: 'Lưu lượng truy cập tăng đáng kể sau khi ra mắt',
-      },
-    ],
-    metrics: [
-      {
-        label: 'Thời gian tải trang',
-        value: '< 2s',
-      },
-    ],
-    seo: {
-      title: 'Mitsubishi Website - Thiết kế chuyên nghiệp',
-      description:
-        'Website chính thức Mitsubishi Motors Vietnam với thiết kế hiện đại',
-      keywords: ['mitsubishi', 'website', 'automotive'],
-    },
-    projectIntroTitle: 'Giới thiệu dự án:',
-    projectMetaInfo: [
-      'Thiết kế nhận diện thương hiệu',
-      'Quay phim chụp hình',
-      'Profile công ty',
-    ],
-    credits: {
-      title: 'Thanks for watching',
-      date: '2023',
-      projectManager:
-        'Project Manager: Nguyễn Văn A\nGraphic Designer: Trần Thị B\nShowcase: Andrea Studio',
-    },
-    heroVideo: null,
-    thumbnail: null,
-    createdAt: '2023-01-15T00:00:00.000Z',
-    updatedAt: '2023-01-15T00:00:00.000Z',
-  },
-  {
-    id: 2,
-    title: 'Ứng dụng di động Mobifone',
-    description:
-      'Phát triển ứng dụng di động cho Mobifone với tính năng thanh toán và quản lý tài khoản',
-    content:
-      'Ứng dụng được phát triển cho cả iOS và Android với tính năng thanh toán tích hợp.',
-    slug: 'mobifone-app',
-    technologies: ['React Native', 'Firebase', 'Stripe'],
-    featured: false,
-    status: 'in-progress',
-    client: 'Mobifone',
-    year: '2024',
-    overview: 'Ứng dụng di động toàn diện cho khách hàng Mobifone',
-    challenge: 'Tích hợp nhiều cổng thanh toán và đảm bảo bảo mật',
-    solution:
-      'Sử dụng Firebase Authentication và Stripe cho thanh toán an toàn',
-    categoryId: 'Mobile Development',
-    featuredImage: null,
-    gallery: [],
-    results: [
-      {
-        title: '100k+ downloads',
-        description: 'Ứng dụng được tải xuống hơn 100,000 lần',
-      },
-    ],
-    metrics: [
-      {
-        label: 'Đánh giá trung bình',
-        value: '4.5/5',
-      },
-    ],
-    seo: {
-      title: 'Mobifone App - Ứng dụng di động',
-      description: 'Ứng dụng di động chính thức của Mobifone',
-      keywords: ['mobifone', 'mobile app', 'telecom'],
-    },
-    projectIntroTitle: 'Giới thiệu dự án:',
-    projectMetaInfo: [
-      'Phát triển ứng dụng di động',
-      'Tích hợp thanh toán',
-      'Quản lý tài khoản',
-    ],
-    credits: {
-      title: 'Thanks for watching',
-      date: '2024',
-      projectManager:
-        'Project Manager: Lê Văn C\nGraphic Designer: Phạm Thị D\nShowcase: Andrea Studio',
-    },
-    heroVideo: null,
-    thumbnail: null,
-    createdAt: '2024-01-10T00:00:00.000Z',
-    updatedAt: '2024-01-10T00:00:00.000Z',
-  },
-];
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { method } = req;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-  switch (method) {
-    case 'GET':
+  try {
+    // Get JWT token from environment variable or request headers
+    const envToken = process.env.STRAPI_API_TOKEN;
+    const authHeader = req.headers.authorization;
+    const headerToken = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : null;
+
+    const token = envToken || headerToken;
+
+    if (!token) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message:
+          'Missing or invalid authorization token. Please set STRAPI_API_TOKEN environment variable or provide Bearer token in Authorization header.',
+      });
+    }
+
+    const {
+      title,
+      description,
+      content,
+      slug,
+      technologies,
+      featured,
+      status,
+      overview,
+      challenge,
+      solution,
+      categoryId,
+      results,
+      metrics,
+      seo,
+      projectIntroTitle,
+      projectMetaInfo,
+      credits,
+      featuredImageUploadId,
+      galleryUploadIds,
+      heroVideoUploadId,
+      thumbnailUploadId,
+      showcase,
+    } = req.body;
+
+    // Validate required fields
+    if (!title || !description || !projectIntroTitle) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        message: 'Title, description, and projectIntroTitle are required',
+      });
+    }
+
+    // Create project data for Strapi (without file uploads for now)
+    const projectData = {
+      data: {
+        title,
+        description,
+        content: content || '',
+        slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
+        technologies: technologies || [],
+        featured: featured || false,
+        status: status || 'draft',
+        overview: overview || '',
+        challenge: challenge || '',
+        solution: solution || '',
+        categoryId: categoryId || null,
+        results: results || [],
+        metrics: metrics || [],
+        seo: seo || {},
+        projectIntroTitle,
+        projectMetaInfo: projectMetaInfo || [],
+        credits: credits || {},
+        // Store upload IDs as strings for now, can be processed later
+        featuredImageUploadId: featuredImageUploadId || null,
+        galleryUploadIds: galleryUploadIds || [],
+        heroVideoUploadId: heroVideoUploadId || null,
+        thumbnailUploadId: thumbnailUploadId || null,
+        showcaseSections: showcase || [],
+        publishedAt: status === 'completed' ? new Date().toISOString() : null,
+      },
+    };
+
+    // Create project in Strapi
+    const strapiBaseUrl =
+      process.env.NEXT_PUBLIC_STRAPI_URL ||
+      'https://joyful-basket-ea764d9c28.strapiapp.com/api';
+    const strapiUrl = `${strapiBaseUrl}/projects`;
+    console.log('Making request to Strapi:', strapiUrl);
+    console.log('Request method:', 'POST');
+    console.log('Request headers:', {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token ? '***' : 'missing'}`,
+    });
+    console.log('Environment variables:', {
+      NEXT_PUBLIC_STRAPI_URL: process.env.NEXT_PUBLIC_STRAPI_URL,
+      STRAPI_API_TOKEN: process.env.STRAPI_API_TOKEN ? '***' : 'missing',
+    });
+
+    // Test if Strapi API is accessible
+    try {
+      const testResponse = await fetch(`${strapiBaseUrl}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Strapi API test response status:', testResponse.status);
+    } catch (testError) {
+      console.error('Strapi API test failed:', testError);
+    }
+
+    const response = await fetch(strapiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(projectData),
+    });
+
+    console.log('Strapi response status:', response.status);
+    console.log(
+      'Strapi response headers:',
+      Object.fromEntries(response.headers.entries())
+    );
+
+    if (!response.ok) {
+      let errorData;
       try {
-        // In production, fetch from Strapi API
-        // const response = await fetch(`${process.env.STRAPI_URL}/api/projects`, {
-        //   headers: {
-        //     'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`,
-        //   },
-        // });
-        // const data = await response.json();
-
-        // For now, return mock data
-        res.status(200).json(mockProjects);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        res.status(500).json({ error: 'Failed to fetch projects' });
+        errorData = await response.json();
+        console.error('Strapi API error:', errorData);
+        throw new Error(
+          errorData.error?.message ||
+            `Strapi API error: ${response.status} ${response.statusText}`
+        );
+      } catch (parseError) {
+        // If response is not JSON (e.g., HTML error page), use status text
+        console.error(
+          'Strapi API error (non-JSON):',
+          response.status,
+          response.statusText
+        );
+        throw new Error(
+          `Strapi API error: ${response.status} ${response.statusText}`
+        );
       }
-      break;
+    }
 
-    case 'POST':
-      try {
-        const projectData = req.body;
+    const result = await response.json();
 
-        // Validate required fields
-        if (!projectData.title || !projectData.slug) {
-          return res.status(400).json({ error: 'Title and slug are required' });
-        }
+    return res.status(201).json({
+      success: true,
+      data: result.data,
+      message: 'Project created successfully',
+    });
+  } catch (error: any) {
+    console.error('Error creating project:', error);
 
-        // In production, create in Strapi
-        // const response = await fetch(`${process.env.STRAPI_URL}/api/projects`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`,
-        //   },
-        //   body: JSON.stringify({
-        //     data: projectData,
-        //   }),
-        // });
+    // Handle network errors specifically
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      return res.status(500).json({
+        error: 'Network error',
+        message:
+          'Unable to connect to Strapi API. Please check your network connection and Strapi URL.',
+      });
+    }
 
-        // For now, simulate creation
-        const newProject = {
-          id: Date.now(),
-          ...projectData,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
-        res.status(201).json(newProject);
-      } catch (error) {
-        console.error('Error creating project:', error);
-        res.status(500).json({ error: 'Failed to create project' });
-      }
-      break;
-
-    default:
-      res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).end(`Method ${method} Not Allowed`);
+    return res.status(500).json({
+      error: 'Internal server error',
+      message: error.message || 'Failed to create project',
+    });
   }
 }

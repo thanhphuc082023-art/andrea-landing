@@ -7,6 +7,7 @@ import {
 import { PlusIcon, XMarkIcon, EyeIcon } from '@heroicons/react/20/solid';
 import { type ProjectFormData } from '@/lib/validations/project';
 import ThumbnailPreviewPopover from './ThumbnailPreviewPopover';
+import SimpleFileUploader from './SimpleFileUploader';
 
 interface HeroSectionProps {
   register: UseFormRegister<ProjectFormData>;
@@ -18,6 +19,7 @@ interface HeroSectionProps {
   setNewMetaInfo: (value: string) => void;
   addMetaInfo: () => void;
   removeMetaInfo: (info: string) => void;
+  onLogout?: () => void;
 }
 
 export default function HeroSection({
@@ -30,6 +32,7 @@ export default function HeroSection({
   setNewMetaInfo,
   addMetaInfo,
   removeMetaInfo,
+  onLogout,
 }: HeroSectionProps) {
   const heroVideo = watch('heroVideo');
   const thumbnail = watch('thumbnail');
@@ -251,18 +254,31 @@ export default function HeroSection({
                 </div>
               </div>
             ) : (
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+              <SimpleFileUploader
+                onFileSelect={(file) => {
+                  setValue('thumbnail', {
+                    file,
+                    url: URL.createObjectURL(file),
+                    name: file.name,
+                  });
+                }}
+                onFileRemove={removeThumbnail}
+                selectedFile={thumbnail?.file}
+                acceptedTypes={['image/*']}
+                maxFileSize={5 * 1024 * 1024} // 5MB
+                label="Tải lên thumbnail"
+                description="Chọn thumbnail cho dự án (JPG, PNG, WebP) - Tối đa 5MB"
+                onLogout={onLogout}
+                onUploadComplete={(result) => {
+                  setValue('thumbnail', {
+                    uploadId: result.uploadId,
+                    fileName: result.fileName,
+                    name: result.fileName,
+                  });
+                }}
               />
             )}
           </div>
-          <p className="mt-1 text-xs text-gray-500">
-            Hình ảnh sẽ hiển thị trong danh sách dự án. Hỗ trợ: JPG, PNG, WebP.
-            Kích thước tối đa: 5MB
-          </p>
         </div>
 
         <div>
@@ -286,17 +302,31 @@ export default function HeroSection({
                 </div>
               </div>
             ) : (
-              <input
-                type="file"
-                accept="video/*"
-                onChange={handleHeroVideoChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+              <SimpleFileUploader
+                onFileSelect={(file) => {
+                  setValue('heroVideo', {
+                    file,
+                    url: URL.createObjectURL(file),
+                    name: file.name,
+                  });
+                }}
+                onFileRemove={removeHeroVideo}
+                selectedFile={heroVideo?.file}
+                acceptedTypes={['video/*']}
+                maxFileSize={100 * 1024 * 1024} // 100MB
+                label="Tải lên video hero"
+                description="Chọn video hero cho dự án (MP4, WebM, MOV) - Tối đa 100MB"
+                onLogout={onLogout}
+                onUploadComplete={(result) => {
+                  setValue('heroVideo', {
+                    uploadId: result.uploadId,
+                    fileName: result.fileName,
+                    name: result.fileName,
+                  });
+                }}
               />
             )}
           </div>
-          <p className="mt-1 text-xs text-gray-500">
-            Hỗ trợ: MP4, WebM, MOV. Kích thước tối đa: 100MB
-          </p>
         </div>
       </div>
     </div>

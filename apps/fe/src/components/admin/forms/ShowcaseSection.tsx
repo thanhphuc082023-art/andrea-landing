@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { useState } from 'react';
 import {
   PlusIcon,
   TrashIcon,
@@ -6,6 +6,7 @@ import {
   VideoCameraIcon,
   DocumentTextIcon,
   CheckIcon,
+  XMarkIcon,
 } from '@heroicons/react/20/solid';
 import {
   DndContext,
@@ -24,11 +25,13 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { type ShowcaseSection } from '@/types/project';
+
+import { type ShowcaseSection, type ShowcaseItem } from '@/types/project';
 
 interface ShowcaseSectionProps {
   showcaseSections: ShowcaseSection[];
-  setShowcaseSections: (sections: ShowcaseSection[]) => void;
+  setShowcaseSections: React.Dispatch<React.SetStateAction<ShowcaseSection[]>>;
+  onLogout?: () => void;
 }
 
 // SortableSection Component
@@ -36,10 +39,12 @@ const SortableSection = ({
   section,
   index,
   setShowcaseSections,
+  onLogout,
 }: {
   section: ShowcaseSection;
   index: number;
-  setShowcaseSections: (sections: ShowcaseSection[]) => void;
+  setShowcaseSections: React.Dispatch<React.SetStateAction<ShowcaseSection[]>>;
+  onLogout?: () => void;
 }) => {
   if (!section || !section.id) {
     return null;
@@ -75,8 +80,6 @@ const SortableSection = ({
         return <VideoCameraIcon className="h-5 w-5 text-red-500" />;
       case 'flipbook':
         return <DocumentTextIcon className="h-5 w-5 text-green-500" />;
-      case 'text':
-        return <DocumentTextIcon className="h-5 w-5 text-purple-500" />;
       default:
         return <DocumentTextIcon className="h-5 w-5 text-gray-500" />;
     }
@@ -90,8 +93,6 @@ const SortableSection = ({
         return 'from-red-50 to-red-100 border-red-200';
       case 'flipbook':
         return 'from-green-50 to-green-100 border-green-200';
-      case 'text':
-        return 'from-purple-50 to-purple-100 border-purple-200';
       default:
         return 'from-gray-50 to-gray-100 border-gray-200';
     }
@@ -125,7 +126,7 @@ const SortableSection = ({
       />
 
       {/* Content Area - No drag, only interactions */}
-      <div className="relative z-10">
+      <div className="relative z-10 space-y-2">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
@@ -150,13 +151,33 @@ const SortableSection = ({
                   className="w-full rounded-md border-gray-300 bg-transparent pb-2 text-lg font-semibold text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
                   placeholder="Nhập tên section..."
                 />
-                <div className="mt-1 flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                   <span className="inline-flex items-center rounded-full bg-white/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm">
                     {section.type}
                   </span>
-                  <span className="inline-flex items-center rounded-full bg-white/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm">
-                    {section.layout}
-                  </span>
+                  <select
+                    value={section.layout}
+                    onChange={(e) => {
+                      setShowcaseSections((prevSections) =>
+                        prevSections.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                layout: e.target
+                                  .value as ShowcaseSection['layout'],
+                              }
+                            : s
+                        )
+                      );
+                    }}
+                    className="rounded-full border-none bg-white/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="single">Single</option>
+                    <option value="half-half">1/2 - 1/2</option>
+                    <option value="one-third">1/3 - 2/3</option>
+                    <option value="grid">Grid</option>
+                    <option value="carousel">Carousel</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -168,15 +189,9 @@ const SortableSection = ({
             <button
               type="button"
               onClick={() => {
-                console.log('Delete button clicked for section:', section.id);
-                setShowcaseSections((prevSections) => {
-                  console.log('Previous sections:', prevSections);
-                  const filtered = prevSections.filter(
-                    (s) => s.id !== section.id
-                  );
-                  console.log('Filtered sections:', filtered);
-                  return filtered;
-                });
+                setShowcaseSections((prevSections) =>
+                  prevSections.filter((s) => s.id !== section.id)
+                );
               }}
               className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-600 transition-all hover:bg-red-500 hover:text-white"
             >
@@ -188,137 +203,259 @@ const SortableSection = ({
         {/* Media Preview */}
         {section.items.length > 0 && section.items[0].src && (
           <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
-            <div className="flex items-center space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-                <CheckIcon className="h-4 w-4 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  {section.items[0].title || 'Uploaded file'}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {section.items[0].size
-                    ? formatFileSize(section.items[0].size)
-                    : 'Unknown size'}
-                </p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                  Ready
-                </span>
-              </div>
+            <div className="space-y-3">
+              {section.items.map((item, index) => (
+                <div key={item.id} className="flex items-center space-x-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                    <CheckIcon className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      {item.title || 'Uploaded file'}{' '}
+                      {section.items.length > 1 ? `(${index + 1})` : ''}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {item.size ? formatFileSize(item.size) : 'Unknown size'}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                      Ready
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowcaseSections((prevSections) =>
+                          prevSections.map((s) =>
+                            s.id === section.id
+                              ? {
+                                  ...s,
+                                  items: s.items.filter((_, i) => i !== index),
+                                }
+                              : s
+                          )
+                        );
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* Width/Height Inputs */}
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700">
-                  Width (px)
-                </label>
-                <input
-                  type="number"
-                  value={section.items[0].width || 1300}
-                  onChange={(e) => {
-                    setShowcaseSections((prevSections) =>
-                      prevSections.map((s) =>
-                        s.id === section.id
-                          ? {
-                              ...s,
-                              items: [
-                                {
-                                  ...s.items[0],
-                                  width: parseInt(e.target.value) || 1300,
-                                },
-                              ],
-                            }
-                          : s
-                      )
-                    );
-                  }}
-                  className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="1300"
-                />
+            {/* Width/Height Inputs for first item */}
+            {section.items[0] && (
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Width (px)
+                  </label>
+                  <input
+                    type="number"
+                    value={section.items[0].width || 1300}
+                    onChange={(e) => {
+                      setShowcaseSections((prevSections) =>
+                        prevSections.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                items: [
+                                  {
+                                    ...s.items[0],
+                                    width: parseInt(e.target.value) || 1300,
+                                  },
+                                  ...s.items.slice(1),
+                                ],
+                              }
+                            : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    placeholder="1300"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Height (px)
+                  </label>
+                  <input
+                    type="number"
+                    value={section.items[0].height || 800}
+                    onChange={(e) => {
+                      setShowcaseSections((prevSections) =>
+                        prevSections.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                items: [
+                                  {
+                                    ...s.items[0],
+                                    height: parseInt(e.target.value) || 800,
+                                  },
+                                  ...s.items.slice(1),
+                                ],
+                              }
+                            : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    placeholder="800"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700">
-                  Height (px)
-                </label>
-                <input
-                  type="number"
-                  value={section.items[0].height || 800}
-                  onChange={(e) => {
-                    setShowcaseSections((prevSections) =>
-                      prevSections.map((s) =>
-                        s.id === section.id
-                          ? {
-                              ...s,
-                              items: [
-                                {
-                                  ...s.items[0],
-                                  height: parseInt(e.target.value) || 800,
-                                },
-                              ],
-                            }
-                          : s
-                      )
-                    );
-                  }}
-                  className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="800"
-                />
-              </div>
-            </div>
+            )}
           </div>
         )}
 
-        {/* Upload Area - Show when no file uploaded */}
-        {(!section.items[0] || !section.items[0].src) && (
-          <label className="mt-4 block cursor-pointer rounded-lg border-2 border-dashed border-white/40 p-4 text-center transition-all hover:border-white/60 hover:bg-white/20">
-            <input
-              type="file"
-              accept={
-                section.type === 'image'
-                  ? 'image/*'
-                  : section.type === 'video'
-                    ? 'video/*'
-                    : section.type === 'flipbook'
-                      ? '.pdf,.doc,.docx'
-                      : '*'
-              }
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setShowcaseSections((prevSections) =>
-                    prevSections.map((s) =>
-                      s.id === section.id
-                        ? {
-                            ...s,
-                            items: [
-                              {
-                                ...s.items[0],
-                                title: file.name,
-                                src: URL.createObjectURL(file),
-                                alt: file.name,
-                                size: file.size,
-                              },
-                            ],
-                          }
-                        : s
-                    )
-                  );
+        {/* Upload Area - Show when no file uploaded or when layout needs more items */}
+        <div className="mt-4 space-y-3">
+          {/* First Item Upload - Hide when already selected */}
+          {(!section.items[0] || !section.items[0].src) && (
+            <div>
+              <label className="mb-2 block text-xs font-medium text-gray-700">
+                Item 1{' '}
+                {section.layout === 'half-half'
+                  ? '(50%)'
+                  : section.layout === 'one-third'
+                    ? '(33%)'
+                    : ''}
+              </label>
+              <input
+                type="file"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  console.log('File selected for showcase:', file);
+                  if (file) {
+                    console.log(
+                      'Processing file:',
+                      file.name,
+                      file.type,
+                      file.size
+                    );
+                    setShowcaseSections((prevSections) => {
+                      const updatedSections = prevSections.map((s) =>
+                        s.id === section.id
+                          ? {
+                              ...s,
+                              items: [
+                                {
+                                  id: `item-${Date.now()}`,
+                                  type: (section.type === 'flipbook'
+                                    ? 'flipbook'
+                                    : section.type === 'video'
+                                      ? 'video'
+                                      : 'image') as
+                                    | 'image'
+                                    | 'video'
+                                    | 'text'
+                                    | 'flipbook',
+                                  title: file.name,
+                                  src: URL.createObjectURL(file),
+                                  alt: file.name,
+                                  size: file.size,
+                                  width: 1300,
+                                  height: 800,
+                                  order: 0,
+                                  file: file, // Lưu file object để uploadProjectMedia có thể xử lý
+                                },
+                              ],
+                            }
+                          : s
+                      );
+
+                      // Debug: Log updated sections
+                      console.log(
+                        'Updated showcase sections:',
+                        updatedSections.map((s) => ({
+                          id: s.id,
+                          title: s.title,
+                          itemsCount: s.items?.length,
+                          hasFile: s.items?.some((item) => item.file),
+                        }))
+                      );
+
+                      return updatedSections;
+                    });
+                  }
+                }}
+                accept={
+                  section.type === 'image'
+                    ? 'image/*'
+                    : section.type === 'video'
+                      ? 'video/*'
+                      : section.type === 'flipbook'
+                        ? 'application/pdf'
+                        : '*'
                 }
-              }}
-              className="hidden"
-            />
-            <PhotoIcon className="mx-auto h-8 w-8 text-gray-400" />
-            <p className="mt-2 text-sm text-gray-600">
-              Chưa có media nào được upload
-            </p>
-            <p className="text-xs text-gray-500">
-              Click vào vùng này để thêm file
-            </p>
-          </label>
-        )}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          )}
+
+          {/* Second Item Upload for half-half and one-third layouts - Hide when already selected */}
+          {(section.layout === 'half-half' || section.layout === 'one-third') &&
+            (!section.items[1] || !section.items[1].src) && (
+              <div>
+                <label className="mb-2 block text-xs font-medium text-gray-700">
+                  Item 2 {section.layout === 'half-half' ? '(50%)' : '(67%)'}
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setShowcaseSections((prevSections) =>
+                        prevSections.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                items: [
+                                  ...s.items,
+                                  {
+                                    id: `item-${Date.now()}`,
+                                    type: (section.type === 'flipbook'
+                                      ? 'flipbook'
+                                      : section.type === 'video'
+                                        ? 'video'
+                                        : 'image') as
+                                      | 'image'
+                                      | 'video'
+                                      | 'text'
+                                      | 'flipbook',
+                                    title: file.name,
+                                    src: URL.createObjectURL(file),
+                                    alt: file.name,
+                                    size: file.size,
+                                    width: 1300,
+                                    height: 800,
+                                    order: 1,
+                                    file: file, // Lưu file object để uploadProjectMedia có thể xử lý
+                                  },
+                                ],
+                              }
+                            : s
+                        )
+                      );
+                    }
+                  }}
+                  accept={
+                    section.type === 'image'
+                      ? 'image/*'
+                      : section.type === 'video'
+                        ? 'video/*'
+                        : section.type === 'flipbook'
+                          ? 'application/pdf'
+                          : '*'
+                  }
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+            )}
+        </div>
       </div>
     </div>
   );
@@ -327,8 +464,9 @@ const SortableSection = ({
 export default function ShowcaseSection({
   showcaseSections,
   setShowcaseSections,
+  onLogout,
 }: ShowcaseSectionProps) {
-  // DnD Sensors - Simplified to avoid errors
+  // DnD Sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -375,21 +513,11 @@ export default function ShowcaseSection({
                 ? 'video'
                 : 'image',
           title: `Item ${showcaseSections.length + 1}`,
-          description: '',
           src: '',
           alt: '',
+          size: 0,
           width: 1300,
           height: 800,
-          colSpan: 1,
-          bookData:
-            type === 'flipbook'
-              ? {
-                  title: 'Project Title',
-                  websiteUrl: 'https://example.com',
-                  phoneNumber: '+1234567890',
-                  downloadUrl: '/download-file.pdf',
-                }
-              : undefined,
           order: 0,
         },
       ],
@@ -439,6 +567,7 @@ export default function ShowcaseSection({
                       section={section}
                       index={index}
                       setShowcaseSections={setShowcaseSections}
+                      onLogout={onLogout}
                     />
                   ))}
               </div>
@@ -482,14 +611,6 @@ export default function ShowcaseSection({
                 >
                   <DocumentTextIcon className="h-6 w-6 text-green-500" />
                   <span className="mt-1 text-xs text-gray-600">Flipbook</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => addQuickSection('text', 'single')}
-                  className="flex flex-col items-center rounded-lg border border-gray-200 p-3 transition-colors hover:border-purple-300 hover:bg-purple-50"
-                >
-                  <DocumentTextIcon className="h-6 w-6 text-purple-500" />
-                  <span className="mt-1 text-xs text-gray-600">Văn bản</span>
                 </button>
               </div>
             </div>

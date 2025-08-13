@@ -261,6 +261,75 @@ const ShowcaseSection = memo(
       );
     }
 
+    // Handle half-half layout (50% - 50%)
+    if (section.layout === 'half-half') {
+      const items = Array.isArray(section.items)
+        ? section.items
+        : [section.items];
+
+      return (
+        <div key={section.id} className="grid grid-cols-1 lg:grid-cols-2">
+          {items.map((item: any, itemIndex: number) => {
+            const transformedItem = transformItem(item);
+            return (
+              <div key={itemIndex} className="group">
+                <div
+                  className="relative overflow-hidden bg-white shadow-sm"
+                  style={{
+                    height:
+                      transformedItem.type === 'video'
+                        ? `${Math.min(transformedItem.height || 400, 400)}px`
+                        : `${transformedItem.height || 400}px`,
+                  }}
+                >
+                  <ShowcaseItem
+                    item={transformedItem}
+                    priority={index === 0 && itemIndex === 0}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // Handle one-third layout (33% - 67%)
+    if (section.layout === 'one-third') {
+      const items = Array.isArray(section.items)
+        ? section.items
+        : [section.items];
+
+      return (
+        <div key={section.id} className="grid grid-cols-1 lg:grid-cols-3">
+          {items.map((item: any, itemIndex: number) => {
+            const transformedItem = transformItem(item);
+            return (
+              <div
+                key={itemIndex}
+                className={`group ${itemIndex === 1 ? 'lg:col-span-2' : ''}`}
+              >
+                <div
+                  className="relative overflow-hidden bg-white shadow-sm"
+                  style={{
+                    height:
+                      transformedItem.type === 'video'
+                        ? `${Math.min(transformedItem.height || 400, 400)}px`
+                        : `${transformedItem.height || 400}px`,
+                  }}
+                >
+                  <ShowcaseItem
+                    item={transformedItem}
+                    priority={index === 0 && itemIndex === 0}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
     // Handle grid layout
     const items = Array.isArray(section.items)
       ? section.items

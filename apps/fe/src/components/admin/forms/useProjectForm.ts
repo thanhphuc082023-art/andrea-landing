@@ -48,9 +48,11 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       projectIntroTitle: initialData?.projectIntroTitle || '',
       credits: initialData?.credits || {
         title: '',
-        creditLabel: '',
+        creditLabel: 'Credit:',
         date: '',
-        projectManager: '',
+        projectManager:
+          initialData?.credits?.projectManager ||
+          'Project Manager: Chưa có\nGraphic Designer: Chưa có\nShowcase: Chưa có',
       },
       seo: initialData?.seo || {
         title: '',
@@ -77,12 +79,22 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       ? initialData.credits.projectManager
           .split('\n')
           .filter((line) => line.trim())
-      : []
+      : [
+          'Project Manager: Chưa có',
+          'Graphic Designer: Chưa có',
+          'Showcase: Chưa có',
+        ]
   );
   const [newCredit, setNewCredit] = useState('');
   const [showcaseSections, setShowcaseSections] = useState<ShowcaseSection[]>(
     []
   );
+
+  // Initialize projectManager field with credits
+  useEffect(() => {
+    const projectManagerText = credits.join('\n');
+    setValue('credits.projectManager', projectManagerText);
+  }, [credits, setValue]);
 
   // Load saved data from sessionStorage after component mounts
   useEffect(() => {
@@ -112,7 +124,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
             'credits',
             parsedData.credits || {
               title: '',
-              creditLabel: '',
+              creditLabel: 'Credit:',
               date: '',
               projectManager: '',
             }
@@ -136,10 +148,13 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
             setProjectMetaInfo(parsedData.projectMetaInfo);
           }
           if (parsedData.credits?.projectManager) {
-            setCredits(
+            const creditsList = parsedData.credits.projectManager
+              .split('\n')
+              .filter((line) => line.trim());
+            setCredits(creditsList);
+            setValue(
+              'credits.projectManager',
               parsedData.credits.projectManager
-                .split('\n')
-                .filter((line) => line.trim())
             );
           }
         } catch (error) {
@@ -223,13 +238,19 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
   // Credit management
   const addCredit = () => {
     if (newCredit.trim() && !credits.includes(newCredit.trim())) {
-      setCredits([...credits, newCredit.trim()]);
+      const updatedCredits = [...credits, newCredit.trim()];
+      setCredits(updatedCredits);
+      // Update projectManager field
+      setValue('credits.projectManager', updatedCredits.join('\n'));
       setNewCredit('');
     }
   };
 
   const removeCredit = (credit: string) => {
-    setCredits(credits.filter((c) => c !== credit));
+    const updatedCredits = credits.filter((c) => c !== credit);
+    setCredits(updatedCredits);
+    // Update projectManager field
+    setValue('credits.projectManager', updatedCredits.join('\n'));
   };
 
   // Save data to sessionStorage for preview
@@ -271,7 +292,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       projectMetaInfo,
       credits: {
         title: data.credits?.title || '',
-        creditLabel: data.credits?.creditLabel || '',
+        creditLabel: data.credits?.creditLabel || 'Credit:',
         date: data.credits?.date || '',
         projectManager: credits.join('\n'),
       },

@@ -67,7 +67,13 @@ export interface ShowcaseSection {
   id: string;
   title: string;
   type: 'image' | 'video' | 'flipbook' | 'text' | 'gallery';
-  layout: 'single' | 'grid' | 'masonry' | 'carousel';
+  layout:
+    | 'single'
+    | 'grid'
+    | 'masonry'
+    | 'carousel'
+    | 'half-half'
+    | 'one-third';
   items: ShowcaseItem[];
   gridCols?: number;
   order: number;
@@ -86,6 +92,7 @@ export interface ShowcaseItem {
   bookData?: any;
   order: number;
   size?: number; // Add file size property
+  file?: File; // Add file property for upload
 }
 
 export interface Category {

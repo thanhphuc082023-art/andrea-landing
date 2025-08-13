@@ -110,6 +110,7 @@ export interface StrapiProject {
     label: string;
     description?: string;
   }>;
+  showcaseSections?: any[];
 }
 
 export interface StrapiAuthor {

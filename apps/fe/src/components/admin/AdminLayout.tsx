@@ -14,12 +14,6 @@ export default function AdminLayout({
   children,
   title = 'Admin Dashboard',
 }: AdminLayoutProps) {
-  // Session cleanup on unmount for admin area - disable auto cleanup to avoid conflicts
-  useSessionCleanup({
-    ...sessionCleanupConfigs.all,
-    disableAutoCleanup: true,
-  });
-
   return (
     <>
       <Head>
