@@ -3,19 +3,21 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import HeaderVideo from '@/contents/index/Header/HeaderVideo';
+import { ProjectData } from '@/types/project';
 
 interface ProjectHeroProps {
-  heroData?: any;
-  project?: any;
+  project?: ProjectData | null;
 }
 
-function ProjectHero({ heroData = null, project = null }: ProjectHeroProps) {
+function ProjectHero({ project = null }: ProjectHeroProps) {
   const projectTitle = project?.title || 'Dự án';
   const projectCategory = project?.category?.name || 'Thiết kế';
   const projectDescription = project?.description || '';
   const projectMetaInfo = project?.projectMetaInfo || [];
   const projectIntroTitle = project?.projectIntroTitle || 'Giới thiệu dự án:';
-  const projectYear = project?.year || new Date().getFullYear();
+  const projectYear = project
+    ? new Date(project.createdAt).getFullYear()
+    : new Date().getFullYear();
   const projectUrl = project?.projectUrl || '';
 
   const router = useRouter();
@@ -31,7 +33,12 @@ function ProjectHero({ heroData = null, project = null }: ProjectHeroProps) {
       )}
     >
       {/* Background Video - giống homepage */}
-      <HeaderVideo heroData={heroData} />
+      <HeaderVideo
+        heroData={{
+          desktopVideo: project?.heroVideo,
+          mobileVideo: project?.heroVideo,
+        }}
+      />
 
       {/* Content */}
       <div

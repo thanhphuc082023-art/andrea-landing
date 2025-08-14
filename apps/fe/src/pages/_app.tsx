@@ -14,6 +14,8 @@ import FontLoaderEffect from '@/components/FontLoaderEffect';
 
 import '@/styles/main.css';
 import '@/styles/header-video.css';
+import 'react-datepicker/dist/react-datepicker.css';
+import '@/styles/datepicker.css';
 
 type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, pageProps?: any) => ReactNode;

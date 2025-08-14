@@ -39,60 +39,8 @@ export default function HeroSection({
   const title = watch('title') || '';
   const description = watch('description') || '';
 
-  const handleHeroVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('video/')) {
-        alert('Vui lòng chọn file video hợp lệ');
-        return;
-      }
-
-      // Validate file size (100MB max)
-      const maxSize = 100 * 1024 * 1024; // 100MB
-      if (file.size > maxSize) {
-        alert('File video quá lớn. Kích thước tối đa là 100MB');
-        return;
-      }
-
-      // Create object URL for preview
-      const videoUrl = URL.createObjectURL(file);
-      setValue('heroVideo', {
-        file,
-        url: videoUrl,
-        name: file.name,
-      });
-    }
-  };
-
   const removeHeroVideo = () => {
     setValue('heroVideo', undefined);
-  };
-
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Vui lòng chọn file hình ảnh hợp lệ');
-        return;
-      }
-
-      // Validate file size (5MB max)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        alert('File hình ảnh quá lớn. Kích thước tối đa là 5MB');
-        return;
-      }
-
-      // Create object URL for preview
-      const imageUrl = URL.createObjectURL(file);
-      setValue('thumbnail', {
-        file,
-        url: imageUrl,
-        name: file.name,
-      });
-    }
   };
 
   const removeThumbnail = () => {
@@ -210,6 +158,26 @@ export default function HeroSection({
             rows={3}
             placeholder="Mô tả ngắn gọn về dự án cho hero section..."
             className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            onKeyDown={(e) => {
+              if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                // Focus vào file input của thumbnail
+                setTimeout(() => {
+                  const thumbnailInput = document.querySelector(
+                    'input[type="file"][accept*="image"]'
+                  ) as HTMLInputElement;
+                  if (thumbnailInput) {
+                    // Focus vào label thay vì input ẩn
+                    const label = thumbnailInput.closest(
+                      'label'
+                    ) as HTMLLabelElement;
+                    if (label) {
+                      label.focus();
+                    }
+                  }
+                }, 0);
+              }
+            }}
           />
           {errors.description && (
             <p className="mt-1 text-sm text-red-600">
@@ -276,6 +244,7 @@ export default function HeroSection({
                     name: result.fileName,
                   });
                 }}
+                data-testid="thumbnail-uploader"
               />
             )}
           </div>

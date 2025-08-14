@@ -78,6 +78,7 @@ export interface StrapiArticle {
 }
 
 export interface StrapiProject {
+  id?: number | string;
   title: string;
   description: string;
   content: string;
@@ -183,7 +184,7 @@ export interface NavigationItem {
 
 // Helper types for API responses
 export type ArticleEntity = StrapiEntity<StrapiArticle>;
-export type ProjectEntity = StrapiEntity<StrapiProject>;
+export type ProjectEntity = StrapiProject;
 export type AuthorEntity = StrapiEntity<StrapiAuthor>;
 export type CategoryEntity = StrapiEntity<StrapiCategory>;
 export type TagEntity = StrapiEntity<StrapiTag>;

@@ -16,6 +16,7 @@ interface SimpleFileUploaderProps {
   className?: string;
   onLogout?: () => void;
   onUploadComplete?: (result: { uploadId: string; fileName: string }) => void;
+  'data-testid'?: string;
 }
 
 const CHUNK_SIZE = 3 * 1024 * 1024; // 3MB chunks
@@ -31,6 +32,7 @@ export default function SimpleFileUploader({
   className = '',
   onLogout,
   onUploadComplete,
+  'data-testid': testId,
 }: SimpleFileUploaderProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -245,7 +247,7 @@ export default function SimpleFileUploader({
   }
 
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-2 ${className}`} data-testid={testId}>
       {selectedFile ? (
         <div className="space-y-3">
           <div className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-2">
@@ -319,7 +321,16 @@ export default function SimpleFileUploader({
           )}
         </div>
       ) : (
-        <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 hover:bg-gray-100">
+        <label
+          className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 hover:bg-gray-100 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+        >
           <input
             ref={fileInputRef}
             type="file"

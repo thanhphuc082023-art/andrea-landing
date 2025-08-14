@@ -5,7 +5,7 @@ import {
   type ProjectFormData,
   projectFormSchema,
 } from '@/lib/validations/project';
-import { type ShowcaseSection } from '@/types/project';
+import { type ProjectShowcaseSection as ShowcaseSection } from '@/types/project';
 import {
   useSessionCleanup,
   sessionCleanupConfigs,
@@ -79,11 +79,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       ? initialData.credits.projectManager
           .split('\n')
           .filter((line) => line.trim())
-      : [
-          'Project Manager: Chưa có',
-          'Graphic Designer: Chưa có',
-          'Showcase: Chưa có',
-        ]
+      : []
   );
   const [newCredit, setNewCredit] = useState('');
   const [showcaseSections, setShowcaseSections] = useState<ShowcaseSection[]>(
@@ -95,6 +91,11 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
     const projectManagerText = credits.join('\n');
     setValue('credits.projectManager', projectManagerText);
   }, [credits, setValue]);
+
+  // Sync projectMetaInfo with form
+  useEffect(() => {
+    setValue('projectMetaInfo', projectMetaInfo);
+  }, [projectMetaInfo, setValue]);
 
   // Load saved data from sessionStorage after component mounts
   useEffect(() => {

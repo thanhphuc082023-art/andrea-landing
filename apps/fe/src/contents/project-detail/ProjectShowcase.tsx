@@ -2,15 +2,19 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { memo } from 'react';
 import MinimalFlipBook from '@/components/MinimalFlipBook';
-import { type ShowcaseSection } from '@/types/project';
+import {
+  ProjectData,
+  ProjectShowcaseSection,
+  ProjectShowcaseItem,
+} from '@/types/project';
 
 // Types
 interface ProjectShowcaseProps {
-  project?: any;
-  showcaseData?: ShowcaseSection[];
+  project?: ProjectData | null;
 }
 
 interface ShowcaseItem {
+  id: string;
   src: string;
   alt: string;
   width: number;
@@ -214,7 +218,8 @@ ShowcaseItem.displayName = 'ShowcaseItem';
 const ShowcaseSection = memo(
   ({ section, index }: { section: any; index: number }) => {
     // Transform admin data structure to match expected format
-    const transformItem = (item: any) => ({
+    const transformItem = (item: any, index: number = 0) => ({
+      id: item.id || `item-${index}`,
       src: item.src || '',
       alt: item.alt || item.title || '',
       width: item.width || 1300,
@@ -233,7 +238,7 @@ const ShowcaseSection = memo(
 
       if (!item) return null;
 
-      const transformedItem = transformItem(item);
+      const transformedItem = transformItem(item, 0);
 
       // Special handling for flipbook sections
       if (transformedItem.type === 'flipbook') {
@@ -270,7 +275,7 @@ const ShowcaseSection = memo(
       return (
         <div key={section.id} className="grid grid-cols-1 lg:grid-cols-2">
           {items.map((item: any, itemIndex: number) => {
-            const transformedItem = transformItem(item);
+            const transformedItem = transformItem(item, itemIndex);
             return (
               <div key={itemIndex} className="group">
                 <div
@@ -303,7 +308,7 @@ const ShowcaseSection = memo(
       return (
         <div key={section.id} className="grid grid-cols-1 lg:grid-cols-3">
           {items.map((item: any, itemIndex: number) => {
-            const transformedItem = transformItem(item);
+            const transformedItem = transformItem(item, itemIndex);
             return (
               <div
                 key={itemIndex}
@@ -342,7 +347,7 @@ const ShowcaseSection = memo(
         className={`grid grid-cols-1 lg:grid-cols-${gridCols}`}
       >
         {items.map((item: any, itemIndex: number) => {
-          const transformedItem = transformItem(item);
+          const transformedItem = transformItem(item, itemIndex);
           return (
             <div
               key={itemIndex}
@@ -369,12 +374,8 @@ const ShowcaseSection = memo(
 
 ShowcaseSection.displayName = 'ShowcaseSection';
 
-function ProjectShowcase({
-  project = null,
-  showcaseData,
-}: ProjectShowcaseProps) {
-  // Use showcaseData from admin if available, otherwise use project.showcase, fallback to legacy data
-  const sections = showcaseData || project?.showcase || legacyShowcaseData;
+function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
+  const sections = project?.showcaseSections || legacyShowcaseData;
 
   return (
     <section className="content-wrapper">

@@ -1,9 +1,5 @@
 import { ReactNode } from 'react';
 import Head from 'next/head';
-import {
-  useSessionCleanup,
-  sessionCleanupConfigs,
-} from '@/hooks/useSessionCleanup';
 
 interface AdminLayoutProps {
   children: ReactNode;

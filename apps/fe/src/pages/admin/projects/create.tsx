@@ -1,20 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import ProjectFormPage from '@/components/admin/ProjectFormPage';
 import AuthLayout from '@/components/auth/AuthLayout';
 import { type ProjectFormData } from '@/lib/validations/project';
 import { uploadProjectMedia } from '@/utils/project-media-upload';
+import {
+  useSessionCleanup,
+  sessionCleanupConfigs,
+} from '@/hooks/useSessionCleanup';
 
 export default function CreateProjectPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Custom cleanup logic - only cleanup when NOT navigating to create or preview pages
+  const { cleanup } = useSessionCleanup({
+    ...sessionCleanupConfigs.projectForm,
+    disableAutoCleanup: true, // Disable automatic cleanup, we'll handle it manually
+  });
+
+  // Handle route changes for conditional cleanup
+  const handleRouteChange = (url: string) => {
+    const isProjectFormRelated =
+      url.includes('/admin/projects/create') ||
+      url.includes('/admin/projects/preview');
+
+    if (!isProjectFormRelated) {
+      cleanup();
+    }
+  };
+
+  // Set up route change listener
+  useEffect(() => {
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [router.events]);
 
   const handleSubmit = async (data: ProjectFormData) => {
     setIsLoading(true);
     setError('');
-    setUploadProgress(0);
 
     try {
       const token = localStorage.getItem('strapiToken');
@@ -30,36 +58,6 @@ export default function CreateProjectPage() {
         gallery: data.gallery?.map((item) => item.file).filter(Boolean) || [],
         showcase: data.showcase || [],
       };
-
-      // Debug: Log showcase data
-      console.log('Showcase data from form:', data.showcase);
-      console.log('Showcase media files:', mediaFiles.showcase);
-      console.log(
-        'Showcase layouts:',
-        data.showcase?.map((s) => ({
-          id: s.id,
-          layout: s.layout,
-          title: s.title,
-        }))
-      );
-
-      // Debug: Check showcase items structure
-      if (data.showcase && data.showcase.length > 0) {
-        data.showcase.forEach((section, sectionIndex) => {
-          console.log(`Section ${sectionIndex}:`, {
-            id: section.id,
-            layout: section.layout,
-            title: section.title,
-            items: section.items?.map((item) => ({
-              id: item.id,
-              title: item.title,
-              hasFile: !!item.file,
-              fileType: typeof item.file,
-              fileIsFile: item.file instanceof File,
-            })),
-          });
-        });
-      }
 
       // Upload media files first if any exist
       let uploadResults: {
@@ -81,25 +79,6 @@ export default function CreateProjectPage() {
         section.items?.some((item) => item.file)
       );
 
-      // Debug: Check showcase files logic
-      console.log('Checking showcase files logic:');
-      if (mediaFiles.showcase && mediaFiles.showcase.length > 0) {
-        mediaFiles.showcase.forEach((section, sectionIndex) => {
-          const sectionHasFiles = section.items?.some((item) => item.file);
-          console.log(`Section ${sectionIndex} has files:`, sectionHasFiles);
-          if (section.items) {
-            section.items.forEach((item, itemIndex) => {
-              console.log(
-                `  Item ${itemIndex} has file:`,
-                !!item.file,
-                'Type:',
-                typeof item.file
-              );
-            });
-          }
-        });
-      }
-
       const hasMediaFiles =
         mediaFiles.heroVideo ||
         mediaFiles.thumbnail ||
@@ -107,34 +86,8 @@ export default function CreateProjectPage() {
         mediaFiles.gallery.length > 0 ||
         showcaseHasFiles;
 
-      // Debug: Check if showcase has files
-      console.log('Showcase has files:', showcaseHasFiles);
-      console.log('Has media files:', hasMediaFiles);
-
-      // Debug: Count total files in showcase
-      let totalShowcaseFiles = 0;
-      if (mediaFiles.showcase && mediaFiles.showcase.length > 0) {
-        mediaFiles.showcase.forEach((section) => {
-          if (section.items) {
-            section.items.forEach((item) => {
-              if (item.file) {
-                totalShowcaseFiles++;
-                console.log(
-                  'Found file in showcase:',
-                  item.file.name,
-                  item.file.type
-                );
-              }
-            });
-          }
-        });
-      }
-      console.log('Total showcase files found:', totalShowcaseFiles);
-
       if (hasMediaFiles) {
-        uploadResults = await uploadProjectMedia(mediaFiles, (progress) => {
-          setUploadProgress(progress);
-        });
+        uploadResults = await uploadProjectMedia(mediaFiles, (progress) => {});
       }
 
       // Prepare data for API call
@@ -154,17 +107,6 @@ export default function CreateProjectPage() {
           ?.map((item) => item.name)
           .filter(Boolean),
       };
-
-      // Debug: Log project data being sent
-      console.log('Project data being sent to API:', {
-        ...projectData,
-        showcase: projectData.showcase?.map((s) => ({
-          id: s.id,
-          layout: s.layout,
-          title: s.title,
-          itemsCount: s.items?.length,
-        })),
-      });
 
       const response = await fetch('/api/admin/projects/create-from-chunks', {
         method: 'POST',
@@ -227,7 +169,6 @@ export default function CreateProjectPage() {
         <ProjectFormPage
           onSubmit={handleSubmit}
           isLoading={isLoading}
-          uploadProgress={uploadProgress}
           onLogout={handleLogout}
         />
       </>

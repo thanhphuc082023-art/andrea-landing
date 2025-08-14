@@ -1,9 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { BookIcon, DocumentIcon, XCircleIcon } from './Icons';
-import {
-  useSessionCleanup,
-  sessionCleanupConfigs,
-} from '@/hooks/useSessionCleanup';
 
 interface ChunkedUploaderProps {
   onUploadComplete: (result: { slug: string; bookId: string }) => void;

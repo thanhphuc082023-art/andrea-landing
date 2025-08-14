@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   PlusIcon,
   TrashIcon,
@@ -26,7 +26,7 @@ import {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import { type ShowcaseSection, type ShowcaseItem } from '@/types/project';
+import { type ShowcaseSection } from '@/types/project';
 
 interface ShowcaseSectionProps {
   showcaseSections: ShowcaseSection[];
@@ -175,8 +175,8 @@ const SortableSection = ({
                     <option value="single">Single</option>
                     <option value="half-half">1/2 - 1/2</option>
                     <option value="one-third">1/3 - 2/3</option>
-                    <option value="grid">Grid</option>
-                    <option value="carousel">Carousel</option>
+                    {/* <option value="grid">Grid</option>
+                    <option value="carousel">Carousel</option> */}
                   </select>
                 </div>
               </div>
@@ -220,7 +220,7 @@ const SortableSection = ({
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                      Ready
+                      Sẵn sàng
                     </span>
                     <button
                       type="button"
@@ -250,11 +250,11 @@ const SortableSection = ({
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-700">
-                    Width (px)
+                    Chiều ngang (px)
                   </label>
                   <input
                     type="number"
-                    value={section.items[0].width || 1300}
+                    value={section.items[0].width || null}
                     onChange={(e) => {
                       setShowcaseSections((prevSections) =>
                         prevSections.map((s) =>
@@ -264,7 +264,7 @@ const SortableSection = ({
                                 items: [
                                   {
                                     ...s.items[0],
-                                    width: parseInt(e.target.value) || 1300,
+                                    width: parseInt(e.target.value) || 0,
                                   },
                                   ...s.items.slice(1),
                                 ],
@@ -279,11 +279,11 @@ const SortableSection = ({
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700">
-                    Height (px)
+                    Chiều cao (px)
                   </label>
                   <input
                     type="number"
-                    value={section.items[0].height || 800}
+                    value={section.items[0].height || null}
                     onChange={(e) => {
                       setShowcaseSections((prevSections) =>
                         prevSections.map((s) =>
@@ -293,7 +293,7 @@ const SortableSection = ({
                                 items: [
                                   {
                                     ...s.items[0],
-                                    height: parseInt(e.target.value) || 800,
+                                    height: parseInt(e.target.value) || 0,
                                   },
                                   ...s.items.slice(1),
                                 ],
@@ -317,104 +317,33 @@ const SortableSection = ({
           {(!section.items[0] || !section.items[0].src) && (
             <div>
               <label className="mb-2 block text-xs font-medium text-gray-700">
-                Item 1{' '}
+                1.{' '}
                 {section.layout === 'half-half'
                   ? '(50%)'
                   : section.layout === 'one-third'
                     ? '(33%)'
                     : ''}
               </label>
-              <input
-                type="file"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  console.log('File selected for showcase:', file);
-                  if (file) {
-                    console.log(
-                      'Processing file:',
-                      file.name,
-                      file.type,
-                      file.size
-                    );
-                    setShowcaseSections((prevSections) => {
-                      const updatedSections = prevSections.map((s) =>
-                        s.id === section.id
-                          ? {
-                              ...s,
-                              items: [
-                                {
-                                  id: `item-${Date.now()}`,
-                                  type: (section.type === 'flipbook'
-                                    ? 'flipbook'
-                                    : section.type === 'video'
-                                      ? 'video'
-                                      : 'image') as
-                                    | 'image'
-                                    | 'video'
-                                    | 'text'
-                                    | 'flipbook',
-                                  title: file.name,
-                                  src: URL.createObjectURL(file),
-                                  alt: file.name,
-                                  size: file.size,
-                                  width: 1300,
-                                  height: 800,
-                                  order: 0,
-                                  file: file, // Lưu file object để uploadProjectMedia có thể xử lý
-                                },
-                              ],
-                            }
-                          : s
-                      );
-
-                      // Debug: Log updated sections
-                      console.log(
-                        'Updated showcase sections:',
-                        updatedSections.map((s) => ({
-                          id: s.id,
-                          title: s.title,
-                          itemsCount: s.items?.length,
-                          hasFile: s.items?.some((item) => item.file),
-                        }))
-                      );
-
-                      return updatedSections;
-                    });
-                  }
-                }}
-                accept={
-                  section.type === 'image'
-                    ? 'image/*'
-                    : section.type === 'video'
-                      ? 'video/*'
-                      : section.type === 'flipbook'
-                        ? 'application/pdf'
-                        : '*'
-                }
-                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-              />
-            </div>
-          )}
-
-          {/* Second Item Upload for half-half and one-third layouts - Hide when already selected */}
-          {(section.layout === 'half-half' || section.layout === 'one-third') &&
-            (!section.items[1] || !section.items[1].src) && (
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Item 2 {section.layout === 'half-half' ? '(50%)' : '(67%)'}
-                </label>
+              <div className="relative">
                 <input
                   type="file"
+                  id={`file-input-${section.id}-1`}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
+                    console.log('File selected for showcase:', file);
                     if (file) {
-                      setShowcaseSections((prevSections) =>
-                        prevSections.map((s) =>
+                      console.log(
+                        'Processing file:',
+                        file.name,
+                        file.type,
+                        file.size
+                      );
+                      setShowcaseSections((prevSections) => {
+                        const updatedSections = prevSections.map((s) =>
                           s.id === section.id
                             ? {
                                 ...s,
                                 items: [
-                                  ...s.items,
                                   {
                                     id: `item-${Date.now()}`,
                                     type: (section.type === 'flipbook'
@@ -432,14 +361,27 @@ const SortableSection = ({
                                     size: file.size,
                                     width: 1300,
                                     height: 800,
-                                    order: 1,
+                                    order: 0,
                                     file: file, // Lưu file object để uploadProjectMedia có thể xử lý
                                   },
                                 ],
                               }
                             : s
-                        )
-                      );
+                        );
+
+                        // Debug: Log updated sections
+                        console.log(
+                          'Updated showcase sections:',
+                          updatedSections.map((s) => ({
+                            id: s.id,
+                            title: s.title,
+                            itemsCount: s.items?.length,
+                            hasFile: s.items?.some((item) => item.file),
+                          }))
+                        );
+
+                        return updatedSections;
+                      });
                     }
                   }}
                   accept={
@@ -451,8 +393,101 @@ const SortableSection = ({
                           ? 'application/pdf'
                           : '*'
                   }
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                 />
+                <label
+                  htmlFor={`file-input-${section.id}-1`}
+                  className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+                >
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Chọn tệp{' '}
+                  {section.type === 'image'
+                    ? 'hình ảnh'
+                    : section.type === 'video'
+                      ? 'video'
+                      : section.type === 'flipbook'
+                        ? 'PDF'
+                        : ''}
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Second Item Upload for half-half and one-third layouts - Hide when already selected */}
+          {(section.layout === 'half-half' || section.layout === 'one-third') &&
+            (!section.items[1] || !section.items[1].src) && (
+              <div>
+                <label className="mb-2 block text-xs font-medium text-gray-700">
+                  2. {section.layout === 'half-half' ? '(50%)' : '(67%)'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    id={`file-input-${section.id}-2`}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setShowcaseSections((prevSections) =>
+                          prevSections.map((s) =>
+                            s.id === section.id
+                              ? {
+                                  ...s,
+                                  items: [
+                                    ...s.items,
+                                    {
+                                      id: `item-${Date.now()}`,
+                                      type: (section.type === 'flipbook'
+                                        ? 'flipbook'
+                                        : section.type === 'video'
+                                          ? 'video'
+                                          : 'image') as
+                                        | 'image'
+                                        | 'video'
+                                        | 'text'
+                                        | 'flipbook',
+                                      title: file.name,
+                                      src: URL.createObjectURL(file),
+                                      alt: file.name,
+                                      size: file.size,
+                                      width: 1300,
+                                      height: 800,
+                                      order: 1,
+                                      file: file, // Lưu file object để uploadProjectMedia có thể xử lý
+                                    },
+                                  ],
+                                }
+                              : s
+                          )
+                        );
+                      }
+                    }}
+                    accept={
+                      section.type === 'image'
+                        ? 'image/*'
+                        : section.type === 'video'
+                          ? 'video/*'
+                          : section.type === 'flipbook'
+                            ? 'application/pdf'
+                            : '*'
+                    }
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  />
+                  <label
+                    htmlFor={`file-input-${section.id}-2`}
+                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700 transition-colors hover:border-blue-400 hover:bg-blue-100"
+                  >
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    Chọn tệp{' '}
+                    {section.type === 'image'
+                      ? 'hình ảnh'
+                      : section.type === 'video'
+                        ? 'video'
+                        : section.type === 'flipbook'
+                          ? 'PDF'
+                          : ''}{' '}
+                    thứ 2
+                  </label>
+                </div>
               </div>
             )}
         </div>

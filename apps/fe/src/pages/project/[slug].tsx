@@ -10,21 +10,23 @@ import {
 import { getStrapiMediaUrl } from '@/utils/helper';
 import { StrapiAPI } from '@/lib/strapi';
 import type { ProjectEntity } from '@/types/strapi';
+import { ProjectData } from '@/types/project';
+import {
+  transformStrapiProject,
+  validateProjectData,
+  debugProjectData,
+} from '@/utils/project-transform';
 
 interface ProjectPageProps extends PagePropsWithGlobal {
-  project: ProjectEntity['attributes'] | null;
-  showcaseData?: any[];
+  project: ProjectData | null;
 }
 
 function ProjectPage({
   serverGlobal = null,
-  heroData = null,
   project = null,
-  showcaseData,
-  footerData = null,
 }: ProjectPageProps) {
   const router = useRouter();
-
+  console.log('project', project);
   if (router.isFallback) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -65,11 +67,7 @@ function ProjectPage({
         seo={project?.seo}
         global={currentGlobal}
       />
-      <ProjectDetailContents
-        heroData={heroData}
-        project={project}
-        showcaseData={showcaseData}
-      />
+      <ProjectDetailContents project={project} />
     </>
   );
 }
@@ -83,7 +81,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     });
 
     const paths = response.data.map((project: any) => ({
-      params: { slug: project.attributes.slug },
+      params: { slug: project.slug },
     }));
 
     return {
@@ -112,49 +110,43 @@ export const getStaticProps: GetStaticProps<ProjectPageProps> = async ({
 
   try {
     return await getStaticPropsWithGlobalAndData(async () => {
-      // Fetch specific project
+      console.log(`Fetching project with slug: ${slug}`);
+
+      // Fetch specific project with comprehensive population
       const project = await StrapiAPI.getEntryBySlug<ProjectEntity>(
         'projects',
         slug,
         {
-          populate: [
-            'featuredImage',
-            'gallery',
-            'seo.metaImage',
-            'technologies',
-            'category',
-            'showcaseSections',
-          ],
+          populate: '*',
           publicationState: 'live',
         }
       );
-
+      console.log('project', project);
       if (!project) {
+        console.error(`Project not found with slug: ${slug}`);
         throw new Error('Project not found');
       }
 
-      // Transform image URLs
-      const transformedProject = {
-        ...project.attributes,
-        featuredImage: project.attributes.featuredImage
-          ? {
-              ...project.attributes.featuredImage,
-              url: StrapiAPI.getMediaUrl(project.attributes.featuredImage.url),
-            }
-          : null,
-        gallery:
-          project.attributes.gallery?.map((img: any) => ({
-            ...img,
-            url: StrapiAPI.getMediaUrl(img.url),
-          })) || [],
-      };
+      console.log(`Found project: ${project.title} (ID: ${project.id})`);
 
-      // Extract showcase data
-      const showcaseData = project.attributes.showcaseSections || [];
+      // Transform Strapi data to standardized ProjectData format
+      const transformedProject = transformStrapiProject(project);
+
+      // Validate the transformed data for UI compatibility
+      const validation = validateProjectData(transformedProject);
+      if (!validation.isValid) {
+        console.warn('Project data validation warnings:', validation.errors);
+
+        // Log debug information
+        debugProjectData(transformedProject);
+      }
+
+      console.log(
+        `Project transformation complete. Showcase sections: ${transformedProject.showcaseSections.length}`
+      );
 
       return {
         project: transformedProject,
-        showcaseData,
       };
     });
   } catch (error) {

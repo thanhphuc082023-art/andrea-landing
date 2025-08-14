@@ -37,7 +37,7 @@ function ProjectCredits({ project = null }: ProjectCreditsProps) {
           {/* Credits Content */}
           <div
             className={clsx(
-              'mt-[26px] max-w-[480px] text-center text-[17px] font-normal leading-7 text-[#979797] dark:text-gray-400'
+              'mt-[10px] max-w-[480px] text-center text-[17px] font-normal leading-7 text-[#979797] dark:text-gray-400'
             )}
           >
             {/* Date */}

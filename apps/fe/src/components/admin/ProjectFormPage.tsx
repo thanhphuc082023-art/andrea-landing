@@ -21,7 +21,6 @@ interface ProjectFormPageProps {
   initialData?: Partial<ProjectFormData>;
   categories?: Array<{ id: number; name: string }>;
   isLoading?: boolean;
-  uploadProgress?: number;
   onLogout?: () => void;
 }
 
@@ -30,15 +29,12 @@ export default function ProjectFormPage({
   initialData,
   categories = [],
   isLoading = false,
-  uploadProgress: externalUploadProgress,
   onLogout,
 }: ProjectFormPageProps) {
   const router = useRouter();
-  const [internalUploadProgress, setInternalUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
   // Use external upload progress if provided, otherwise use internal
-  const uploadProgress = externalUploadProgress ?? internalUploadProgress;
 
   // Session cleanup on unmount - disable auto cleanup to preserve data for preview
   const { cleanup } = useSessionCleanup({
@@ -122,7 +118,6 @@ export default function ProjectFormPage({
   // Enhanced form submission
   const handleEnhancedFormSubmit = async (data: ProjectFormData) => {
     setIsUploading(true);
-    setInternalUploadProgress(0);
     console.log('handleEnhancedFormSubmit', data);
     try {
       // Submit form data directly
@@ -131,12 +126,40 @@ export default function ProjectFormPage({
       console.error('Form submission error:', error);
     } finally {
       setIsUploading(false);
-      setInternalUploadProgress(0);
     }
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen">
+      {/* Fullscreen Loading Overlay */}
+      {(isLoading || isUploading) && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
+          <svg
+            className="text-brand-orange mb-4 h-10 w-10 animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+          <div className="text-brand-orange text-lg font-semibold">
+            Đang tải lên, vui lòng chờ...
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="border-b border-gray-200 bg-white shadow-sm">
         <div className="content-wrapper">
@@ -174,39 +197,23 @@ export default function ProjectFormPage({
               </button>
               <button
                 type="submit"
-                disabled={isLoading || isUploading || uploadProgress > 0}
+                disabled={isLoading || isUploading}
                 className="inline-flex items-center rounded-md border border-transparent bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleSubmit(handleEnhancedFormSubmit)}
               >
-                {isLoading || isUploading || uploadProgress > 0
-                  ? `Đang ${uploadProgress > 0 ? 'upload...' : isUploading ? 'upload...' : 'lưu...'}`
+                {isLoading || isUploading
+                  ? `Đang lưu...`
                   : initialData
                     ? 'Cập nhật'
                     : 'Tạo dự án'}
               </button>
             </div>
           </div>
-
-          {/* Upload Progress */}
-          {(isUploading || uploadProgress > 0) && (
-            <div className="mt-2">
-              <div className="flex items-center justify-between text-sm">
-                <span>Tiến trình upload</span>
-                <span>{Math.round(uploadProgress)}%</span>
-              </div>
-              <div className="mt-1 h-2 w-full rounded-full bg-gray-200">
-                <div
-                  className="h-2 rounded-full bg-blue-600 transition-all duration-300"
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="content-wrapper">
+      <div className="content-wrapper pb-6">
         <Tab.Group>
           <Tab.Panels className="mt-6">
             <Tab.Panel>

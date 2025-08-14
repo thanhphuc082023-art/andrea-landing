@@ -5,7 +5,12 @@ import {
   UseFormWatch,
 } from 'react-hook-form';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/20/solid';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { vi } from 'date-fns/locale';
 import { type ProjectFormData } from '@/lib/validations/project';
+
+// Register Vietnamese locale
+registerLocale('vi', vi);
 
 interface CreditsSectionProps {
   register: UseFormRegister<ProjectFormData>;
@@ -117,22 +122,83 @@ export default function CreditsSection({
         </div>
 
         <div>
-          <label
-            htmlFor="credits.date"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label className="mb-2 block text-sm font-medium text-gray-700">
             Ngày tháng <span className="text-red-500">*</span>
           </label>
-          <input
-            type="date"
-            {...register('credits.date')}
-            className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
+          <div className="relative">
+            <DatePicker
+              selected={
+                watch('credits.date')
+                  ? new Date(watch('credits.date') || '')
+                  : null
+              }
+              onChange={(date: Date | null) => {
+                if (date) {
+                  setValue('credits.date', date.toISOString().split('T')[0]);
+                } else {
+                  setValue('credits.date', '');
+                }
+              }}
+              placeholderText="Chọn ngày tháng dự án"
+              dateFormat="dd/MM/yyyy"
+              locale="vi"
+              className={`h-9 w-full rounded-lg border px-4 py-3 pr-12 shadow-sm transition-all duration-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 sm:text-sm ${
+                errors.credits?.date
+                  ? 'border-red-300 bg-red-50/50'
+                  : 'border-gray-300 bg-white hover:border-gray-400'
+              } placeholder:text-gray-400`}
+              wrapperClassName="w-full"
+              showPopperArrow={false}
+              todayButton="Chọn hôm nay"
+              shouldCloseOnSelect={true}
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
+              maxDate={new Date()}
+              minDate={new Date('2000-01-01')}
+              popperClassName="z-50"
+              calendarClassName="shadow-2xl border-0 rounded-xl"
+              yearDropdownItemNumber={15}
+            />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+              <svg
+                className={`h-5 w-5 transition-colors duration-200 ${
+                  errors.credits?.date ? 'text-red-400' : 'text-gray-400'
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+          </div>
           {errors.credits?.date && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.credits.date.message}
-            </p>
+            <div className="mt-2 flex items-center">
+              <svg
+                className="mr-1 h-4 w-4 text-red-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-sm text-red-600">
+                {errors.credits.date.message}
+              </p>
+            </div>
           )}
+          <p className="mt-1 text-xs text-gray-500">
+            Chọn ngày hoàn thành dự án hoặc ngày phát hành
+          </p>
         </div>
 
         <div>

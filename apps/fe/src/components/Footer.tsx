@@ -55,11 +55,7 @@ function Footer({ footerData = {} }: FooterProps) {
                 className="h-[125px] w-[92px] object-contain max-md:h-[69px] max-md:w-[50px]"
               />
             ) : (
-              <div
-                className={clsx(
-                  'absolute bottom-0 right-[65px] flex items-center justify-center'
-                )}
-              >
+              <div className={clsx('')}>
                 <NumberDesignElement
                   width={92}
                   height={125}
@@ -292,109 +288,96 @@ function Footer({ footerData = {} }: FooterProps) {
                 </div>
               )}
 
-              <div className={clsx('mt-1 flex flex-wrap space-x-3')}>
-                {socialMediaLinks.length > 0 ? (
-                  socialMediaLinks
-                    .sort((a, b) => Number(b.position) - Number(a.position))
-                    .map((link) => (
+              {contactInfo ? (
+                <div className={clsx('mt-1 flex flex-wrap space-x-3')}>
+                  {socialMediaLinks.length > 0 ? (
+                    socialMediaLinks
+                      .sort((a, b) => Number(b.position) - Number(a.position))
+                      .map((link) => (
+                        <a
+                          key={link.id}
+                          href={link.url}
+                          target="_blank"
+                          rel="noreferrer nofollow"
+                          className="flex h-8 w-8 items-center justify-center transition-colors"
+                          aria-label={link.url}
+                        >
+                          <img
+                            src={getStrapiMediaUrl(link.icon)}
+                            alt={link.url || 'Social Icon'}
+                            className="h-full w-full object-contain"
+                          />
+                        </a>
+                      ))
+                  ) : (
+                    // Fallback social links nếu không có data từ Strapi
+                    <>
                       <a
-                        key={link.id}
-                        href={link.url}
+                        href="https://facebook.com/"
                         target="_blank"
                         rel="noreferrer nofollow"
-                        className="flex h-8 w-8 items-center justify-center transition-colors"
-                        aria-label={link.url}
+                        className={clsx(
+                          'flex h-8 w-8 items-center justify-center rounded-full',
+                          'group'
+                        )}
+                        aria-label="Facebook"
                       >
-                        <img
-                          src={getStrapiMediaUrl(link.icon)}
-                          alt={link.url || 'Social Icon'}
-                          className="h-full w-full object-contain"
+                        <FacebookIcon
+                          className={clsx(
+                            'h-8 w-8 text-gray-400 group-hover:text-gray-500'
+                          )}
                         />
                       </a>
-                    ))
-                ) : (
-                  // Fallback social links nếu không có data từ Strapi
-                  <>
-                    <a
-                      href="https://facebook.com/"
-                      target="_blank"
-                      rel="noreferrer nofollow"
-                      className={clsx(
-                        'flex h-8 w-8 items-center justify-center rounded-full',
-                        'group'
-                      )}
-                      aria-label="Facebook"
-                    >
-                      <FacebookIcon
+
+                      <a
+                        href="https://zalo.me/"
+                        target="_blank"
+                        rel="noreferrer nofollow"
+                        className={clsx('flex items-center justify-center')}
+                        aria-label="Zalo"
+                      >
+                        <ZaloIcon className={clsx('h-8 w-8')} />
+                      </a>
+                      <a
+                        href="https://www.tiktok.com/@andrea.vn"
+                        target="_blank"
+                        rel="noreferrer nofollow"
                         className={clsx(
-                          'h-8 w-8 text-gray-400 group-hover:text-gray-500'
+                          'flex h-8 w-8 items-center justify-center rounded-[4px] bg-gray-400',
+                          'transition-colors hover:bg-gray-500'
                         )}
-                      />
-                    </a>
-
-                    <a
-                      href="https://zalo.me/"
-                      target="_blank"
-                      rel="noreferrer nofollow"
-                      className={clsx('flex items-center justify-center')}
-                      aria-label="Zalo"
-                    >
-                      <ZaloIcon className={clsx('h-8 w-8')} />
-                    </a>
-                    <a
-                      href="https://www.tiktok.com/@andrea.vn"
-                      target="_blank"
-                      rel="noreferrer nofollow"
-                      className={clsx(
-                        'flex h-8 w-8 items-center justify-center rounded-[4px] bg-gray-400',
-                        'transition-colors hover:bg-gray-500'
-                      )}
-                      aria-label="Tiktok"
-                    >
-                      <FaTiktok className={clsx('h-5 w-5 text-white')} />
-                    </a>
-                    <a
-                      href="https://instagram.com/"
-                      target="_blank"
-                      rel="noreferrer nofollow"
-                      className={clsx(
-                        'flex h-8 w-8 items-center justify-center rounded-full bg-gray-400',
-                        'transition-colors hover:bg-gray-500'
-                      )}
-                      aria-label="Instagram"
-                    >
-                      <InstagramIcon className={clsx('h-5 w-5 text-white')} />
-                    </a>
-                    <a
-                      href="https://behance.net/"
-                      target="_blank"
-                      rel="noreferrer nofollow"
-                      className={clsx(
-                        'flex h-8 w-8 items-center justify-center rounded-[4px] bg-gray-400',
-                        'transition-colors hover:bg-gray-500'
-                      )}
-                      aria-label="Behance"
-                    >
-                      <FaBehance className={clsx('h-5 w-5 text-white')} />
-                    </a>
-                    <a
-                      href="https://linkedin.com/"
-                      target="_blank"
-                      rel="noreferrer nofollow"
-                      className={clsx(
-                        'flex h-8 w-8 items-center justify-center rounded-[4px] bg-gray-400',
-                        'transition-colors hover:bg-gray-500'
-                      )}
-                      aria-label="LinkedIn"
-                    >
-                      <FaLinkedinIn className={clsx('h-5 w-5 text-white')} />
-                    </a>
-                  </>
-                )}
-              </div>
-
-              {/* Fallback contact info nếu không có data từ Strapi */}
-              {!contactInfo && (
+                        aria-label="Tiktok"
+                      >
+                        <FaTiktok className={clsx('h-5 w-5 text-white')} />
+                      </a>
+                      <a
+                        href="https://instagram.com/"
+                        target="_blank"
+                        rel="noreferrer nofollow"
+                        className={clsx(
+                          'flex h-8 w-8 items-center justify-center rounded-full bg-gray-400',
+                          'transition-colors hover:bg-gray-500'
+                        )}
+                        aria-label="Instagram"
+                      >
+                        <InstagramIcon className={clsx('h-5 w-5 text-white')} />
+                      </a>
+                      <a
+                        href="https://behance.net/"
+                        target="_blank"
+                        rel="noreferrer nofollow"
+                        className={clsx(
+                          'flex h-8 w-8 items-center justify-center rounded-[4px] bg-gray-400',
+                          'transition-colors hover:bg-gray-500'
+                        )}
+                        aria-label="Behance"
+                      >
+                        <FaBehance className={clsx('h-5 w-5 text-white')} />
+                      </a>
+                    </>
+                  )}
+                </div>
+              ) : (
                 <>
                   <div className={clsx('flex items-start gap-2')}>
                     <div
@@ -457,7 +440,7 @@ function Footer({ footerData = {} }: FooterProps) {
                       info@andrea.vn
                     </a>
                   </div>
-                  <div className={clsx('flex flex-wrap space-x-3')}>
+                  <div className={clsx('mt-1 flex flex-wrap space-x-3')}>
                     {socialMediaLinks.length > 0 ? (
                       socialMediaLinks
                         .sort((a, b) => Number(b.position) - Number(a.position))

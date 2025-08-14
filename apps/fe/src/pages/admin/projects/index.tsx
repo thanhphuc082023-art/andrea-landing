@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import { PlusIcon, PencilIcon, EyeIcon } from '@heroicons/react/24/outline';
 import {
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
-  EyeIcon,
-} from '@heroicons/react/24/outline';
+  getStaticPropsWithGlobalAndData,
+  type PagePropsWithGlobal,
+} from '@/lib/page-helpers';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
 interface Project {
   id: number;
@@ -23,39 +23,16 @@ interface Project {
   updatedAt: string;
 }
 
-export default function AdminProjects() {
+interface AdminProjectsPageProps extends PagePropsWithGlobal {
+  initialProjects: Project[];
+  error?: string;
+}
+
+export default function AdminProjects({
+  initialProjects,
+  error,
+}: AdminProjectsPageProps) {
   const router = useRouter();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  // Refresh projects when returning from form pages
-  useEffect(() => {
-    const handleFocus = () => {
-      fetchProjects();
-    };
-
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/admin/projects');
-      if (response.ok) {
-        const data = await response.json();
-        setProjects(data);
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleCreateProject = () => {
     router.push('/admin/projects/create');
@@ -63,24 +40,6 @@ export default function AdminProjects() {
 
   const handleUpdateProject = (project: Project) => {
     router.push(`/admin/projects/${project.id}/edit`);
-  };
-
-  const handleDeleteProject = async (id: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa dự án này?')) return;
-
-    try {
-      const response = await fetch(`/api/admin/projects/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        await fetchProjects();
-      } else {
-        console.error('Failed to delete project');
-      }
-    } catch (error) {
-      console.error('Error deleting project:', error);
-    }
   };
 
   const handleEditProject = (project: Project) => {
@@ -108,12 +67,12 @@ export default function AdminProjects() {
     );
   };
 
-  if (isLoading) {
+  if (error) {
     return (
       <div className="mt-[65px] flex min-h-screen items-center justify-center bg-gray-50 max-md:mt-[60px]">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Đang tải...</p>
+          <h1 className="mb-4 text-3xl font-bold text-gray-900">Lỗi</h1>
+          <p className="text-gray-600">{error}</p>
         </div>
       </div>
     );
@@ -121,7 +80,7 @@ export default function AdminProjects() {
 
   return (
     <div className="mt-[65px] min-h-screen bg-gray-50 max-md:mt-[60px]">
-      <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+      <div className="content-wrapper">
         {/* Header */}
         <div className="px-4 py-6 sm:px-0">
           <div className="flex items-center justify-between">
@@ -129,9 +88,9 @@ export default function AdminProjects() {
               <h1 className="text-3xl font-bold text-gray-900">
                 Quản lý Dự án
               </h1>
-              <p className="mt-2 text-sm text-gray-600">
+              {/* <p className="mt-2 text-sm text-gray-600">
                 Tạo, chỉnh sửa và quản lý các dự án của bạn
-              </p>
+              </p> */}
             </div>
             <button
               onClick={handleCreateProject}
@@ -144,9 +103,9 @@ export default function AdminProjects() {
         </div>
 
         {/* Projects List */}
-        <div className="px-4 sm:px-0">
+        <div className="px-4 pb-6 sm:px-0">
           <div className="overflow-hidden bg-white shadow sm:rounded-md">
-            {projects.length === 0 ? (
+            {initialProjects.length === 0 ? (
               <div className="py-12 text-center">
                 <div className="mx-auto h-12 w-12 text-gray-400">
                   <PlusIcon className="h-12 w-12" />
@@ -169,16 +128,18 @@ export default function AdminProjects() {
               </div>
             ) : (
               <ul className="divide-y divide-gray-200">
-                {projects.map((project) => (
+                {initialProjects.map((project) => (
                   <li key={project.id}>
                     <div className="px-4 py-4 sm:px-6">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-16">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
                             {project.thumbnail ? (
                               <div className="h-10 w-10 overflow-hidden rounded-full">
                                 <Image
-                                  src={project.thumbnail.url}
+                                  src={
+                                    getStrapiMediaUrl(project.thumbnail) || ''
+                                  }
                                   alt={project.title}
                                   width={40}
                                   height={40}
@@ -204,14 +165,14 @@ export default function AdminProjects() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-500">
+                            <p className="line-clamp-2 text-sm text-gray-500">
                               {project.description}
                             </p>
                             <div className="mt-1 flex items-center space-x-4">
                               <span className="text-xs text-gray-400">
                                 /{project.slug}
                               </span>
-                              {getStatusBadge(project.status)}
+                              {/* {getStatusBadge(project.status)} */}
                             </div>
                           </div>
                         </div>
@@ -225,20 +186,13 @@ export default function AdminProjects() {
                           >
                             <EyeIcon className="h-5 w-5" />
                           </button>
-                          <button
+                          {/* <button
                             onClick={() => handleEditProject(project)}
                             className="text-gray-400 hover:text-gray-600"
                             title="Chỉnh sửa"
                           >
                             <PencilIcon className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProject(project.id)}
-                            className="text-red-400 hover:text-red-600"
-                            title="Xóa"
-                          >
-                            <TrashIcon className="h-5 w-5" />
-                          </button>
+                          </button> */}
                         </div>
                       </div>
                     </div>
@@ -252,3 +206,48 @@ export default function AdminProjects() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps<
+  AdminProjectsPageProps
+> = async () => {
+  return getStaticPropsWithGlobalAndData(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/projects?populate=*&sort=createdAt:desc`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const projects: Project[] = data.data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        slug: item.slug,
+        status: item.projectStatus,
+        featured: item.featured,
+        thumbnail: item.thumbnail,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      }));
+
+      return {
+        initialProjects: projects,
+      };
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      return {
+        initialProjects: [],
+        error: 'Không thể tải danh sách dự án. Vui lòng thử lại sau.',
+      };
+    }
+  });
+};

@@ -4,28 +4,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
   try {
-    // Get JWT token from environment variable or request headers
-    const envToken = process.env.STRAPI_API_TOKEN;
-    const authHeader = req.headers.authorization;
-    const headerToken = authHeader?.startsWith('Bearer ')
-      ? authHeader.slice(7)
-      : null;
-
-    const token = envToken || headerToken;
-
-    if (!token) {
-      return res.status(401).json({
-        error: 'Unauthorized',
-        message:
-          'Missing or invalid authorization token. Please set STRAPI_API_TOKEN environment variable or provide Bearer token in Authorization header.',
-      });
-    }
-
     const {
       title,
       description,
@@ -94,16 +73,6 @@ export default async function handler(
       process.env.NEXT_PUBLIC_STRAPI_URL ||
       'https://joyful-basket-ea764d9c28.strapiapp.com/api';
     const strapiUrl = `${strapiBaseUrl}/projects`;
-    console.log('Making request to Strapi:', strapiUrl);
-    console.log('Request method:', 'POST');
-    console.log('Request headers:', {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token ? '***' : 'missing'}`,
-    });
-    console.log('Environment variables:', {
-      NEXT_PUBLIC_STRAPI_URL: process.env.NEXT_PUBLIC_STRAPI_URL,
-      STRAPI_API_TOKEN: process.env.STRAPI_API_TOKEN ? '***' : 'missing',
-    });
 
     // Test if Strapi API is accessible
     try {
@@ -120,10 +89,6 @@ export default async function handler(
 
     const response = await fetch(strapiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(projectData),
     });
 

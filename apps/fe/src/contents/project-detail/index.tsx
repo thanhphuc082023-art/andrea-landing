@@ -3,25 +3,20 @@ import ProjectHero from './ProjectHero';
 import ProjectShowcase from './ProjectShowcase';
 import ContactForm from '@/contents/index/ContactForm';
 import NextProjects from '@/contents/project-detail/NextProjects';
+import { ProjectData } from '@/types/project';
 
 interface ProjectDetailContentsProps {
-  heroData?: any;
-  project?: any;
-  showcaseData?: any[];
+  project?: ProjectData | null;
 }
 
-function ProjectDetailContents({
-  heroData = null,
-  project = null,
-  showcaseData,
-}: ProjectDetailContentsProps) {
+function ProjectDetailContents({ project = null }: ProjectDetailContentsProps) {
   return (
     <>
       {/* Hero Section */}
-      <ProjectHero heroData={heroData} project={project} />
+      <ProjectHero project={project} />
 
       {/* Project Showcase */}
-      <ProjectShowcase project={project} showcaseData={showcaseData} />
+      <ProjectShowcase project={project} />
 
       {/* Project Credits */}
       <ProjectCredits project={project} />

@@ -3,27 +3,15 @@ import { useRouter } from 'next/router';
 import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { type ProjectFormData } from '@/lib/validations/project';
-import { createProject } from '@/utils/projectUtils';
 import ProjectPreviewContent from '@/components/admin/ProjectPreviewContent';
-import {
-  useSessionCleanup,
-  sessionCleanupConfigs,
-} from '@/hooks/useSessionCleanup';
 
 export default function ProjectPreviewPage() {
-  // Session cleanup on unmount - disable auto cleanup to preserve data for preview
-  const { cleanup } = useSessionCleanup({
-    ...sessionCleanupConfigs.projectForm,
-    disableAutoCleanup: true,
-  });
-
   const router = useRouter();
   const [formData, setFormData] = useState<Partial<ProjectFormData> | null>(
     null
   );
   const [showcaseSections, setShowcaseSections] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     // Lấy data từ sessionStorage hoặc localStorage
@@ -53,29 +41,6 @@ export default function ProjectPreviewPage() {
     setIsLoading(false);
   }, []);
 
-  // Clear sessionStorage when leaving preview page (but not when going back to form or reload)
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      // Don't clear if going back to form or staying in admin area
-      if (
-        !url.includes('/admin/projects/create') &&
-        !url.includes('/admin/projects/') &&
-        !url.includes('/edit')
-      ) {
-        // Use the cleanup function from the hook
-        cleanup();
-      }
-    };
-
-    // Listen for route changes
-    router.events.on('routeChangeStart', handleRouteChange);
-
-    // Cleanup listeners
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChange);
-    };
-  }, [router, cleanup]);
-
   const handleBackToForm = () => {
     // Quay lại trang create hoặc edit
     const isEdit = router.query.mode === 'edit';
@@ -85,32 +50,6 @@ export default function ProjectPreviewPage() {
       router.push(`/admin/projects/${projectId}/edit`);
     } else {
       router.push('/admin/projects/create');
-    }
-  };
-
-  const handleCreateProject = async () => {
-    setIsCreating(true);
-    // Lấy data từ sessionStorage và submit
-    const savedFormData = sessionStorage.getItem('projectFormData');
-    if (savedFormData) {
-      try {
-        const formData = JSON.parse(savedFormData);
-
-        // Create project using utility function
-        await createProject(formData);
-
-        // Clear sessionStorage using cleanup function
-        cleanup();
-
-        // Navigate to projects list
-        router.push('/admin/projects');
-      } catch (error) {
-        console.error('Error creating project:', error);
-      } finally {
-        setIsCreating(false);
-      }
-    } else {
-      setIsCreating(false);
     }
   };
 
@@ -174,27 +113,6 @@ export default function ProjectPreviewPage() {
                 <h1 className="text-xl font-semibold text-gray-900">
                   Preview Dự án
                 </h1>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center space-x-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleBackToForm();
-                  }}
-                  className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  Chỉnh sửa
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCreateProject}
-                  disabled={isCreating}
-                  className="inline-flex items-center rounded-md border border-transparent bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:from-green-500 hover:to-emerald-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isCreating ? 'Đang tạo...' : 'Tạo dự án'}
-                </button>
               </div>
             </div>
           </div>

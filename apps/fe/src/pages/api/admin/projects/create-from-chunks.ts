@@ -1,27 +1,311 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { upload } from '@/utils/strapi-upload';
 import fs from 'fs';
 import path from 'path';
-import {
-  createFileFromBuffer,
-  getSystemErrorMessage,
-  getValidationErrorMessage,
-} from '@/utils/helper';
 
 const UPLOAD_DIR = '/tmp/uploads';
 
-// Helper function to cleanup temporary files
-export const cleanupFiles = (filePaths: string[]) => {
-  filePaths.forEach((filePath) => {
-    if (filePath && fs.existsSync(filePath)) {
-      try {
-        fs.unlinkSync(filePath);
-      } catch (error) {
-        console.warn('Failed to cleanup file:', filePath, error);
+// Ensure upload directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+interface MediaUploadResult {
+  id: number;
+  url: string;
+  name: string;
+  mime: string;
+  width?: number;
+  height?: number;
+}
+
+/**
+ * Upload a file to Strapi using the upload API
+ */
+async function uploadToStrapi(
+  filePath: string,
+  originalName: string,
+  token: string,
+  category: string = 'general'
+): Promise<MediaUploadResult | null> {
+  try {
+    if (!fs.existsSync(filePath)) {
+      console.error(`File not found: ${filePath}`);
+      return null;
+    }
+
+    const fileBuffer = fs.readFileSync(filePath);
+    const stats = fs.statSync(filePath);
+
+    // Determine proper MIME type and extension
+    const ext = path.extname(originalName).toLowerCase();
+    const mimeType = getMimeTypeFromExtension(ext);
+
+    const formData = new FormData();
+    const blob = new Blob([fileBuffer], { type: mimeType });
+
+    formData.append('files', blob, originalName);
+    formData.append('path', category);
+
+    const strapiBaseUrl =
+      process.env.NEXT_PUBLIC_STRAPI_URL ||
+      'https://tremendous-delight-4e1d7b6669.strapiapp.com';
+    const uploadUrl = `${strapiBaseUrl}/api/upload`;
+
+    const response = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `Upload failed for ${originalName}:`,
+        response.status,
+        errorText
+      );
+      return null;
+    }
+
+    const result = await response.json();
+
+    if (result && result.length > 0) {
+      const uploadedFile = result[0];
+
+      return {
+        id: uploadedFile.id,
+        url: uploadedFile.url,
+        name: uploadedFile.name,
+        mime: uploadedFile.mime,
+        width: uploadedFile.width,
+        height: uploadedFile.height,
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`Error uploading ${originalName}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Get MIME type from file extension
+ */
+function getMimeTypeFromExtension(ext: string): string {
+  const mimeTypes: Record<string, string> = {
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.mp4': 'video/mp4',
+    '.mov': 'video/quicktime',
+    '.avi': 'video/x-msvideo',
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword',
+    '.docx':
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  };
+
+  return mimeTypes[ext] || 'application/octet-stream';
+}
+
+/**
+ * Find uploaded file by upload ID
+ */
+function findUploadedFile(
+  uploadId: string
+): { filePath: string; originalName: string } | null {
+  try {
+    const completePath = path.join(UPLOAD_DIR, `${uploadId}-complete`);
+
+    // Check all possible extensions
+    const possibleExtensions = [
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
+      '.webp',
+      '.mp4',
+      '.mov',
+      '.avi',
+      '.pdf',
+      '.doc',
+      '.docx',
+    ];
+
+    for (const ext of possibleExtensions) {
+      const testPath = `${completePath}${ext}`;
+      if (fs.existsSync(testPath)) {
+        // Try to find original name from metadata file
+        const metaPath = path.join(UPLOAD_DIR, `${uploadId}-meta.json`);
+        let originalName = `file${ext}`;
+
+        if (fs.existsSync(metaPath)) {
+          try {
+            const meta = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+            originalName = meta.originalName || originalName;
+          } catch (e) {
+            console.warn(`Could not read metadata for ${uploadId}`);
+          }
+        }
+
+        return { filePath: testPath, originalName };
       }
     }
+
+    console.error(`Upload file not found for ID: ${uploadId}`);
+    return null;
+  } catch (error) {
+    console.error(`Error finding uploaded file ${uploadId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Process showcase sections and upload media files
+ */
+async function processShowcaseSections(
+  showcaseSections: any[],
+  showcaseUploadIds: string[],
+  showcaseOriginalNames: string[],
+  token: string
+): Promise<any[]> {
+  const uploadedFiles: Array<{ id: number; url: string }> = [];
+
+  for (let i = 0; i < showcaseUploadIds.length; i++) {
+    const uploadId = showcaseUploadIds[i];
+    const originalName = showcaseOriginalNames[i] || `showcase-${i}`;
+
+    const fileInfo = findUploadedFile(uploadId);
+    if (fileInfo) {
+      const uploadResult = await uploadToStrapi(
+        fileInfo.filePath,
+        originalName,
+        token,
+        'showcase'
+      );
+      if (uploadResult) {
+        uploadedFiles.push({ id: uploadResult.id, url: uploadResult.url });
+      }
+    }
+  }
+
+  // Map uploaded files to showcase items
+  let fileIndex = 0;
+  const processedSections = showcaseSections.map((section, sectionIndex) => {
+    if (!section.items || section.items.length === 0) {
+      return section;
+    }
+
+    const processedItems = section.items.map((item: any, itemIndex: number) => {
+      // Check if this item needs an uploaded file
+      if (fileIndex < uploadedFiles.length) {
+        const uploadedFile = uploadedFiles[fileIndex];
+        fileIndex++;
+
+        return {
+          ...item,
+          id: item.id || `item-${sectionIndex}-${itemIndex}`,
+          src: uploadedFile.url,
+          type: item.type || 'image',
+          title: item.title || `Item ${itemIndex + 1}`,
+          alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+          width: item.width || 1300,
+          height: item.height || 800,
+          order: item.order !== undefined ? item.order : itemIndex,
+        };
+      }
+
+      // Return item without file upload
+      return {
+        ...item,
+        id: item.id || `item-${sectionIndex}-${itemIndex}`,
+        type: item.type || 'image',
+        title: item.title || `Item ${itemIndex + 1}`,
+        alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+        width: item.width || 1300,
+        height: item.height || 800,
+        order: item.order !== undefined ? item.order : itemIndex,
+      };
+    });
+
+    return {
+      ...section,
+      id: section.id || `section-${sectionIndex}`,
+      title: section.title || `Section ${sectionIndex + 1}`,
+      type: section.type || 'image',
+      layout: section.layout || 'single',
+      items: processedItems,
+      order: section.order !== undefined ? section.order : sectionIndex,
+    };
   });
-};
+
+  console.log(
+    `Processed showcase sections: ${processedSections.length} sections, ${uploadedFiles.length} files uploaded`
+  );
+  return processedSections;
+}
+
+/**
+ * Create project in Strapi
+ */
+async function createProjectInStrapi(projectData: any, token: string) {
+  const strapiBaseUrl =
+    process.env.NEXT_PUBLIC_STRAPI_URL ||
+    'https://tremendous-delight-4e1d7b6669.strapiapp.com';
+  const projectUrl = `${strapiBaseUrl}/api/projects`;
+
+  const response = await fetch(projectUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(projectData),
+  });
+
+  if (!response.ok) {
+    let errorData;
+    try {
+      errorData = await response.json();
+      console.error(
+        'Strapi API error details:',
+        JSON.stringify(errorData, null, 2)
+      );
+
+      if (errorData.error?.details?.errors) {
+        console.error('Validation errors:');
+        errorData.error.details.errors.forEach((err: any) => {
+          console.error(`- ${err.path?.join('.')}: ${err.message}`);
+        });
+      }
+    } catch (parseError) {
+      const responseText = await response.text();
+      console.error(
+        'Strapi API error (non-JSON):',
+        response.status,
+        response.statusText
+      );
+      console.error('Response text:', responseText);
+      throw new Error(
+        `Strapi API error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    throw new Error(
+      errorData?.error?.message || `Strapi API error: ${response.status}`
+    );
+  }
+
+  const result = await response.json();
+
+  return result;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,476 +316,197 @@ export default async function handler(
   }
 
   try {
-    // Get JWT token from environment variable or request headers
-    const envToken = process.env.STRAPI_API_TOKEN;
-    const authHeader = req.headers.authorization;
-    const headerToken = authHeader?.startsWith('Bearer ')
-      ? authHeader.slice(7)
-      : null;
-
-    const token = envToken || headerToken;
-
+    // Get authentication token
+    const token =
+      process.env.STRAPI_API_TOKEN ||
+      req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
       return res.status(401).json({
         error: 'Unauthorized',
-        message:
-          'Missing or invalid authorization token. Please set STRAPI_API_TOKEN environment variable or provide Bearer token in Authorization header.',
+        message: 'Missing authentication token',
       });
     }
 
-    const {
-      title,
-      description,
-      content,
-      slug,
-      technologies,
-      featured,
-      status,
-      overview,
-      challenge,
-      solution,
-      categoryId,
-      results,
-      metrics,
-      seo,
-      projectIntroTitle,
-      projectMetaInfo,
-      credits,
-      showcase,
-      // Media upload IDs
-      heroVideoUploadId,
-      thumbnailUploadId,
-      featuredImageUploadId,
-      galleryUploadIds,
-      showcaseUploadIds,
-      // Original file names
-      originalHeroVideoName,
-      originalThumbnailName,
-      originalFeaturedImageName,
-      originalGalleryNames,
-    } = req.body;
-
-    // Debug: Log showcase data
-    console.log('Showcase data received:', showcase);
-    console.log('Showcase upload IDs received:', showcaseUploadIds);
+    const requestData = req.body;
 
     // Validate required fields
-    if (!title || !description || !projectIntroTitle) {
+    const requiredFields = ['title', 'description', 'projectIntroTitle'];
+    const missingFields = requiredFields.filter((field) => !requestData[field]);
+
+    if (missingFields.length > 0) {
       return res.status(400).json({
         error: 'Missing required fields',
-        message: 'Title, description, and projectIntroTitle are required',
+        message: `Missing: ${missingFields.join(', ')}`,
       });
     }
 
-    // Upload media files to Strapi
-    let heroVideoFileId = null;
-    let thumbnailFileId = null;
-    let featuredImageFileId = null;
-    const galleryFileIds: number[] = [];
+    // Process media uploads
+    const mediaResults: any = {};
 
-    // Upload hero video if provided
-    if (heroVideoUploadId) {
-      const heroVideoPath = path.join(
-        UPLOAD_DIR,
-        `${heroVideoUploadId}-complete.pdf`
-      );
-      if (fs.existsSync(heroVideoPath)) {
-        try {
-          const heroVideoBuffer = fs.readFileSync(heroVideoPath);
-          const heroVideoFileObj = createFileFromBuffer(
-            heroVideoBuffer,
-            originalHeroVideoName || 'hero-video.mp4',
-            'video/mp4'
-          );
-
-          const heroVideoUploadResponse = await upload(
-            heroVideoFileObj,
-            'videos',
-            token
-          );
-          if (heroVideoUploadResponse?.[0]?.id) {
-            heroVideoFileId = heroVideoUploadResponse[0].id;
-          }
-          // Clean up file
-          fs.unlinkSync(heroVideoPath);
-        } catch (error) {
-          console.error('Error uploading hero video:', error);
-        }
-      }
-    }
-
-    // Upload thumbnail if provided
-    if (thumbnailUploadId) {
-      const thumbnailPath = path.join(
-        UPLOAD_DIR,
-        `${thumbnailUploadId}-complete.pdf`
-      );
-      if (fs.existsSync(thumbnailPath)) {
-        try {
-          const thumbnailBuffer = fs.readFileSync(thumbnailPath);
-          const thumbnailFileObj = createFileFromBuffer(
-            thumbnailBuffer,
-            originalThumbnailName || 'thumbnail.jpg',
-            'image/jpeg'
-          );
-
-          const thumbnailUploadResponse = await upload(
-            thumbnailFileObj,
-            'thumbnails',
-            token
-          );
-          if (thumbnailUploadResponse?.[0]?.id) {
-            thumbnailFileId = thumbnailUploadResponse[0].id;
-          }
-          // Clean up file
-          fs.unlinkSync(thumbnailPath);
-        } catch (error) {
-          console.error('Error uploading thumbnail:', error);
-        }
-      }
-    }
-
-    // Upload featured image if provided
-    if (featuredImageUploadId) {
-      const featuredImagePath = path.join(
-        UPLOAD_DIR,
-        `${featuredImageUploadId}-complete.pdf`
-      );
-      if (fs.existsSync(featuredImagePath)) {
-        try {
-          const featuredImageBuffer = fs.readFileSync(featuredImagePath);
-          const featuredImageFileObj = createFileFromBuffer(
-            featuredImageBuffer,
-            originalFeaturedImageName || 'featured-image.jpg',
-            'image/jpeg'
-          );
-
-          const featuredImageUploadResponse = await upload(
-            featuredImageFileObj,
-            'images',
-            token
-          );
-          if (featuredImageUploadResponse?.[0]?.id) {
-            featuredImageFileId = featuredImageUploadResponse[0].id;
-          }
-          // Clean up file
-          fs.unlinkSync(featuredImagePath);
-        } catch (error) {
-          console.error('Error uploading featured image:', error);
-        }
-      }
-    }
-
-    // Upload gallery images if provided
-    if (galleryUploadIds && galleryUploadIds.length > 0) {
-      for (let i = 0; i < galleryUploadIds.length; i++) {
-        const galleryPath = path.join(
-          UPLOAD_DIR,
-          `${galleryUploadIds[i]}-complete.pdf`
+    // Upload hero video
+    if (requestData.heroVideoUploadId) {
+      const fileInfo = findUploadedFile(requestData.heroVideoUploadId);
+      if (fileInfo) {
+        const result = await uploadToStrapi(
+          fileInfo.filePath,
+          requestData.originalHeroVideoName || 'hero-video.mp4',
+          token,
+          'videos'
         );
-        if (fs.existsSync(galleryPath)) {
-          try {
-            const galleryBuffer = fs.readFileSync(galleryPath);
-            const galleryFileObj = createFileFromBuffer(
-              galleryBuffer,
-              originalGalleryNames?.[i] || `gallery-${i}.jpg`,
-              'image/jpeg'
-            );
+        if (result) mediaResults.heroVideo = result.id;
+      }
+    }
 
-            const galleryUploadResponse = await upload(
-              galleryFileObj,
-              'gallery',
-              token
-            );
-            if (galleryUploadResponse?.[0]?.id) {
-              galleryFileIds.push(galleryUploadResponse[0].id);
-            }
-            // Clean up file
-            fs.unlinkSync(galleryPath);
-          } catch (error) {
-            console.error('Error uploading gallery image:', error);
-          }
+    // Upload thumbnail
+    if (requestData.thumbnailUploadId) {
+      const fileInfo = findUploadedFile(requestData.thumbnailUploadId);
+      if (fileInfo) {
+        const result = await uploadToStrapi(
+          fileInfo.filePath,
+          requestData.originalThumbnailName || 'thumbnail.jpg',
+          token,
+          'thumbnails'
+        );
+        if (result) mediaResults.thumbnail = result.id;
+      }
+    }
+
+    // Upload featured image
+    if (requestData.featuredImageUploadId) {
+      const fileInfo = findUploadedFile(requestData.featuredImageUploadId);
+      if (fileInfo) {
+        const result = await uploadToStrapi(
+          fileInfo.filePath,
+          requestData.originalFeaturedImageName || 'featured-image.jpg',
+          token,
+          'images'
+        );
+        if (result) mediaResults.featuredImage = result.id;
+      }
+    }
+
+    // Upload gallery images
+    const galleryIds: number[] = [];
+    if (
+      requestData.galleryUploadIds &&
+      Array.isArray(requestData.galleryUploadIds)
+    ) {
+      for (let i = 0; i < requestData.galleryUploadIds.length; i++) {
+        const uploadId = requestData.galleryUploadIds[i];
+        const originalName =
+          requestData.originalGalleryNames?.[i] || `gallery-${i}.jpg`;
+
+        const fileInfo = findUploadedFile(uploadId);
+        if (fileInfo) {
+          const result = await uploadToStrapi(
+            fileInfo.filePath,
+            originalName,
+            token,
+            'gallery'
+          );
+          if (result) galleryIds.push(result.id);
         }
       }
     }
 
-    // Process showcase sections and upload their media files
-    let processedShowcaseSections = showcase || [];
-    if (showcase && showcase.length > 0) {
-      console.log(
-        'Processing showcase sections:',
-        showcase.map((s) => ({ id: s.id, layout: s.layout, title: s.title }))
-      );
+    // Process showcase sections
+    const processedShowcase = await processShowcaseSections(
+      requestData.showcase || [],
+      requestData.showcaseUploadIds || [],
+      requestData.showcaseOriginalNames || [],
+      token
+    );
 
-      processedShowcaseSections = await Promise.all(
-        showcase.map(async (section: any, sectionIndex: number) => {
-          console.log(`Processing section ${sectionIndex}:`, {
-            id: section.id,
-            layout: section.layout,
-            title: section.title,
-          });
-
-          if (section.items && section.items.length > 0) {
-            const processedItems = await Promise.all(
-              section.items.map(async (item: any, itemIndex: number) => {
-                // If item has a file object (from form), upload it
-                if (
-                  item.file &&
-                  typeof item.file === 'object' &&
-                  'name' in item.file
-                ) {
-                  try {
-                    // For now, skip file upload in showcase items
-                    // This will be handled by the frontend before submission
-                    console.log(
-                      'Showcase item with file detected:',
-                      item.file.name
-                    );
-                    return item;
-                  } catch (error) {
-                    console.error('Error processing showcase item:', error);
-                  }
-                }
-
-                // If item has a blob URL, convert it to a proper URL
-                if (item.src && item.src.startsWith('blob:')) {
-                  // For blob URLs, we need to handle them differently
-                  // For now, keep the original src but log a warning
-                  console.warn('Blob URL detected in showcase item:', item.src);
-                }
-
-                return item;
-              })
-            );
-
-            const processedSection = {
-              ...section,
-              items: processedItems,
-            };
-            console.log(`Processed section ${sectionIndex}:`, {
-              id: processedSection.id,
-              layout: processedSection.layout,
-              title: processedSection.title,
-            });
-            return processedSection;
-          }
-
-          return section;
-        })
-      );
-    }
-
-    // Process showcase upload IDs if provided
-    if (showcaseUploadIds && showcaseUploadIds.length > 0) {
-      console.log('Processing showcase upload IDs:', showcaseUploadIds);
-      let showcaseIndex = 0;
-      processedShowcaseSections = await Promise.all(
-        processedShowcaseSections.map(
-          async (section: any, sectionIndex: number) => {
-            console.log(`Processing upload IDs for section ${sectionIndex}:`, {
-              id: section.id,
-              layout: section.layout,
-            });
-
-            if (section.items && section.items.length > 0) {
-              const processedItems = await Promise.all(
-                section.items.map(async (item: any, itemIndex: number) => {
-                  // If this item should have an uploaded file
-                  if (showcaseIndex < showcaseUploadIds.length) {
-                    const uploadId = showcaseUploadIds[showcaseIndex];
-
-                    // Try different file extensions
-                    const possibleExtensions = [
-                      '.pdf',
-                      '.jpg',
-                      '.jpeg',
-                      '.png',
-                      '.gif',
-                      '.mp4',
-                      '.mov',
-                      '.avi',
-                    ];
-                    let showcasePath: string | null = null;
-                    let fileExtension: string | null = null;
-
-                    for (const ext of possibleExtensions) {
-                      const testPath = path.join(
-                        UPLOAD_DIR,
-                        `${uploadId}-complete${ext}`
-                      );
-                      if (fs.existsSync(testPath)) {
-                        showcasePath = testPath;
-                        fileExtension = ext;
-                        break;
-                      }
-                    }
-
-                    if (showcasePath) {
-                      try {
-                        const showcaseBuffer = fs.readFileSync(showcasePath);
-
-                        // Determine MIME type based on extension
-                        let mimeType = 'application/octet-stream';
-                        if (
-                          fileExtension === '.jpg' ||
-                          fileExtension === '.jpeg'
-                        ) {
-                          mimeType = 'image/jpeg';
-                        } else if (fileExtension === '.png') {
-                          mimeType = 'image/png';
-                        } else if (fileExtension === '.gif') {
-                          mimeType = 'image/gif';
-                        } else if (fileExtension === '.mp4') {
-                          mimeType = 'video/mp4';
-                        } else if (fileExtension === '.mov') {
-                          mimeType = 'video/quicktime';
-                        } else if (fileExtension === '.avi') {
-                          mimeType = 'video/x-msvideo';
-                        } else if (fileExtension === '.pdf') {
-                          mimeType = 'application/pdf';
-                        }
-
-                        const showcaseFileObj = createFileFromBuffer(
-                          showcaseBuffer,
-                          `showcase-${showcaseIndex}${fileExtension}`,
-                          mimeType
-                        );
-
-                        const showcaseUploadResponse = await upload(
-                          showcaseFileObj,
-                          'showcase',
-                          token
-                        );
-
-                        // Clean up file
-                        fs.unlinkSync(showcasePath);
-
-                        if (showcaseUploadResponse?.[0]?.id) {
-                          showcaseIndex++;
-                          return {
-                            ...item,
-                            src: showcaseUploadResponse[0].url, // Replace with uploaded URL
-                            file: undefined, // Remove file object
-                          };
-                        }
-                      } catch (error) {
-                        console.error('Error uploading showcase item:', error);
-                      }
-                    } else {
-                      console.warn(`No file found for uploadId: ${uploadId}`);
-                    }
-                  }
-
-                  return item;
-                })
-              );
-
-              const processedSection = {
-                ...section,
-                items: processedItems,
-              };
-              console.log(`Final processed section ${sectionIndex}:`, {
-                id: processedSection.id,
-                layout: processedSection.layout,
-                title: processedSection.title,
-              });
-              return processedSection;
-            }
-
-            return section;
-          }
-        )
-      );
-    }
-
-    // Create project data for Strapi
+    // Build final project data for Strapi
     const projectData = {
       data: {
-        title,
-        description,
-        content: content || '',
-        slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
-        technologies: technologies || [],
-        featured: featured || false,
-        status: status || 'draft',
-        overview: overview || '',
-        challenge: challenge || '',
-        solution: solution || '',
-        categoryId: categoryId || null,
-        results: results || [],
-        metrics: metrics || [],
-        seo: seo || {},
-        projectIntroTitle,
-        projectMetaInfo: projectMetaInfo || [],
-        credits: credits || {},
-        showcaseSections: processedShowcaseSections,
-        publishedAt: status === 'completed' ? new Date().toISOString() : null,
-        // Add media file IDs
-        ...(heroVideoFileId ? { heroVideo: heroVideoFileId } : {}),
-        ...(thumbnailFileId ? { thumbnail: thumbnailFileId } : {}),
-        ...(featuredImageFileId ? { featuredImage: featuredImageFileId } : {}),
-        ...(galleryFileIds.length > 0 ? { gallery: galleryFileIds } : {}),
+        // Core required fields
+        title: requestData.title,
+        slug:
+          requestData.slug ||
+          requestData.title.toLowerCase().replace(/\s+/g, '-'),
+        description: requestData.description,
+        projectIntroTitle: requestData.projectIntroTitle,
+
+        // Optional content fields
+        content: requestData.content || '',
+        overview: requestData.overview || '',
+        challenge: requestData.challenge || '',
+        solution: requestData.solution || '',
+
+        // Metadata
+        projectStatus: requestData.status || 'draft',
+        featured: requestData.featured || false,
+        technologies: requestData.technologies || [],
+        projectMetaInfo: requestData.projectMetaInfo || [],
+
+        // Additional data
+        results: requestData.results || [],
+        metrics: requestData.metrics || [],
+        credits: requestData.credits || {},
+        seo: requestData.seo || {},
+
+        // Processed showcase sections
+        showcaseSections: processedShowcase,
+
+        // Media file IDs
+        ...(mediaResults.heroVideo && { heroVideo: mediaResults.heroVideo }),
+        ...(mediaResults.thumbnail && { thumbnail: mediaResults.thumbnail }),
+        ...(mediaResults.featuredImage && {
+          featuredImage: mediaResults.featuredImage,
+        }),
+        ...(galleryIds.length > 0 && { gallery: galleryIds }),
+
+        // Category
+        ...(requestData.categoryId && { category: requestData.categoryId }),
+
+        // Auto-publish completed projects
+        publishedAt:
+          requestData.status === 'completed' ? new Date().toISOString() : null,
       },
     };
 
-    // Debug: Log final showcase data
-    console.log(
-      'Final showcase sections to be sent to Strapi:',
-      processedShowcaseSections.map((s) => ({
-        id: s.id,
-        layout: s.layout,
-        title: s.title,
-        itemsCount: s.items?.length,
-      }))
-    );
-
     // Create project in Strapi
-    const strapiBaseUrl =
-      process.env.NEXT_PUBLIC_STRAPI_URL ||
-      'https://joyful-basket-ea764d9c28.strapiapp.com/api';
-    const strapiUrl = `${strapiBaseUrl}/projects`;
+    const result = await createProjectInStrapi(projectData, token);
 
-    console.log('Making request to Strapi:', strapiUrl);
-    console.log('Request method:', 'POST');
-    console.log('Request headers:', {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token ? '***' : 'missing'}`,
-    });
+    // Clean up uploaded files
+    try {
+      const uploadIds = [
+        requestData.heroVideoUploadId,
+        requestData.thumbnailUploadId,
+        requestData.featuredImageUploadId,
+        ...(requestData.galleryUploadIds || []),
+        ...(requestData.showcaseUploadIds || []),
+      ].filter(Boolean);
 
-    const response = await fetch(strapiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(projectData),
-    });
+      uploadIds.forEach((uploadId: string) => {
+        const patterns = [
+          path.join(UPLOAD_DIR, `${uploadId}-complete*`),
+          path.join(UPLOAD_DIR, `${uploadId}-meta.json`),
+        ];
 
-    console.log('Strapi response status:', response.status);
-
-    if (!response.ok) {
-      let errorData;
-      try {
-        errorData = await response.json();
-        console.error('Strapi API error:', errorData);
-        throw new Error(
-          errorData.error?.message ||
-            `Strapi API error: ${response.status} ${response.statusText}`
-        );
-      } catch (parseError) {
-        // If response is not JSON (e.g., HTML error page), use status text
-        console.error(
-          'Strapi API error (non-JSON):',
-          response.status,
-          response.statusText
-        );
-        throw new Error(
-          `Strapi API error: ${response.status} ${response.statusText}`
-        );
-      }
+        patterns.forEach((pattern) => {
+          try {
+            const files = fs
+              .readdirSync(UPLOAD_DIR)
+              .filter((f) => f.startsWith(`${uploadId}-`));
+            files.forEach((file) => {
+              const fullPath = path.join(UPLOAD_DIR, file);
+              if (fs.existsSync(fullPath)) {
+                fs.unlinkSync(fullPath);
+              }
+            });
+          } catch (cleanupError) {
+            console.warn(
+              `Could not clean up files for ${uploadId}:`,
+              cleanupError
+            );
+          }
+        });
+      });
+    } catch (cleanupError) {
+      console.error('Error during cleanup:', cleanupError);
     }
-
-    const result = await response.json();
 
     return res.status(201).json({
       success: true,
@@ -509,14 +514,13 @@ export default async function handler(
       message: 'Project created successfully',
     });
   } catch (error: any) {
-    console.error('Error creating project:', error);
+    console.error('Error in project creation:', error);
 
-    // Handle network errors specifically
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+    // Handle specific error types
+    if (error.message?.includes('fetch')) {
       return res.status(500).json({
         error: 'Network error',
-        message:
-          'Unable to connect to Strapi API. Please check your network connection and Strapi URL.',
+        message: 'Unable to connect to Strapi API',
       });
     }
 
