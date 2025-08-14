@@ -15,6 +15,7 @@ interface IndexContentsProps {
   servicesData?: any;
   workflowData?: any[];
   partnersData?: any[];
+  featuredProjectsData?: any;
 }
 
 function IndexContents({
@@ -23,27 +24,28 @@ function IndexContents({
   servicesData = [],
   workflowData = [],
   partnersData = [],
+  featuredProjectsData = null,
 }: IndexContentsProps) {
   return (
     <>
       <Header heroData={heroData} />
       <BrandSection brandSectionData={brandSectionData} />
 
-      <div className="py-[75px]">
+      <div className="py-[50px]">
         <Services servicesData={servicesData} />
       </div>
 
-      <div className={clsx('pb-[75px]')}>
+      <div className={clsx('pb-[50px]')}>
         <Workflow workflowData={workflowData} />
       </div>
 
-      <div className={clsx('pb-[75px]')}>
-        <ProjectGrid />
+      <div className={clsx('pb-[50px]')}>
+        <ProjectGrid featuredProjectsData={featuredProjectsData} />
       </div>
 
       <Partners partnersData={partnersData} />
 
-      <div className={clsx('py-[75px]')}>
+      <div className={clsx('py-[50px]')}>
         <Blog />
       </div>
 

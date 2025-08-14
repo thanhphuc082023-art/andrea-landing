@@ -7,9 +7,13 @@ import { ProjectData } from '@/types/project';
 
 interface ProjectDetailContentsProps {
   project?: ProjectData | null;
+  nextProjects?: any[];
 }
 
-function ProjectDetailContents({ project = null }: ProjectDetailContentsProps) {
+function ProjectDetailContents({
+  project = null,
+  nextProjects = [],
+}: ProjectDetailContentsProps) {
   return (
     <>
       {/* Hero Section */}
@@ -23,7 +27,7 @@ function ProjectDetailContents({ project = null }: ProjectDetailContentsProps) {
 
       {/* Next Projects */}
       <div className="my-[73px] max-md:my-[60px]">
-        <NextProjects />
+        <NextProjects projects={nextProjects} />
       </div>
 
       {/* Contact Form */}

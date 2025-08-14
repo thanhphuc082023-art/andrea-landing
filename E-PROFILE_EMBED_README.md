@@ -179,8 +179,6 @@ E-Profile Embed cho phép bạn nhúng các E-Profile tương tác vào bất k�
       event.data.type === 'IFRAME_LOADED' &&
       event.data.source === 'e-profile-embed'
     ) {
-      console.log('E-Profile loaded:', event.data.data.title);
-
       if (event.data.data.status === 'success') {
         // E-Profile loaded successfully
         document.getElementById('loading').style.display = 'none';

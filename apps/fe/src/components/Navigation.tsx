@@ -74,7 +74,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[1000] w-full">
-      <div className="max-sd:h-[60px] h-[65px] w-full bg-[#F5F5F5] shadow-md">
+      <div className="max-sd:h-[60px] h-[65px] w-full bg-white shadow-md">
         <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
           <Link
@@ -101,7 +101,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                   'text-lg transition-colors duration-200',
                   isItemActive(item)
                     ? 'text-brand-orange hover:text-brand-orange-dark font-bold'
-                    : 'font-normal text-gray-700 hover:text-gray-900'
+                    : 'hover:text-brand-orange font-normal text-gray-700'
                 )}
               >
                 {item.label}
@@ -185,7 +185,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                       'hover:border-brand-orange/30 hover:translate-x-2',
                       isItemActive(item)
                         ? 'text-brand-orange translate-x-1 font-bold'
-                        : 'font-normal text-gray-700 hover:text-gray-900'
+                        : 'hover:text-brand-orange font-normal text-gray-700'
                     )}
                     onClick={() => handleMobileMenuClick(item.label)}
                   >

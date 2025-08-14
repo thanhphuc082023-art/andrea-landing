@@ -42,7 +42,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
       <div
         className={clsx(
           'relative flex h-full flex-col',
-          'p-8 max-lg:p-6 max-md:p-4'
+          'px-[25px] py-[35px] max-md:p-4'
         )}
       >
         {/* Title with Number */}
@@ -57,7 +57,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
               className={clsx(
                 'text-text-primary group-hover:text-brand-orange shrink-0 leading-normal transition-all duration-300',
                 'dark:text-white',
-                'text-[18px] font-semibold max-md:text-lg'
+                'text-[24px] font-semibold leading-[32px] max-md:text-lg'
               )}
             >
               {position}.
@@ -66,7 +66,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
               className={clsx(
                 'text-text-primary group-hover:text-brand-orange max-w-[80%] leading-normal transition-all duration-300',
                 'flex-1 dark:text-white',
-                'text-[18px] font-semibold max-md:text-lg'
+                'text-[24px] font-semibold leading-[32px] max-md:text-lg'
               )}
             >
               {title}
@@ -78,7 +78,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
             <div
               className={clsx(
                 'absolute shrink-0 opacity-100 group-hover:opacity-0',
-                'right-8 top-8 max-lg:right-6 max-lg:top-6 max-md:right-4 max-md:top-4'
+                'right-[25px] top-[35px] max-md:right-4 max-md:top-4'
               )}
             >
               <img
@@ -95,7 +95,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
             <div
               className={clsx(
                 'absolute shrink-0 opacity-0 group-hover:opacity-100',
-                'right-8 top-8 max-lg:right-6 max-lg:top-6 max-md:right-4 max-md:top-4',
+                'right-[25px] top-[35px] max-md:right-4 max-md:top-4',
                 active ? 'opacity-100' : 'opacity-0'
               )}
             >

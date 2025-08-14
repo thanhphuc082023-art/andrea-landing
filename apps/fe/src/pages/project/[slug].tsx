@@ -19,11 +19,13 @@ import {
 
 interface ProjectPageProps extends PagePropsWithGlobal {
   project: ProjectData | null;
+  nextProjects: any[];
 }
 
 function ProjectPage({
   serverGlobal = null,
   project = null,
+  nextProjects = [],
 }: ProjectPageProps) {
   const router = useRouter();
   console.log('project', project);
@@ -45,7 +47,7 @@ function ProjectPage({
           </p>
           <a
             href="/"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700"
+            className="bg-brand-orange hover:bg-brand-orange-dark inline-block rounded-lg px-6 py-3 text-white transition-colors"
           >
             Quay lại trang chủ
           </a>
@@ -67,7 +69,7 @@ function ProjectPage({
         seo={project?.seo}
         global={currentGlobal}
       />
-      <ProjectDetailContents project={project} />
+      <ProjectDetailContents project={project} nextProjects={nextProjects} />
     </>
   );
 }
@@ -145,8 +147,22 @@ export const getStaticProps: GetStaticProps<ProjectPageProps> = async ({
         `Project transformation complete. Showcase sections: ${transformedProject.showcaseSections.length}`
       );
 
+      // Fetch other projects for NextProjects section, excluding current project
+      const nextProjectsResponse = await StrapiAPI.getCollection('projects', {
+        pagination: { pageSize: 6 },
+        publicationState: 'live',
+        populate: '*',
+        sort: ['publishedAt:desc'],
+        filters: {
+          slug: { $ne: slug }, // Exclude current project by slug
+        },
+      });
+      console.log('nextProjectsResponse', nextProjectsResponse);
+      console.log(`Fetched ${nextProjectsResponse.data.length} next projects`);
+
       return {
         project: transformedProject,
+        nextProjects: nextProjectsResponse.data || [],
       };
     });
   } catch (error) {

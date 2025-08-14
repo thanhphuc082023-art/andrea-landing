@@ -43,7 +43,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
       {/* Content */}
       <div
         className={clsx(
-          'relative z-10 flex min-h-[511px] items-center py-[75px]'
+          'relative z-10 flex min-h-[511px] items-center py-[50px]'
         )}
       >
         <div className={clsx('content-wrapper')}>

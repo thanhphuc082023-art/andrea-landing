@@ -126,7 +126,7 @@ export interface Project {
 
 // Legacy project card props
 export interface ProjectCardProps {
-  project: Project;
+  project: any;
   className?: string;
 }
 

@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ProjectCardProps } from '@/types/project';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
 function RegularProjectCard({ project, className }: ProjectCardProps) {
   return (
@@ -10,11 +11,11 @@ function RegularProjectCard({ project, className }: ProjectCardProps) {
         {/* Project Image */}
         <div
           className={clsx(
-            'group-hover:border-brand-orange relative mb-4 h-[300px] w-full overflow-hidden rounded-2xl border-2 border-transparent transition-all duration-200'
+            'group-hover:border-brand-orange rounded-10 relative mb-4 h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200'
           )}
         >
           <Image
-            src={project.image}
+            src={getStrapiMediaUrl(project?.thumbnail) || ''}
             alt={project.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -33,7 +34,7 @@ function RegularProjectCard({ project, className }: ProjectCardProps) {
           </h3>
           <p
             className={clsx(
-              'text-text-secondary text-base font-normal tracking-wide'
+              'text-text-secondary line-clamp-2 text-base font-normal tracking-wide'
             )}
           >
             {project.description}

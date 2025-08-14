@@ -14,6 +14,7 @@ function HomePage({
   workflowData = [],
   partnersData = null,
   footerData = null,
+  featuredProjectsData = null,
 }: PagePropsWithGlobal) {
   const currentGlobal = serverGlobal;
   const siteName = currentGlobal?.siteName || 'ANDREA';
@@ -37,6 +38,7 @@ function HomePage({
         servicesData={servicesData}
         workflowData={workflowData}
         partnersData={partnersData}
+        featuredProjectsData={featuredProjectsData}
       />
     </>
   );

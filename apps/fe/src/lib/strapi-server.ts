@@ -190,6 +190,43 @@ export async function getFooterSettings(): Promise<FooterResponse> {
   return fetchStrapiAPI('footer', params);
 }
 
+/**
+ * Server-side function to fetch featured projects directly from Strapi
+ */
+export async function getFeaturedProjectsSettings(): Promise<
+  StrapiResponse<any>
+> {
+  const params = {
+    populate: {
+      projects: {
+        populate: {
+          projectItem: {
+            populate: {
+              project: {
+                populate: {
+                  thumbnail: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
+  const response = await fetchStrapiAPI('home-featured-project', params);
+  console.log(response.data);
+
+  if (response?.data) {
+    response.data.projects.sort(
+      (a: any, b: any) =>
+        (a?.projectItem?.position || 0) - (b?.projectItem?.position || 0)
+    );
+  }
+
+  return response;
+}
+
 // Static versions (same implementation for now)
 export const getStaticGlobalSettings = getGlobalSettings;
 export const getStaticMenuSettings = getMenuSettings;
@@ -199,3 +236,4 @@ export const getStaticServicesSettings = getServicesSettings;
 export const getStaticWorkflowSettings = getWorkflowSettings;
 export const getStaticPartnersSettings = getPartnersSettings;
 export const getStaticFooterSettings = getFooterSettings;
+export const getStaticFeaturedProjectsSettings = getFeaturedProjectsSettings;

@@ -26,7 +26,7 @@ function Header({ heroData = null }: HeaderProps) {
       {/* Content */}
       <div
         className={clsx(
-          'relative z-10 flex min-h-[509px] items-center py-[75px]'
+          'relative z-10 flex min-h-[509px] items-center py-[50px]'
         )}
       >
         <div className={clsx('content-wrapper mx-auto')}>

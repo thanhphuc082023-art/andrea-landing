@@ -11,7 +11,7 @@ function NewHeaderTitle({ title = '', subTitle = '' }: NewHeaderTitleProps) {
       <div className="max-sd:leading-[55px] max-lg:text-center max-lg:!leading-[40px]">
         <span
           className={clsx(
-            'text-brand-orange font-playfair font-normal',
+            'text-brand-orange font-playfair font-semibold',
             'max-sd:text-[60px] text-[76px] max-lg:text-[50px]'
           )}
         >

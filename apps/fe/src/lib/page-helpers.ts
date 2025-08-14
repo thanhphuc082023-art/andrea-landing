@@ -8,6 +8,7 @@ import {
   getWorkflowSettings,
   getPartnersSettings,
   getFooterSettings,
+  getFeaturedProjectsSettings,
 } from '@/lib/strapi-server';
 
 export interface PagePropsWithGlobal {
@@ -19,6 +20,7 @@ export interface PagePropsWithGlobal {
   workflowData?: any[];
   partnersData?: any;
   footerData?: any;
+  featuredProjectsData?: any;
 }
 
 export const getStaticPropsWithGlobal: GetStaticProps<
@@ -34,6 +36,7 @@ export const getStaticPropsWithGlobal: GetStaticProps<
       workflowResult,
       partnersResult,
       footerResult,
+      featuredProjectsResult,
     ] = await Promise.all([
       getGlobalSettings(),
       getMenuSettings(),
@@ -43,6 +46,7 @@ export const getStaticPropsWithGlobal: GetStaticProps<
       getWorkflowSettings(),
       getPartnersSettings(),
       getFooterSettings(),
+      getFeaturedProjectsSettings(),
     ]);
 
     return {
@@ -55,6 +59,7 @@ export const getStaticPropsWithGlobal: GetStaticProps<
         workflowData: workflowResult.data || [],
         partnersData: partnersResult.data || null,
         footerData: footerResult.data || null,
+        featuredProjectsData: featuredProjectsResult.data || null,
       },
       revalidate: 3600, // ISR 1 hour
     };
@@ -70,6 +75,7 @@ export const getStaticPropsWithGlobal: GetStaticProps<
         workflowData: [],
         partnersData: null,
         footerData: null,
+        featuredProjectsData: null,
       },
       revalidate: 3600,
     };

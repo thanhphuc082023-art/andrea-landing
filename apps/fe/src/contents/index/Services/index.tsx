@@ -74,7 +74,7 @@ function Services({ servicesData = {} }: ServicesProps) {
           <h2
             className={clsx(
               'font-playfair text-brand-orange font-medium',
-              'max-sd:text-[40px] max-370:text-[28px] text-[42px] max-lg:text-[36px] max-md:text-[35px]'
+              'max-sd:text-[40px] max-370:text-[28px] text-[50px] max-lg:text-[36px] max-md:text-[35px]'
             )}
           >
             {servicesData?.title || 'Dịch vụ'}
@@ -84,10 +84,10 @@ function Services({ servicesData = {} }: ServicesProps) {
         {/* Services Grid */}
         <div
           className={clsx(
-            'grid grid-cols-6 grid-rows-4 gap-6',
-            'max-sd:grid-cols-4 max-sd:gap-4',
-            'max-lg:grid-cols-3 max-lg:gap-4',
-            'max-md:grid-cols-1 max-md:gap-4'
+            'grid grid-cols-6 grid-rows-4 gap-[15px]',
+            'max-sd:grid-cols-4',
+            'max-lg:grid-cols-3',
+            'max-md:grid-cols-1'
           )}
         >
           {/* Render 5 items đầu với layout cố định */}

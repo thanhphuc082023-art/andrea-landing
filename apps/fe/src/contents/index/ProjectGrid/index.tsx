@@ -1,46 +1,67 @@
 import clsx from 'clsx';
 import SubmitButton from '@/components/SubmitButton';
 import { FeaturedProjectCard, RegularProjectCard } from '@/components/projects';
-import { featuredProjects, regularProjects } from '@/data/projects';
 
-function ProjectGrid() {
+interface ProjectGridProps {
+  featuredProjectsData?: {
+    title?: string;
+    projects?: any[];
+  };
+}
+
+function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
+  const featuredTitle = featuredProjectsData?.title || 'Dự án tiêu biểu';
+  const allProjects = featuredProjectsData?.projects || [];
+  const featuredProjects = allProjects.slice(0, 2).map((project, index) => ({
+    ...project?.projectItem?.project,
+    isLarge: index === 0, // First item is large
+  }));
+
+  const regularProjects = allProjects.slice(2)?.map((item) => item?.project); // Remaining items
+  console.log('allProjects', allProjects);
+  console.log('featuredProjects', featuredProjects);
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
-        {/* Featured Projects Section */}
-        <div className={clsx('mb-6')}>
-          <h2
+        {/* Featured Projects Section - Only show if we have featured projects */}
+        {featuredProjects.length > 0 && (
+          <>
+            <div className={clsx('mb-6')}>
+              <h2
+                className={clsx(
+                  'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
+                )}
+              >
+                {featuredTitle}
+              </h2>
+            </div>
+
+            {/* Featured Projects Grid */}
+            <div
+              className={clsx(
+                'mb-[50px] grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:gap-y-[60px] lg:grid-cols-12'
+              )}
+            >
+              {featuredProjects.map((project, index) => (
+                <FeaturedProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Regular Projects Grid - Show remaining projects */}
+        {regularProjects.length > 0 && (
+          <div
             className={clsx(
-              'font-playfair text-brand-orange max-sd:text-[40px] text-[42px] font-medium max-md:text-[35px]'
+              'grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:gap-y-[60px] md:grid-cols-2 lg:grid-cols-3'
             )}
           >
-            Dự án tiêu biểu
-          </h2>
-        </div>
+            {regularProjects.map((project) => (
+              <RegularProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        )}
 
-        {/* Featured Projects Grid */}
-        <div
-          className={clsx(
-            'mb-[75px] grid grid-cols-1 gap-x-5 gap-y-10 max-md:gap-y-[60px] lg:grid-cols-12'
-          )}
-        >
-          {featuredProjects.map((project) => (
-            <FeaturedProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-
-        {/* Regular Projects Grid - 3 columns, 2 rows */}
-        <div
-          className={clsx(
-            'grid grid-cols-1 gap-x-5 gap-y-10 max-md:gap-y-[60px] md:grid-cols-2 lg:grid-cols-3'
-          )}
-        >
-          {regularProjects.map((project) => (
-            <RegularProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-
-        {/* See More Button */}
         <div className={clsx('mt-9 text-center')}>
           <SubmitButton
             textColor="text-brand-orange"

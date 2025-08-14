@@ -134,7 +134,7 @@ function Blog() {
         <div className={clsx('mb-6')}>
           <h2
             className={clsx(
-              'font-playfair text-brand-orange max-sd:text-[40px] text-[42px] font-medium max-md:text-[35px]'
+              'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
             )}
           >
             Góc nhìn của Andrea

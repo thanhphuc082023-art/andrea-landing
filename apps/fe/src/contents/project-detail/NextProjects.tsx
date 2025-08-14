@@ -1,16 +1,38 @@
 import clsx from 'clsx';
 import { RegularProjectCard } from '@/components/projects';
-import { regularProjects } from '@/data/projects';
 import SubmitButton from '@/components/SubmitButton';
 
-function NextProjects() {
+interface NextProjectsProps {
+  projects?: any[];
+}
+
+function NextProjects({ projects = [] }: NextProjectsProps) {
+  if (projects.length === 0) {
+    return (
+      <section className={clsx('content-wrapper mx-auto')}>
+        <div className={clsx('mb-6')}>
+          <h2
+            className={clsx(
+              'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
+            )}
+          >
+            Dự án tiếp theo
+          </h2>
+        </div>
+        <div className="py-12 text-center">
+          <p className="text-gray-600">Không có dự án nào</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={clsx('content-wrapper mx-auto')}>
       {/* Title */}
       <div className={clsx('mb-6')}>
         <h2
           className={clsx(
-            'font-playfair text-brand-orange max-sd:text-[40px] text-[42px] font-medium max-md:text-[35px]'
+            'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
           )}
         >
           Dự án tiếp theo
@@ -23,7 +45,7 @@ function NextProjects() {
           'grid grid-cols-1 gap-x-5 gap-y-10 max-md:gap-y-[60px] md:grid-cols-2 lg:grid-cols-3'
         )}
       >
-        {regularProjects.map((project) => (
+        {projects.map((project) => (
           <RegularProjectCard key={project.id} project={project} />
         ))}
       </div>

@@ -57,20 +57,6 @@ export default async function handler(
     // Transform the response to include full URLs for images
     const transformedData = response.data.map((project) => ({
       ...project,
-      attributes: {
-        ...project.attributes,
-        images: project.attributes.images?.data
-          ? {
-              data: project.attributes.images.data.map((image) => ({
-                ...image,
-                attributes: {
-                  ...image,
-                  url: StrapiAPI.getMediaUrl(image.url),
-                },
-              })),
-            }
-          : null,
-      },
     }));
 
     return res.status(200).json({

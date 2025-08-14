@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ProjectCardProps } from '@/types/project';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
 function FeaturedProjectCard({ project, className }: ProjectCardProps) {
   if (project.isLarge) {
@@ -12,11 +13,11 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
             {/* Main Image */}
             <div
               className={clsx(
-                'group-hover:border-brand-orange relative h-[400px] w-full overflow-hidden rounded-2xl border-2 border-transparent transition-all duration-200 lg:h-[600px]'
+                'group-hover:border-brand-orange rounded-10 relative h-[400px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 lg:h-[600px]'
               )}
             >
               <Image
-                src={project.image}
+                src={getStrapiMediaUrl(project?.thumbnail) || ''}
                 alt={project.title}
                 fill
                 className="object-cover"
@@ -37,7 +38,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
               </h3>
               <p
                 className={clsx(
-                  'text-text-secondary text-base font-normal tracking-wide'
+                  'text-text-secondary line-clamp-2 text-base font-normal tracking-wide'
                 )}
               >
                 {project.description}
@@ -81,7 +82,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
             </h3>
             <p
               className={clsx(
-                'text-text-secondary text-base font-normal tracking-wide'
+                'text-text-secondary line-clamp-2 text-base font-normal tracking-wide'
               )}
             >
               {project.description}

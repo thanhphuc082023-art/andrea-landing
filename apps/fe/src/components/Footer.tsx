@@ -33,7 +33,7 @@ function Footer({ footerData = {} }: FooterProps) {
     : null;
 
   return (
-    <footer className="bg-[#D9D9D980]">
+    <footer className="bg-white shadow-lg">
       <div
         className={clsx(
           'content-wrapper relative py-[70px] max-md:py-[55px] dark:border-slate-800 dark:bg-slate-900'
