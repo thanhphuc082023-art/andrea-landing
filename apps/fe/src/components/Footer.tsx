@@ -41,7 +41,7 @@ function Footer({ footerData = {} }: FooterProps) {
       >
         <div
           className={clsx(
-            'grid grid-cols-1 gap-[92px] max-lg:gap-9 max-md:gap-[18px] lg:grid-cols-[120px_1fr_1fr_1fr]'
+            'grid grid-cols-1 gap-[92px] max-lg:gap-9 max-md:gap-[18px] lg:grid-cols-[150px_1fr_1fr_1fr]'
           )}
         >
           <div className={clsx('lg:col-span-1')}>
