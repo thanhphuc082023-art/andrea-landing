@@ -6,6 +6,7 @@ import ContactForm from '@/contents/index/ContactForm';
 import Header from '@/contents/index/Header';
 import Partners from '@/contents/index/Partners';
 import ProjectGrid from '@/contents/index/ProjectGrid';
+import ProjectGridOld from '@/contents/index/ProjectGrid/old';
 import Services from '@/contents/index/Services';
 import Workflow from '@/contents/index/Workflow';
 
@@ -39,8 +40,12 @@ function IndexContents({
         <Workflow workflowData={workflowData} />
       </div>
 
-      <div className={clsx('pb-[50px]')}>
+      {/* <div className={clsx('pb-[50px]')}>
         <ProjectGrid featuredProjectsData={featuredProjectsData} />
+      </div> */}
+
+      <div className={clsx('pb-[50px]')}>
+        <ProjectGridOld />
       </div>
 
       <Partners partnersData={partnersData} />

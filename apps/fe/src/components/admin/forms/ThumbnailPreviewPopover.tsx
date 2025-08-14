@@ -35,7 +35,7 @@ export default function ThumbnailPreviewPopover({
             {/* Preview Card */}
             <div className="w-[420px]">
               {/* Thumbnail Image */}
-              <div className="relative mb-4 h-[300px] w-full overflow-hidden rounded-2xl">
+              <div className="relative mb-4 h-[300px] w-full overflow-hidden rounded-10">
                 <Image
                   src={thumbnailUrl}
                   alt={title}

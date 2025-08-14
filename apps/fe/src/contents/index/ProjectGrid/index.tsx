@@ -17,9 +17,7 @@ function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
     isLarge: index === 0, // First item is large
   }));
 
-  const regularProjects = allProjects.slice(2)?.map((item) => item?.project); // Remaining items
-  console.log('allProjects', allProjects);
-  console.log('featuredProjects', featuredProjects);
+  const regularProjects = allProjects.slice(2)?.map((item) => item?.project); //
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto')}>

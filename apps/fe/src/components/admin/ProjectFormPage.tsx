@@ -118,7 +118,6 @@ export default function ProjectFormPage({
   // Enhanced form submission
   const handleEnhancedFormSubmit = async (data: ProjectFormData) => {
     setIsUploading(true);
-    console.log('handleEnhancedFormSubmit', data);
     try {
       // Submit form data directly
       await onSubmit({ ...data, showcase: showcaseSections });

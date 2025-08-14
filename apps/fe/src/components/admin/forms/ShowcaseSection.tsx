@@ -330,14 +330,7 @@ const SortableSection = ({
                   id={`file-input-${section.id}-1`}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    console.log('File selected for showcase:', file);
                     if (file) {
-                      console.log(
-                        'Processing file:',
-                        file.name,
-                        file.type,
-                        file.size
-                      );
                       setShowcaseSections((prevSections) => {
                         const updatedSections = prevSections.map((s) =>
                           s.id === section.id
