@@ -99,7 +99,7 @@ export const HeroParallax = ({
     useTransform(
       scrollYProgress,
       [0, 0.2],
-      [isMobile ? -560 : -1100, isMobile ? 50 : 100]
+      [isMobile ? -560 : -900, isMobile ? 50 : 100]
     ),
     springConfig
   );
