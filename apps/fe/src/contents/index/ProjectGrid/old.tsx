@@ -9,12 +9,12 @@ import { featuredProjects, regularProjects } from '@/data/projects';
 function ProjectGrid() {
   return (
     <section>
-      <div className={clsx('content-wrapper mx-auto')}>
+      <div className={clsx('content-wrapper mx-auto max-md:!px-0')}>
         {/* Featured Projects Section */}
         <div className={clsx('mb-6')}>
           <h2
             className={clsx(
-              'font-playfair text-brand-orange max-sd:text-[40px] text-[42px] font-medium max-md:text-[35px]'
+              'font-playfair text-brand-orange max-sd:text-[40px] text-[42px] font-medium max-md:px-[25px] max-md:text-[35px]'
             )}
           >
             Dự án tiêu biểu
@@ -24,7 +24,7 @@ function ProjectGrid() {
         {/* Featured Projects Grid */}
         <div
           className={clsx(
-            'mb-[75px] grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:gap-y-[60px] lg:grid-cols-12'
+            'mb-[75px] grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:mb-[50px] max-md:gap-y-[50px] lg:grid-cols-12'
           )}
         >
           {featuredProjects.map((project) => (
@@ -35,7 +35,7 @@ function ProjectGrid() {
         {/* Regular Projects Grid - 3 columns, 2 rows */}
         <div
           className={clsx(
-            'grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:gap-y-[60px] md:grid-cols-2 lg:grid-cols-3'
+            'grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:gap-y-[50px] md:grid-cols-2 lg:grid-cols-3'
           )}
         >
           {regularProjects.map((project) => (

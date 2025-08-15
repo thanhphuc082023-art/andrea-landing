@@ -13,7 +13,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
             {/* Main Image */}
             <div
               className={clsx(
-                'group-hover:border-brand-orange rounded-10 relative h-[400px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 lg:h-[600px]'
+                'group-hover:border-brand-orange rounded-10 relative h-[400px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 max-md:rounded-none max-md:border-none max-md:hover:!border-2 lg:h-[600px]'
               )}
             >
               <Image
@@ -28,7 +28,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
             </div>
 
             {/* Project Info */}
-            <div className={clsx('mt-4')}>
+            <div className={clsx('mt-4 max-md:px-[25px]')}>
               <h3
                 className={clsx(
                   'text-text-primary mb-2 text-[22px] font-semibold lg:text-[22px]'
@@ -57,7 +57,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
           {/* Featured Image */}
           <div
             className={clsx(
-              'group-hover:border-brand-orange rounded-10 relative h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 lg:h-[300px]'
+              'group-hover:border-brand-orange rounded-10 relative h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 max-md:rounded-none max-md:border-none max-md:hover:!border-2 lg:h-[300px]'
             )}
           >
             <Image
@@ -72,7 +72,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
           </div>
 
           {/* Project Info */}
-          <div className={clsx('mt-4 lg:mt-6')}>
+          <div className={clsx('mt-4 max-md:px-[25px]')}>
             <h3
               className={clsx(
                 'text-text-primary mb-2 text-[22px] font-semibold'
@@ -108,7 +108,7 @@ export function FeaturedProjectCardOld({
             {/* Main Image */}
             <div
               className={clsx(
-                'group-hover:border-brand-orange rounded-10 relative h-[400px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 lg:h-[600px]'
+                'group-hover:border-brand-orange rounded-10 relative h-[400px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 max-md:rounded-none max-md:border-none max-md:hover:!border-2 lg:h-[600px]'
               )}
             >
               <Image
@@ -123,7 +123,7 @@ export function FeaturedProjectCardOld({
             </div>
 
             {/* Project Info */}
-            <div className={clsx('mt-4')}>
+            <div className={clsx('mt-4 max-md:px-[25px]')}>
               <h3
                 className={clsx(
                   'text-text-primary mb-2 text-[22px] font-semibold lg:text-[22px]'
@@ -152,7 +152,7 @@ export function FeaturedProjectCardOld({
           {/* Featured Image */}
           <div
             className={clsx(
-              'group-hover:border-brand-orange rounded-10 relative h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 lg:h-[300px]'
+              'group-hover:border-brand-orange rounded-10 relative h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 max-md:border-none max-md:hover:!border-2 lg:h-[300px]'
             )}
           >
             <Image
@@ -167,7 +167,7 @@ export function FeaturedProjectCardOld({
           </div>
 
           {/* Project Info */}
-          <div className={clsx('mt-4 lg:mt-6')}>
+          <div className={clsx('mt-4 max-md:px-[25px]')}>
             <h3
               className={clsx(
                 'text-text-primary mb-2 text-[22px] font-semibold'

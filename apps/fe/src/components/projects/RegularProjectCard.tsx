@@ -11,7 +11,7 @@ function RegularProjectCard({ project, className }: ProjectCardProps) {
         {/* Project Image */}
         <div
           className={clsx(
-            'group-hover:border-brand-orange rounded-10 relative mb-4 h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200'
+            'group-hover:border-brand-orange rounded-10 relative h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 max-md:rounded-none max-md:border-none max-md:hover:!border-2'
           )}
         >
           <Image
@@ -26,7 +26,7 @@ function RegularProjectCard({ project, className }: ProjectCardProps) {
         </div>
 
         {/* Project Info */}
-        <div>
+        <div className="mt-4 max-md:px-[25px]">
           <h3
             className={clsx('text-text-primary mb-2 text-[22px] font-semibold')}
           >
@@ -57,7 +57,7 @@ export function RegularProjectCardOld({
         {/* Project Image */}
         <div
           className={clsx(
-            'group-hover:border-brand-orange rounded-10 relative mb-4 h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200'
+            'group-hover:border-brand-orange rounded-10 relative h-[300px] w-full overflow-hidden border-2 border-transparent transition-all duration-200 max-md:rounded-none max-md:border-none max-md:hover:!border-2'
           )}
         >
           <Image
@@ -72,7 +72,7 @@ export function RegularProjectCardOld({
         </div>
 
         {/* Project Info */}
-        <div>
+        <div className="mt-4 max-md:px-[25px]">
           <h3
             className={clsx('text-text-primary mb-2 text-[22px] font-semibold')}
           >

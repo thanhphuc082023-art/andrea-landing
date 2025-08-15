@@ -42,7 +42,7 @@ function NextProjects({ projects = [] }: NextProjectsProps) {
       {/* Regular Projects Grid - 3 columns, 2 rows */}
       <div
         className={clsx(
-          'grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:gap-y-[60px] md:grid-cols-2 lg:grid-cols-3'
+          'grid grid-cols-1 gap-x-[15px] gap-y-10 max-md:gap-y-[50px] md:grid-cols-2 lg:grid-cols-3'
         )}
       >
         {projects.map((project) => (

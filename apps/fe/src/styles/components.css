@@ -3,7 +3,7 @@
 @layer components {
   .content-wrapper {
     @apply mx-auto max-w-[1440px];
-    @apply px-[30px] lg:px-[80px];
+    @apply px-[25px] lg:px-[80px];
   }
 
   .content-wrapper-max {
@@ -192,6 +192,21 @@
     &--soon {
       @apply cursor-not-allowed text-slate-600;
       @apply dark:text-slate-400;
+    }
+  }
+
+  /* Infinite scroll animation */
+  .animate-scroll {
+    animation: scroll var(--animation-duration, 40s)
+      var(--animation-direction, forwards) linear infinite;
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
     }
   }
 }
