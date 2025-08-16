@@ -69,7 +69,7 @@ export const HeroParallax = ({
     useTransform(
       scrollYProgress,
       [0, 0.2],
-      [isMobile ? -560 : -940, isMobile ? 50 : 100]
+      [isMobile ? -560 : -950, isMobile ? 50 : 100]
     ),
     springConfig
   );
@@ -79,7 +79,7 @@ export const HeroParallax = ({
     useTransform(
       scrollYProgress,
       [0, 0.2],
-      [isMobile ? -200 : -280, isMobile ? -2.5 : -5]
+      [isMobile ? -200 : -270, isMobile ? -2.5 : -5]
     ),
     springConfig
   );
@@ -157,9 +157,6 @@ export const ProductCard = ({
 }) => {
   return (
     <motion.div
-      whileHover={{
-        y: -20,
-      }}
       key={product.title}
       className="group/product relative h-[300px] w-[350px] max-w-full shrink-0 md:h-[400px] md:w-[450px]" // Fixed width for infinite scroll
     >
@@ -168,7 +165,7 @@ export const ProductCard = ({
           src={product.thumbnail}
           height="400"
           width="400"
-          className="absolute inset-0 h-full w-full object-cover object-left-top"
+          className={`absolute inset-0 h-full w-full object-cover object-left-top transition-opacity duration-300`}
           alt={product.title}
         />
       </a>
