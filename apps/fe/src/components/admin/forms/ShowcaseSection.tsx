@@ -201,120 +201,269 @@ const SortableSection = ({
         </div>
 
         {/* Media Preview */}
-        {section.items.length > 0 && section.items[0].src && (
-          <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
-            <div className="space-y-3">
-              {section.items.map((item, index) => (
-                <div key={item.id} className="flex items-center space-x-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-                    <CheckIcon className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
-                      {item.title || 'Uploaded file'}{' '}
-                      {section.items.length > 1 ? `(${index + 1})` : ''}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {item.size ? formatFileSize(item.size) : 'Unknown size'}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                      Sẵn sàng
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowcaseSections((prevSections) =>
-                          prevSections.map((s) =>
-                            s.id === section.id
-                              ? {
-                                  ...s,
-                                  items: s.items.filter((_, i) => i !== index),
-                                }
-                              : s
-                          )
-                        );
-                      }}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <XMarkIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Width/Height Inputs for first item */}
-            {section.items[0] && (
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-700">
-                    Chiều ngang (px)
-                  </label>
-                  <input
-                    type="number"
-                    value={section.items[0].width || null}
-                    onChange={(e) => {
-                      setShowcaseSections((prevSections) =>
-                        prevSections.map((s) =>
-                          s.id === section.id
-                            ? {
-                                ...s,
-                                items: [
-                                  {
-                                    ...s.items[0],
-                                    width: parseInt(e.target.value) || 0,
-                                  },
-                                  ...s.items.slice(1),
-                                ],
-                              }
-                            : s
-                        )
-                      );
-                    }}
-                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    placeholder="1300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700">
-                    Chiều cao (px)
-                  </label>
-                  <input
-                    type="number"
-                    value={section.items[0].height || null}
-                    onChange={(e) => {
-                      setShowcaseSections((prevSections) =>
-                        prevSections.map((s) =>
-                          s.id === section.id
-                            ? {
-                                ...s,
-                                items: [
-                                  {
-                                    ...s.items[0],
-                                    height: parseInt(e.target.value) || 0,
-                                  },
-                                  ...s.items.slice(1),
-                                ],
-                              }
-                            : s
-                        )
-                      );
-                    }}
-                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    placeholder="800"
-                  />
-                </div>
+        {section.items.length > 0 &&
+          section.items.some(
+            (item) => item.src && (item.file || item.uploadId)
+          ) && (
+            <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
+              <div className="space-y-3">
+                {section.items
+                  .filter((item) => item.src && (item.file || item.uploadId)) // Only show items with files
+                  .map((item, index) => (
+                    <div key={item.id} className="flex items-center space-x-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                        <CheckIcon className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">
+                          {item.title || 'Uploaded file'}{' '}
+                          {section.items.length > 1 ? `(${index + 1})` : ''}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {item.size
+                            ? formatFileSize(item.size)
+                            : 'Unknown size'}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {item.uploadId ? (
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                            ✓ Uploaded
+                          </span>
+                        ) : item.file ? (
+                          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                            Sẵn sàng
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+                            No file
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items: s.items.filter(
+                                        (_, i) =>
+                                          i !==
+                                          section.items.findIndex(
+                                            (originalItem) =>
+                                              originalItem.id === item.id
+                                          )
+                                      ),
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <XMarkIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
               </div>
-            )}
-          </div>
-        )}
+
+              {/* Width/Height Inputs - Updated logic for layouts */}
+              {section.items.filter(
+                (item) => item.src && (item.file || item.uploadId)
+              ).length > 0 && (
+                <div className="mt-3 space-y-3">
+                  {section.layout === 'single' ? (
+                    // Single layout - individual width/height
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Chiều ngang (px)
+                        </label>
+                        <input
+                          type="number"
+                          value={
+                            section.items.find(
+                              (item) => item.src && (item.file || item.uploadId)
+                            )?.width || ''
+                          }
+                          onChange={(e) => {
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items: s.items.map((item, idx) =>
+                                        idx === 0
+                                          ? {
+                                              ...item,
+                                              width:
+                                                parseInt(e.target.value) || 0,
+                                            }
+                                          : item
+                                      ),
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="1300"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Chiều cao (px)
+                        </label>
+                        <input
+                          type="number"
+                          value={
+                            section.items.find(
+                              (item) => item.src && (item.file || item.uploadId)
+                            )?.height || ''
+                          }
+                          onChange={(e) => {
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items: s.items.map((item, idx) =>
+                                        idx === 0
+                                          ? {
+                                              ...item,
+                                              height:
+                                                parseInt(e.target.value) || 0,
+                                            }
+                                          : item
+                                      ),
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="800"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    // Half-half and one-third layouts - shared dimensions
+                    <div className="space-y-3">
+                      {/* Total Width Input */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Tổng chiều ngang (px) -
+                          {section.layout === 'half-half'
+                            ? ' Chia đôi 50% - 50%'
+                            : ' Chia 33% - 67%'}
+                        </label>
+                        <input
+                          type="number"
+                          value={section.items[0].width || ''}
+                          onChange={(e) => {
+                            const totalWidth = parseInt(e.target.value) || 0;
+                            const firstItemWidth =
+                              section.layout === 'half-half'
+                                ? Math.floor(totalWidth / 2)
+                                : Math.floor(totalWidth / 3);
+                            const secondItemWidth = totalWidth - firstItemWidth;
+
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items: s.items.map((item, index) => ({
+                                        ...item,
+                                        width:
+                                          index === 0
+                                            ? totalWidth
+                                            : secondItemWidth,
+                                      })),
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="1300"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                          {section.layout === 'half-half'
+                            ? `Sẽ chia: ${Math.floor((section.items[0].width || 1300) / 2)}px + ${(section.items[0].width || 1300) - Math.floor((section.items[0].width || 1300) / 2)}px`
+                            : `Sẽ chia: ${Math.floor((section.items[0].width || 1300) / 3)}px + ${(section.items[0].width || 1300) - Math.floor((section.items[0].width || 1300) / 3)}px`}
+                        </p>
+                      </div>
+
+                      {/* Shared Height Input */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Chiều cao chung (px) - Áp dụng cho cả 2
+                        </label>
+                        <input
+                          type="number"
+                          value={section.items[0].height || ''}
+                          onChange={(e) => {
+                            const sharedHeight = parseInt(e.target.value) || 0;
+
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items: s.items.map((item) => ({
+                                        ...item,
+                                        height: sharedHeight,
+                                      })),
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="800"
+                        />
+                      </div>
+
+                      {/* Preview of dimensions */}
+                      <div className="rounded-md bg-gray-50 p-2">
+                        <p className="mb-1 text-xs font-medium text-gray-700">
+                          Kích thước preview:
+                        </p>
+                        <div className="space-y-1">
+                          <div className="text-xs text-gray-600">
+                            • Item 1 (
+                            {section.layout === 'half-half' ? '50%' : '33%'}):
+                            {section.layout === 'half-half'
+                              ? ` ${Math.floor((section.items[0].width || 1300) / 2)}px`
+                              : ` ${Math.floor((section.items[0].width || 1300) / 3)}px`}
+                            {` × `} {section.items[0].height || 800}px
+                          </div>
+                          {section.items[1] && (
+                            <div className="text-xs text-gray-600">
+                              • Item 2 (
+                              {section.layout === 'half-half' ? '50%' : '67%'}):
+                              {section.layout === 'half-half'
+                                ? ` ${(section.items[0].width || 1300) - Math.floor((section.items[0].width || 1300) / 2)}px`
+                                : ` ${(section.items[0].width || 1300) - Math.floor((section.items[0].width || 1300) / 3)}px`}
+                              × {section.items[1].height || 800}px
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
         {/* Upload Area - Show when no file uploaded or when layout needs more items */}
         <div className="mt-4 space-y-3">
-          {/* First Item Upload - Hide when already selected */}
-          {(!section.items[0] || !section.items[0].src) && (
+          {/* First Item Upload - Hide when already has file */}
+          {!section.items.some((item) => item.order === 0 && item.file) && (
             <div>
               <label className="mb-2 block text-xs font-medium text-gray-700">
                 1.{' '}
@@ -331,6 +480,16 @@ const SortableSection = ({
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
+                      console.log(
+                        `📋 [ShowcaseSection] File selected for section "${section.title}" (lazy upload):`,
+                        {
+                          name: file.name,
+                          size: file.size,
+                          type: file.type,
+                          sectionId: section.id,
+                        }
+                      );
+
                       setShowcaseSections((prevSections) => {
                         const updatedSections = prevSections.map((s) =>
                           s.id === section.id
@@ -406,9 +565,9 @@ const SortableSection = ({
             </div>
           )}
 
-          {/* Second Item Upload for half-half and one-third layouts - Hide when already selected */}
+          {/* Second Item Upload for half-half and one-third layouts - Hide when already has file */}
           {(section.layout === 'half-half' || section.layout === 'one-third') &&
-            (!section.items[1] || !section.items[1].src) && (
+            !section.items.some((item) => item.order === 1 && item.file) && (
               <div>
                 <label className="mb-2 block text-xs font-medium text-gray-700">
                   2. {section.layout === 'half-half' ? '(50%)' : '(67%)'}
@@ -442,8 +601,21 @@ const SortableSection = ({
                                       src: URL.createObjectURL(file),
                                       alt: file.name,
                                       size: file.size,
-                                      width: 1300,
-                                      height: 800,
+                                      // Tính toán width dựa trên layout và item đầu tiên
+                                      width:
+                                        section.layout === 'half-half'
+                                          ? (s.items[0]?.width || 1300) -
+                                            Math.floor(
+                                              (s.items[0]?.width || 1300) / 2
+                                            )
+                                          : section.layout === 'one-third'
+                                            ? (s.items[0]?.width || 1300) -
+                                              Math.floor(
+                                                (s.items[0]?.width || 1300) / 3
+                                              )
+                                            : 1300,
+                                      // Sử dụng cùng height với item đầu tiên
+                                      height: s.items[0]?.height || 800,
                                       order: 1,
                                       file: file, // Lưu file object để uploadProjectMedia có thể xử lý
                                     },

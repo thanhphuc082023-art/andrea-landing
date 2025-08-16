@@ -343,6 +343,16 @@ export default async function handler(
     // Process media uploads
     const mediaResults: any = {};
 
+    console.log('=== API MEDIA PROCESSING DEBUG ===');
+    console.log('Request media fields:', {
+      heroVideoUploadId: requestData.heroVideoUploadId,
+      heroBannerUploadId: requestData.heroBannerUploadId,
+      thumbnailUploadId: requestData.thumbnailUploadId,
+      existingHeroVideoUrl: requestData.existingHeroVideoUrl,
+      existingHeroBannerUrl: requestData.existingHeroBannerUrl,
+      existingThumbnailUrl: requestData.existingThumbnailUrl,
+    });
+
     // Upload hero video
     if (requestData.heroVideoUploadId) {
       const fileInfo = findUploadedFile(requestData.heroVideoUploadId);
@@ -355,6 +365,32 @@ export default async function handler(
         );
         if (result) mediaResults.heroVideo = result.id;
       }
+    } else if (requestData.existingHeroVideoUrl) {
+      // Use existing URL - need to find the Strapi media ID from URL
+      console.log(
+        'Using existing hero video URL:',
+        requestData.existingHeroVideoUrl
+      );
+      // TODO: Parse Strapi media ID from URL if needed
+    }
+
+    // Upload hero banner
+    if (requestData.heroBannerUploadId) {
+      const fileInfo = findUploadedFile(requestData.heroBannerUploadId);
+      if (fileInfo) {
+        const result = await uploadToStrapi(
+          fileInfo.filePath,
+          requestData.originalHeroBannerName || 'hero-banner.jpg',
+          token,
+          'images'
+        );
+        if (result) mediaResults.heroBanner = result.id;
+      }
+    } else if (requestData.existingHeroBannerUrl) {
+      console.log(
+        'Using existing hero banner URL:',
+        requestData.existingHeroBannerUrl
+      );
     }
 
     // Upload thumbnail
@@ -369,6 +405,11 @@ export default async function handler(
         );
         if (result) mediaResults.thumbnail = result.id;
       }
+    } else if (requestData.existingThumbnailUrl) {
+      console.log(
+        'Using existing thumbnail URL:',
+        requestData.existingThumbnailUrl
+      );
     }
 
     // Upload featured image
@@ -408,6 +449,11 @@ export default async function handler(
         }
       }
     }
+
+    console.log('=== MEDIA PROCESSING RESULTS ===');
+    console.log('Final mediaResults:', mediaResults);
+    console.log('Gallery IDs:', galleryIds);
+    console.log('=== END MEDIA PROCESSING DEBUG ===');
 
     // Process showcase sections
     const processedShowcase = await processShowcaseSections(
@@ -451,6 +497,7 @@ export default async function handler(
 
         // Media file IDs
         ...(mediaResults.heroVideo && { heroVideo: mediaResults.heroVideo }),
+        ...(mediaResults.heroBanner && { heroBanner: mediaResults.heroBanner }),
         ...(mediaResults.thumbnail && { thumbnail: mediaResults.thumbnail }),
         ...(mediaResults.featuredImage && {
           featuredImage: mediaResults.featuredImage,

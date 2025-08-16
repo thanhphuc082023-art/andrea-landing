@@ -92,6 +92,7 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
     technologies: project.technologies || [],
     projectMetaInfo: project.projectMetaInfo || [],
 
+    heroBanner: transformMediaFile(project.heroBanner),
     heroVideo: transformMediaFile(project.heroVideo),
     thumbnail: transformMediaFile(project.thumbnail),
     featuredImage: transformMediaFile(project.featuredImage),

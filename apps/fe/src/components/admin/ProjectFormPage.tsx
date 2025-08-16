@@ -14,7 +14,7 @@ import {
   useSessionCleanup,
   sessionCleanupConfigs,
 } from '@/hooks/useSessionCleanup';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ProjectFormPageProps {
   onSubmit: (data: ProjectFormData) => void;
@@ -22,6 +22,11 @@ interface ProjectFormPageProps {
   categories?: Array<{ id: number; name: string }>;
   isLoading?: boolean;
   onLogout?: () => void;
+  viewMode?: 'create' | 'preview'; // Thêm viewMode prop
+  onViewModeChange?: (
+    mode: 'create' | 'preview',
+    data?: { formData: Partial<ProjectFormData>; showcaseSections: any[] }
+  ) => void; // Callback với data
 }
 
 export default function ProjectFormPage({
@@ -30,11 +35,19 @@ export default function ProjectFormPage({
   categories = [],
   isLoading = false,
   onLogout,
+  viewMode = 'create', // Default là create mode
+  onViewModeChange,
 }: ProjectFormPageProps) {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
 
-  // Use external upload progress if provided, otherwise use internal
+  // State để lưu file objects riêng (vì React Hook Form có thể không preserve chúng)
+  const [fileObjects, setFileObjects] = useState<{
+    thumbnail?: File;
+    heroVideo?: File;
+    heroBanner?: File;
+    featuredImage?: File;
+  }>({});
 
   // Session cleanup on unmount - disable auto cleanup to preserve data for preview
   const { cleanup } = useSessionCleanup({
@@ -75,11 +88,20 @@ export default function ProjectFormPage({
     removeKeyword,
     addCredit,
     removeCredit,
-    handleFormSubmit,
-    resetForm,
     saveDataForPreview,
     cleanup: formCleanup,
   } = useProjectForm({ initialData, onSubmit });
+  const heroVideo = watch('heroVideo');
+  const heroBanner = watch('heroBanner');
+  const thumbnail = watch('thumbnail');
+  const title = watch('title') || '';
+  const description = watch('description') || '';
+
+  console.log('thumbnail', thumbnail);
+  console.log('heroVideo', heroVideo);
+  console.log('heroBanner', heroBanner);
+  console.log('title', title);
+  console.log('description', description);
 
   const handleCancel = () => {
     cleanup();
@@ -94,14 +116,95 @@ export default function ProjectFormPage({
   };
 
   const handlePreview = () => {
-    saveDataForPreview();
-    const isEdit = !!initialData;
-    const projectId = router.query.id;
+    // Bỏ saveDataForPreview() vì chúng ta pass data trực tiếp
+    if (onViewModeChange) {
+      console.log('🎯 Starting handlePreview...');
+      console.log('Current fileObjects state:', fileObjects);
+      console.log('Current form values:', {
+        thumbnail: {
+          hasFile: !!thumbnail?.file,
+          fileName: thumbnail?.file?.name,
+          hasUrl: !!thumbnail?.url,
+          url: thumbnail?.url?.substring(0, 50) + '...',
+        },
+        heroVideo: {
+          hasFile: !!heroVideo?.file,
+          fileName: heroVideo?.file?.name,
+          hasUrl: !!heroVideo?.url,
+        },
+        heroBanner: {
+          hasFile: !!heroBanner?.file,
+          fileName: heroBanner?.file?.name,
+          hasUrl: !!heroBanner?.url,
+        },
+      });
 
-    if (isEdit && projectId) {
-      router.push(`/admin/projects/preview?mode=edit&id=${projectId}`);
+      // Lấy form data từ watch() và merge với file objects từ state riêng
+      const baseFormData = watch(); // Base form data
+      const currentFormData = {
+        ...baseFormData,
+        // Merge với file objects từ state riêng
+        heroVideo: heroVideo
+          ? {
+              ...heroVideo,
+              file: fileObjects.heroVideo || heroVideo.file, // Ưu tiên từ fileObjects state
+            }
+          : undefined,
+        heroBanner: heroBanner
+          ? {
+              ...heroBanner,
+              file: fileObjects.heroBanner || heroBanner.file,
+            }
+          : undefined,
+        thumbnail: thumbnail
+          ? {
+              ...thumbnail,
+              file: fileObjects.thumbnail || thumbnail.file,
+            }
+          : undefined,
+        featuredImage: baseFormData.featuredImage
+          ? {
+              ...baseFormData.featuredImage,
+              file:
+                fileObjects.featuredImage || baseFormData.featuredImage.file,
+            }
+          : undefined,
+        gallery: baseFormData.gallery,
+      };
+
+      console.log('🔍 Final merged data for preview:');
+      console.log('thumbnail final:', {
+        hasFile: !!currentFormData.thumbnail?.file,
+        fileName: currentFormData.thumbnail?.file?.name,
+        fileSize: currentFormData.thumbnail?.file?.size,
+        hasUrl: !!currentFormData.thumbnail?.url,
+        name: currentFormData.thumbnail?.name,
+      });
+      console.log('heroVideo final:', {
+        hasFile: !!currentFormData.heroVideo?.file,
+        fileName: currentFormData.heroVideo?.file?.name,
+        hasUrl: !!currentFormData.heroVideo?.url,
+      });
+      console.log('heroBanner final:', {
+        hasFile: !!currentFormData.heroBanner?.file,
+        fileName: currentFormData.heroBanner?.file?.name,
+        hasUrl: !!currentFormData.heroBanner?.url,
+      });
+
+      onViewModeChange('preview', {
+        formData: currentFormData,
+        showcaseSections,
+      }); // Truyền data với File objects
     } else {
-      router.push('/admin/projects/preview?mode=create');
+      // Fallback: navigate như cũ nếu không có callback
+      const isEdit = !!initialData;
+      const projectId = router.query.id;
+
+      if (isEdit && projectId) {
+        router.push(`/admin/projects/preview?mode=edit&id=${projectId}`);
+      } else {
+        router.push('/admin/projects/preview?mode=create');
+      }
     }
   };
 
@@ -114,9 +217,10 @@ export default function ProjectFormPage({
       router.push('/admin/projects/create');
     }
   };
-
   // Enhanced form submission
   const handleEnhancedFormSubmit = async (data: ProjectFormData) => {
+    console.log('data', data);
+    console.log('showcaseSections', showcaseSections);
     setIsUploading(true);
     try {
       // Submit form data directly

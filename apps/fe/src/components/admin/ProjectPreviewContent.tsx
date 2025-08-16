@@ -19,16 +19,58 @@ export default function ProjectPreviewContent({
     description: formData.description || 'Mô tả dự án sẽ hiển thị ở đây...',
     projectMetaInfo: formData.projectMetaInfo || [],
     projectIntroTitle: formData.projectIntroTitle || 'Giới thiệu dự án:',
-    credits: {
-      title: formData.credits?.title || 'Thanks for watching',
-      date: formData.credits?.date || new Date().getFullYear().toString(),
+
+    // Required fields for ProjectData interface
+    projectStatus:
+      (formData.status as 'draft' | 'in-progress' | 'completed') || 'draft',
+    featured: formData.featured || false,
+    technologies: formData.technologies || [],
+    gallery: [], // Empty gallery for preview
+    showcaseSections: showcaseSections,
+    results: [], // Empty results for preview
+    metrics: [], // Empty metrics for preview
+
+    // Add heroVideo to project data for ProjectHero component
+    heroVideo: formData.heroVideo
+      ? {
+          id: 0,
+          url: formData.heroVideo.url,
+          name: 'Hero Video',
+          mime: 'video/mp4',
+          alt: 'Hero Video',
+        }
+      : null,
+
+    // Add heroBanner to project data
+    heroBanner: formData.heroBanner
+      ? {
+          id: 0,
+          url: formData.heroBanner.url,
+          name: 'Hero Banner',
+          mime: 'image/jpeg',
+          alt: 'Hero Banner',
+        }
+      : null,
+
+    category: {
+      id: 1,
+      name: 'Thiết kế & Phát triển',
+      slug: 'design-development',
+    },
+
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    publishedAt: new Date().toISOString(),
+
+    // Credits in the format that ProjectCredits.tsx expects
+    credits: formData.credits || {
+      title: 'Thanks for watching',
+      creditLabel: 'Credit:',
+      date: new Date().getFullYear().toString(),
       projectManager:
-        formData.credits?.projectManager ||
         'Project Manager: Chưa có\nGraphic Designer: Chưa có\nShowcase: Chưa có',
     },
-    technologies: formData.technologies || [],
-    status: formData.status || 'draft',
-    showcase: showcaseSections,
+
     seo: formData.seo || {
       title: '',
       description: '',
@@ -36,28 +78,10 @@ export default function ProjectPreviewContent({
     },
   };
 
-  // Create hero data with video support
-  const heroData = {
-    slogan: {
-      title: projectData.title,
-      subTitle: 'Thiết kế & Phát triển',
-      description: projectData.description,
-    },
-    // Use heroVideo from form if available, otherwise use default
-    desktopVideo:
-      formData.heroVideo?.url ||
-      'https://andrea.vn/uploads/videos/intro-website_3.mp4',
-    mobileVideo:
-      formData.heroVideo?.url ||
-      'https://andrea.vn/uploads/videos/intro-website_3.mp4',
-  };
-
   return (
     <div className="bg-white">
       <ProjectDetailContents
-        heroData={heroData}
-        project={projectData}
-        showcaseData={showcaseSections}
+        project={projectData as any} // Cast to any because ProjectCredits component expects different structure
       />
     </div>
   );

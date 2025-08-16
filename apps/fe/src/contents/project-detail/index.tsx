@@ -14,6 +14,7 @@ function ProjectDetailContents({
   project = null,
   nextProjects = [],
 }: ProjectDetailContentsProps) {
+  console.log(project);
   return (
     <>
       {/* Hero Section */}

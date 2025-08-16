@@ -14,43 +14,134 @@ export default function ProjectPreviewPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('=== PREVIEW PAGE MOUNT DEBUG ===');
+    console.log('Loading preview data from sessionStorage...');
+
     // Lấy data từ sessionStorage hoặc localStorage
     const savedFormData = sessionStorage.getItem('projectFormData');
     const savedShowcaseSections = sessionStorage.getItem(
       'projectShowcaseSections'
     );
 
+    console.log('Raw sessionStorage data:');
+    console.log('- projectFormData length:', savedFormData?.length || 0);
+    console.log(
+      '- projectShowcaseSections length:',
+      savedShowcaseSections?.length || 0
+    );
+
     if (savedFormData) {
       try {
         const parsedData = JSON.parse(savedFormData);
+        console.log('Parsed form data for preview:', {
+          title: parsedData.title,
+          description: parsedData.description?.substring(0, 50) + '...',
+          heroVideo: parsedData.heroVideo
+            ? {
+                name: parsedData.heroVideo.name,
+                url: parsedData.heroVideo.url,
+                hasFile: !!parsedData.heroVideo.file,
+              }
+            : null,
+          thumbnail: parsedData.thumbnail
+            ? {
+                name: parsedData.thumbnail.name,
+                url: parsedData.thumbnail.url,
+                hasFile: !!parsedData.thumbnail.file,
+              }
+            : null,
+          technologiesCount: parsedData.technologies?.length || 0,
+          projectMetaInfoCount: parsedData.projectMetaInfo?.length || 0,
+          creditsInfo: parsedData.credits
+            ? {
+                title: parsedData.credits.title,
+                projectManager:
+                  parsedData.credits.projectManager?.substring(0, 50) + '...',
+              }
+            : null,
+        });
         setFormData(parsedData);
       } catch (error) {
         console.error('Error parsing form data:', error);
       }
+    } else {
+      console.log('No saved form data found in sessionStorage');
     }
 
     if (savedShowcaseSections) {
       try {
         const parsedSections = JSON.parse(savedShowcaseSections);
+        console.log('Parsed showcase sections for preview:', {
+          sectionsCount: parsedSections.length,
+          sectionsWithItems: parsedSections.filter((s) => s.items?.length > 0)
+            .length,
+          sectionsWithFiles: parsedSections.filter((s) =>
+            s.items?.some((i) => i.file)
+          ).length,
+          totalItems: parsedSections.reduce(
+            (acc, s) => acc + (s.items?.length || 0),
+            0
+          ),
+          itemsWithFiles: parsedSections.reduce(
+            (acc, s) => acc + (s.items?.filter((i) => i.file).length || 0),
+            0
+          ),
+        });
+
+        // Log each section details
+        parsedSections.forEach((section, index) => {
+          console.log(`Section ${index + 1}:`, {
+            id: section.id,
+            title: section.title,
+            type: section.type,
+            layout: section.layout,
+            itemsCount: section.items?.length || 0,
+            itemsWithFiles: section.items?.filter((i) => i.file).length || 0,
+            itemsWithSrc: section.items?.filter((i) => i.src).length || 0,
+          });
+        });
+
         setShowcaseSections(parsedSections);
       } catch (error) {
         console.error('Error parsing showcase sections:', error);
       }
+    } else {
+      console.log('No saved showcase sections found in sessionStorage');
     }
 
     setIsLoading(false);
+    console.log('=== END PREVIEW PAGE MOUNT DEBUG ===');
   }, []);
 
   const handleBackToForm = () => {
+    console.log('=== PREVIEW BACK TO FORM DEBUG ===');
+    console.log('Navigating back to form...');
+
+    // Check if data still exists in sessionStorage before navigating
+    const savedFormData = sessionStorage.getItem('projectFormData');
+    const savedShowcaseSections = sessionStorage.getItem(
+      'projectShowcaseSections'
+    );
+
+    console.log('Data preservation check:');
+    console.log('- projectFormData still exists:', !!savedFormData);
+    console.log(
+      '- projectShowcaseSections still exists:',
+      !!savedShowcaseSections
+    );
+
     // Quay lại trang create hoặc edit
     const isEdit = router.query.mode === 'edit';
     const projectId = router.query.id;
 
     if (isEdit && projectId) {
+      console.log('Navigating to edit mode for project:', projectId);
       router.push(`/admin/projects/${projectId}/edit`);
     } else {
+      console.log('Navigating to create mode');
       router.push('/admin/projects/create');
     }
+    console.log('=== END PREVIEW BACK TO FORM DEBUG ===');
   };
 
   if (isLoading) {

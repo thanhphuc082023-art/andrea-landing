@@ -35,12 +35,17 @@ export default function HeroSection({
   onLogout,
 }: HeroSectionProps) {
   const heroVideo = watch('heroVideo');
+  const heroBanner = watch('heroBanner');
   const thumbnail = watch('thumbnail');
   const title = watch('title') || '';
   const description = watch('description') || '';
 
   const removeHeroVideo = () => {
     setValue('heroVideo', undefined);
+  };
+
+  const removeHeroBanner = () => {
+    setValue('heroBanner', undefined);
   };
 
   const removeThumbnail = () => {
@@ -209,9 +214,27 @@ export default function HeroSection({
             {thumbnail ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-2">
-                  <span className="text-sm text-gray-700">
-                    {thumbnail.name}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    {thumbnail.url && (
+                      <img
+                        src={thumbnail.url}
+                        alt="Thumbnail preview"
+                        className="h-8 w-8 rounded object-cover"
+                      />
+                    )}
+                    <span className="text-sm text-gray-700">
+                      {thumbnail.name || thumbnail.fileName}
+                    </span>
+                    {thumbnail.uploadId ? (
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        ✓ Uploaded
+                      </span>
+                    ) : thumbnail.file ? (
+                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                        Sẵn sàng
+                      </span>
+                    ) : null}
+                  </div>
                   <button
                     type="button"
                     onClick={removeThumbnail}
@@ -224,11 +247,20 @@ export default function HeroSection({
             ) : (
               <SimpleFileUploader
                 onFileSelect={(file) => {
+                  // Only create blob URL for preview, don't upload immediately
                   setValue('thumbnail', {
                     file,
                     url: URL.createObjectURL(file),
                     name: file.name,
                   });
+                  console.log(
+                    '🖼️ [HeroSection] Thumbnail selected (lazy upload):',
+                    {
+                      name: file.name,
+                      size: file.size,
+                      type: file.type,
+                    }
+                  );
                 }}
                 onFileRemove={removeThumbnail}
                 selectedFile={thumbnail?.file}
@@ -237,13 +269,7 @@ export default function HeroSection({
                 label="Tải lên thumbnail"
                 description="Chọn thumbnail cho dự án (JPG, PNG, WebP) - Tối đa 5MB"
                 onLogout={onLogout}
-                onUploadComplete={(result) => {
-                  setValue('thumbnail', {
-                    uploadId: result.uploadId,
-                    fileName: result.fileName,
-                    name: result.fileName,
-                  });
-                }}
+                // Remove onUploadComplete to disable immediate upload
                 data-testid="thumbnail-uploader"
               />
             )}
@@ -258,9 +284,27 @@ export default function HeroSection({
             {heroVideo ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-2">
-                  <span className="text-sm text-gray-700">
-                    {heroVideo.name}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    {heroVideo.url && (
+                      <video
+                        src={heroVideo.url}
+                        className="h-8 w-12 rounded object-cover"
+                        muted
+                      />
+                    )}
+                    <span className="text-sm text-gray-700">
+                      {heroVideo.name || heroVideo.fileName}
+                    </span>
+                    {heroVideo.uploadId ? (
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        ✓ Uploaded
+                      </span>
+                    ) : heroVideo.file ? (
+                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                        Sẵn sàng
+                      </span>
+                    ) : null}
+                  </div>
                   <button
                     type="button"
                     onClick={removeHeroVideo}
@@ -278,6 +322,14 @@ export default function HeroSection({
                     url: URL.createObjectURL(file),
                     name: file.name,
                   });
+                  console.log(
+                    '🎥 [HeroSection] Hero video selected (lazy upload):',
+                    {
+                      name: file.name,
+                      size: file.size,
+                      type: file.type,
+                    }
+                  );
                 }}
                 onFileRemove={removeHeroVideo}
                 selectedFile={heroVideo?.file}
@@ -286,13 +338,75 @@ export default function HeroSection({
                 label="Tải lên video hero"
                 description="Chọn video hero cho dự án (MP4, WebM, MOV) - Tối đa 100MB"
                 onLogout={onLogout}
-                onUploadComplete={(result) => {
-                  setValue('heroVideo', {
-                    uploadId: result.uploadId,
-                    fileName: result.fileName,
-                    name: result.fileName,
+                // Remove onUploadComplete to disable immediate upload
+              />
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Hero Banner (Hình ảnh)
+          </label>
+          <div className="mt-1">
+            {heroBanner ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-2">
+                  <div className="flex items-center space-x-2">
+                    {heroBanner.url && (
+                      <img
+                        src={heroBanner.url}
+                        alt="Hero banner preview"
+                        className="h-8 w-12 rounded object-cover"
+                      />
+                    )}
+                    <span className="text-sm text-gray-700">
+                      {heroBanner.name || heroBanner.fileName}
+                    </span>
+                    {heroBanner.uploadId ? (
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        ✓ Uploaded
+                      </span>
+                    ) : heroBanner.file ? (
+                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                        Sẵn sàng
+                      </span>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeHeroBanner}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <XMarkIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <SimpleFileUploader
+                onFileSelect={(file) => {
+                  setValue('heroBanner', {
+                    file,
+                    url: URL.createObjectURL(file),
+                    name: file.name,
                   });
+                  console.log(
+                    '🖼️ [HeroSection] Hero banner selected (lazy upload):',
+                    {
+                      name: file.name,
+                      size: file.size,
+                      type: file.type,
+                    }
+                  );
                 }}
+                onFileRemove={removeHeroBanner}
+                selectedFile={heroBanner?.file}
+                acceptedTypes={['image/*']}
+                maxFileSize={10 * 1024 * 1024} // 10MB
+                label="Tải lên hero banner"
+                description="Chọn hình ảnh hero banner cho dự án (JPG, PNG, WebP) - Tối đa 10MB"
+                onLogout={onLogout}
+                // Remove onUploadComplete to disable immediate upload
               />
             )}
           </div>

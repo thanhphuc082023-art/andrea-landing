@@ -61,6 +61,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       },
       thumbnail: initialData?.thumbnail || undefined,
       heroVideo: initialData?.heroVideo || undefined,
+      heroBanner: initialData?.heroBanner || undefined,
     },
   });
 
@@ -140,6 +141,112 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
           );
           setValue('thumbnail', parsedData.thumbnail || undefined);
           setValue('heroVideo', parsedData.heroVideo || undefined);
+          setValue('heroBanner', parsedData.heroBanner || undefined);
+
+          console.log(
+            '📥 [useProjectForm] Restored media from sessionStorage:',
+            {
+              thumbnail: parsedData.thumbnail
+                ? {
+                    name: parsedData.thumbnail.name,
+                    hasFile: !!parsedData.thumbnail.file,
+                    uploadId: parsedData.thumbnail.uploadId,
+                    url: parsedData.thumbnail.url?.startsWith('blob:')
+                      ? 'BLOB URL (will be lost)'
+                      : 'server URL',
+                  }
+                : null,
+              heroVideo: parsedData.heroVideo
+                ? {
+                    name: parsedData.heroVideo.name,
+                    hasFile: !!parsedData.heroVideo.file,
+                    uploadId: parsedData.heroVideo.uploadId,
+                    url: parsedData.heroVideo.url?.startsWith('blob:')
+                      ? 'BLOB URL (will be lost)'
+                      : 'server URL',
+                  }
+                : null,
+              heroBanner: parsedData.heroBanner
+                ? {
+                    name: parsedData.heroBanner.name,
+                    hasFile: !!parsedData.heroBanner.file,
+                    uploadId: parsedData.heroBanner.uploadId,
+                    url: parsedData.heroBanner.url?.startsWith('blob:')
+                      ? 'BLOB URL (will be lost)'
+                      : 'server URL',
+                  }
+                : null,
+            }
+          );
+
+          // Important: File objects are lost during JSON serialization
+          // Only preserve URLs and uploadIds, remove file references
+          if (parsedData.thumbnail?.url?.startsWith('blob:')) {
+            console.warn(
+              '⚠️ Thumbnail blob URL detected - file object was lost in sessionStorage'
+            );
+            // Don't restore blob URLs without file objects as they're invalid
+            setValue('thumbnail', undefined);
+          } else if (parsedData.thumbnail) {
+            setValue('thumbnail', {
+              ...parsedData.thumbnail,
+              file: undefined, // Always remove file reference from sessionStorage
+            });
+          }
+
+          if (parsedData.heroVideo?.url?.startsWith('blob:')) {
+            console.warn(
+              '⚠️ Hero video blob URL detected - file object was lost in sessionStorage'
+            );
+            setValue('heroVideo', undefined);
+          } else if (parsedData.heroVideo) {
+            setValue('heroVideo', {
+              ...parsedData.heroVideo,
+              file: undefined,
+            });
+          }
+
+          if (parsedData.heroBanner?.url?.startsWith('blob:')) {
+            console.warn(
+              '⚠️ Hero banner blob URL detected - file object was lost in sessionStorage'
+            );
+            setValue('heroBanner', undefined);
+          } else if (parsedData.heroBanner) {
+            setValue('heroBanner', {
+              ...parsedData.heroBanner,
+              file: undefined,
+            });
+          }
+
+          // Update other form values
+          setValue('title', parsedData.title || '');
+          setValue('description', parsedData.description || '');
+          setValue('content', parsedData.content || '');
+          setValue('slug', parsedData.slug || '');
+          setValue('status', parsedData.status || 'draft');
+          setValue('featured', parsedData.featured || false);
+          setValue('overview', parsedData.overview || '');
+          setValue('challenge', parsedData.challenge || '');
+          setValue('solution', parsedData.solution || '');
+          setValue('categoryId', parsedData.categoryId || '');
+          setValue('projectIntroTitle', parsedData.projectIntroTitle || '');
+          setValue(
+            'credits',
+            parsedData.credits || {
+              title: '',
+              creditLabel: 'Credit:',
+              date: '',
+              projectManager: '',
+            }
+          );
+          setValue(
+            'seo',
+            parsedData.seo || {
+              title: '',
+              description: '',
+              keywords: [],
+            }
+          );
 
           // Update local state
           if (parsedData.technologies) {
@@ -167,7 +274,49 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       if (savedShowcaseSections) {
         try {
           const parsedSections = JSON.parse(savedShowcaseSections);
-          setShowcaseSections(parsedSections);
+
+          // Clean up showcase sections - remove items with blob URLs without file objects
+          const cleanedSections = parsedSections.map((section: any) => ({
+            ...section,
+            items: section.items
+              ?.map((item: any) => {
+                // If item has blob URL but no file object, clear it
+                if (item.src?.startsWith('blob:') && !item.file) {
+                  console.warn(
+                    `⚠️ Showcase item "${item.title}" has blob URL but no file object - clearing`
+                  );
+                  return {
+                    ...item,
+                    src: undefined,
+                    file: undefined,
+                  };
+                }
+                // Remove file reference from sessionStorage (File objects can't be serialized)
+                return {
+                  ...item,
+                  file: undefined,
+                };
+              })
+              .filter((item: any) => item.src || item.uploadId), // Remove items without src or uploadId
+          }));
+
+          console.log('📥 [useProjectForm] Cleaned showcase sections:', {
+            originalSections: parsedSections.length,
+            cleanedSections: cleanedSections.length,
+            itemsRemoved:
+              parsedSections.reduce(
+                (acc: number, section: any) =>
+                  acc + (section.items?.length || 0),
+                0
+              ) -
+              cleanedSections.reduce(
+                (acc: number, section: any) =>
+                  acc + (section.items?.length || 0),
+                0
+              ),
+          });
+
+          setShowcaseSections(cleanedSections);
         } catch (error) {
           console.error('Error parsing showcase sections:', error);
         }
@@ -274,8 +423,69 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       },
       // Include heroVideo and thumbnail data for preview
       heroVideo: currentData.heroVideo,
+      heroBanner: currentData.heroBanner,
       thumbnail: currentData.thumbnail,
     };
+
+    console.log('🔄 [useProjectForm] Saving media to sessionStorage:', {
+      thumbnail: finalData.thumbnail
+        ? {
+            name: finalData.thumbnail.name,
+            hasFile: !!finalData.thumbnail.file,
+            uploadId: finalData.thumbnail.uploadId,
+            url: finalData.thumbnail.url?.startsWith('blob:')
+              ? 'blob URL'
+              : 'server URL',
+          }
+        : null,
+      heroVideo: finalData.heroVideo
+        ? {
+            name: finalData.heroVideo.name,
+            hasFile: !!finalData.heroVideo.file,
+            uploadId: finalData.heroVideo.uploadId,
+            url: finalData.heroVideo.url?.startsWith('blob:')
+              ? 'blob URL'
+              : 'server URL',
+          }
+        : null,
+      heroBanner: finalData.heroBanner
+        ? {
+            name: finalData.heroBanner.name,
+            hasFile: !!finalData.heroBanner.file,
+            uploadId: finalData.heroBanner.uploadId,
+            url: finalData.heroBanner.url?.startsWith('blob:')
+              ? 'blob URL'
+              : 'server URL',
+          }
+        : null,
+      showcase: {
+        sectionsCount: showcaseSections.length,
+        sectionsWithFiles: showcaseSections.filter((section) =>
+          section.items?.some((item) => item.file || item.uploadId)
+        ).length,
+        totalItems: showcaseSections.reduce(
+          (acc, section) =>
+            acc +
+            (section.items?.filter((item) => item.file || item.uploadId)
+              .length || 0),
+          0
+        ),
+        itemsWithFiles: showcaseSections.reduce(
+          (acc, section) =>
+            acc +
+            (section.items?.filter((item) => item.file || item.uploadId)
+              .length || 0),
+          0
+        ),
+        emptySlots: showcaseSections.reduce(
+          (acc, section) =>
+            acc +
+            (section.items?.filter((item) => !item.file && !item.uploadId)
+              .length || 0),
+          0
+        ),
+      },
+    });
 
     sessionStorage.setItem('projectFormData', JSON.stringify(finalData));
     sessionStorage.setItem(
@@ -300,6 +510,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       showcase: showcaseSections,
       // Include heroVideo and thumbnail data for submission
       heroVideo: data.heroVideo,
+      heroBanner: data.heroBanner,
       thumbnail: data.thumbnail,
     };
 

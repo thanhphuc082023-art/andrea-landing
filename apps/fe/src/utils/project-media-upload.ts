@@ -67,6 +67,7 @@ export const uploadFileInChunks = async (
 export const uploadProjectMedia = async (
   mediaFiles: {
     heroVideo?: File;
+    heroBanner?: File;
     thumbnail?: File;
     featuredImage?: File;
     gallery?: File[];
@@ -75,6 +76,7 @@ export const uploadProjectMedia = async (
   onProgress?: (progress: number) => void
 ): Promise<{
   heroVideoUploadId?: string;
+  heroBannerUploadId?: string;
   thumbnailUploadId?: string;
   featuredImageUploadId?: string;
   galleryUploadIds: string[];
@@ -82,6 +84,7 @@ export const uploadProjectMedia = async (
 }> => {
   const results: {
     heroVideoUploadId?: string;
+    heroBannerUploadId?: string;
     thumbnailUploadId?: string;
     featuredImageUploadId?: string;
     galleryUploadIds: string[];
@@ -96,6 +99,7 @@ export const uploadProjectMedia = async (
 
   // Count total files to upload
   if (mediaFiles.heroVideo) totalFiles++;
+  if (mediaFiles.heroBanner) totalFiles++;
   if (mediaFiles.thumbnail) totalFiles++;
   if (mediaFiles.featuredImage) totalFiles++;
   if (mediaFiles.gallery) totalFiles += mediaFiles.gallery.length;
@@ -120,6 +124,18 @@ export const uploadProjectMedia = async (
       }
     });
     results.heroVideoUploadId = uploadId;
+    uploadedFiles++;
+  }
+
+  // Upload hero banner
+  if (mediaFiles.heroBanner) {
+    const uploadId = generateUploadId();
+    await uploadFileInChunks(mediaFiles.heroBanner, uploadId, (progress) => {
+      if (onProgress) {
+        onProgress((uploadedFiles * 90 + progress) / totalFiles);
+      }
+    });
+    results.heroBannerUploadId = uploadId;
     uploadedFiles++;
   }
 

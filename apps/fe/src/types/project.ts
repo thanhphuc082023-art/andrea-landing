@@ -15,6 +15,10 @@ export interface ProjectShowcaseItem {
     phoneNumber?: string;
     downloadUrl?: string;
   };
+  // For file upload handling
+  file?: File;
+  uploadId?: string;
+  size?: number;
 }
 
 // Project showcase section for UI display
@@ -87,6 +91,7 @@ export interface ProjectData {
   projectMetaInfo: string[];
 
   heroVideo?: MediaFile | null;
+  heroBanner?: MediaFile | null;
   thumbnail?: MediaFile | null;
   featuredImage?: MediaFile | null;
   gallery: MediaFile[];

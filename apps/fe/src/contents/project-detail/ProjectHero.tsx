@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import HeaderVideo from '@/contents/index/Header/HeaderVideo';
+import ScrollDownButton from '@/components/ScrollDownButton';
 import { ProjectData } from '@/types/project';
 
 interface ProjectHeroProps {
@@ -19,26 +20,51 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
     ? new Date(project.createdAt).getFullYear()
     : new Date().getFullYear();
   const projectUrl = project?.projectUrl || '';
-
+  console.log('project', project);
   const router = useRouter();
 
   const mode = router.query.mode;
 
   return (
-    <header
-      id="project-header"
-      className={clsx(
-        'relative overflow-hidden',
-        mode === 'edit' || mode === 'create' ? '' : 'max-sd:mt-[60px] mt-[65px]'
-      )}
-    >
-      {/* Background Video - giống homepage */}
-      <HeaderVideo
-        heroData={{
-          desktopVideo: project?.heroVideo,
-          mobileVideo: project?.heroVideo,
-        }}
-      />
+    <header id="project-header" className={clsx('relative overflow-hidden')}>
+      {/* Background Video hoặc Banner */}
+      {project?.heroVideo?.url ? (
+        <HeaderVideo
+          heroData={{
+            desktopVideo: project.heroVideo,
+            mobileVideo: project.heroVideo,
+          }}
+        />
+      ) : project?.heroBanner?.url ? (
+        <div
+          className={clsx(
+            'header-video-container relative inset-0 z-0 overflow-hidden',
+            'max-sd:h-[calc(100vh-60px)] max-sd:mt-[60px] mt-[65px] h-[calc(100vh-65px)]'
+          )}
+        >
+          {/* Hero Banner Image */}
+          <Image
+            src={project.heroBanner.url}
+            alt={project.title || 'Hero Banner'}
+            fill
+            className="relative z-20 object-cover"
+            priority
+          />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 z-10 bg-black/20" />
+
+          {/* Scroll Down Button */}
+          {mode !== 'edit' && mode !== 'create' && (
+            <ScrollDownButton
+              className={clsx(
+                'absolute bottom-6 left-1/2 z-30 -translate-x-1/2'
+              )}
+              text="Kéo xuống"
+            />
+          )}
+        </div>
+      ) : null}
 
       {/* Content */}
       <div
