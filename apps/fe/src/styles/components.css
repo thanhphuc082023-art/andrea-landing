@@ -197,13 +197,13 @@
 
   /* Infinite scroll animation */
   .animate-scroll {
-    animation: scroll var(--animation-duration, 40s)
+    animation: scroll var(--animation-duration, 100s)
       var(--animation-direction, forwards) linear infinite;
   }
 
   @keyframes scroll {
     0% {
-      transform: translateX(-0%);
+      transform: translateX(0%);
     }
     100% {
       transform: translateX(-50%);

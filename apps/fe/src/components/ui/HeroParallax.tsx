@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
+import { InfiniteScroll } from './InfiniteScroll';
 
 export const HeroParallax = ({
   products,
@@ -18,10 +19,6 @@ export const HeroParallax = ({
 
   // State để handle responsive screen size, avoid hydration error
   const [isMobile, setIsMobile] = useState(false);
-  const [start, setStart] = useState(false);
-
-  // Refs for infinite animation
-  const rowRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,33 +34,6 @@ export const HeroParallax = ({
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  useEffect(() => {
-    // Add animation after component mounts
-    addAnimation();
-  }, []);
-
-  const addAnimation = () => {
-    rowRefs.current.forEach((ref, index) => {
-      if (ref) {
-        const items = ref.children;
-        const itemsArray = Array.from(items);
-
-        // Duplicate items for infinite scroll
-        itemsArray.forEach((item) => {
-          const duplicated = item.cloneNode(true) as HTMLElement;
-          ref.appendChild(duplicated);
-        });
-
-        // Set animation direction and speed
-        const direction = index % 2 === 0 ? 'forwards' : 'reverse';
-        ref.style.setProperty('--animation-direction', direction);
-        ref.style.setProperty('--animation-duration', '40s');
-      }
-    });
-
-    setStart(true);
-  };
 
   const ITEMS_PER_ROW = isMobile ? ITEMS_PER_ROW_MOBILE : ITEMS_PER_ROW_DESKTOP;
   const totalRows = Math.ceil(products.length / ITEMS_PER_ROW);
@@ -140,22 +110,17 @@ export const HeroParallax = ({
         className="overflow-hidden"
       >
         {rows.map((row, rowIndex) => (
-          <div
+          <InfiniteScroll
             key={`row-${rowIndex}`}
-            ref={(el) => {
-              rowRefs.current[rowIndex] = el;
-            }}
-            className={`flex w-max min-w-full shrink-0 flex-nowrap px-4 md:px-10 ${
-              start ? 'animate-scroll' : ''
-            } hover:[animation-play-state:paused]`}
-            style={{
-              animationDirection: rowIndex % 2 === 0 ? 'normal' : 'reverse',
-            }}
+            direction={rowIndex % 2 === 0 ? 'left' : 'right'}
+            pauseOnHover={true}
+            className="px-4 md:px-10"
+            duplicateCount={3}
           >
             {row.map((product) => (
               <ProductCard product={product} key={product.title} />
             ))}
-          </div>
+          </InfiniteScroll>
         ))}
       </motion.div>
       {/* Content parallax */}
