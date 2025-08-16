@@ -25,30 +25,6 @@ const ProjectPreviewWrapper = ({
   formData?: Partial<ProjectFormData> | null; // Nhận data trực tiếp
   showcaseSections?: any[]; // Nhận showcase sections trực tiếp
 }) => {
-  // Không cần state nữa vì data được pass từ bên ngoài
-
-  console.log('📋 ProjectPreviewWrapper received data:');
-  console.log('formData thumbnail:', {
-    name: formData?.thumbnail?.name,
-    url: formData?.thumbnail?.url
-      ? formData.thumbnail.url.substring(0, 50) + '...'
-      : null,
-    hasFile: !!formData?.thumbnail?.file,
-    fileType: formData?.thumbnail?.file?.type,
-    fileSize: formData?.thumbnail?.file?.size,
-  });
-  console.log('formData heroVideo:', {
-    name: formData?.heroVideo?.name,
-    hasFile: !!formData?.heroVideo?.file,
-    fileType: formData?.heroVideo?.file?.type,
-  });
-  console.log('formData heroBanner:', {
-    name: formData?.heroBanner?.name,
-    hasFile: !!formData?.heroBanner?.file,
-    fileType: formData?.heroBanner?.file?.type,
-  });
-  console.log('showcaseSections count:', showcaseSections?.length || 0);
-
   if (!formData) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -93,40 +69,6 @@ const ProjectPreviewWrapper = ({
               <span className="text-sm text-gray-600">Preview Mode</span>
             </div>
           </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="flex items-center space-x-2 rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <svg
-                  className="h-4 w-4 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <span>Đang tạo...</span>
-              </>
-            ) : (
-              <span>Tạo dự án</span>
-            )}
-          </button>
         </div>
       </div>
 
@@ -207,42 +149,13 @@ export default function CreateProjectPage() {
     mode: 'create' | 'preview',
     data?: { formData: Partial<ProjectFormData>; showcaseSections: any[] }
   ) => {
-    console.log(`🔄 ViewMode changing: ${viewMode} -> ${mode}`);
-
     if (mode === 'preview' && data) {
-      console.log('🎯 handleViewModeChange: Received data for preview:');
-      console.log('thumbnail:', {
-        name: data.formData.thumbnail?.name,
-        url: data.formData.thumbnail?.url
-          ? data.formData.thumbnail.url.substring(0, 50) + '...'
-          : null,
-        hasFile: !!data.formData.thumbnail?.file,
-        fileType: data.formData.thumbnail?.file?.type,
-        fileSize: data.formData.thumbnail?.file?.size,
-      });
-      console.log('heroVideo:', {
-        name: data.formData.heroVideo?.name,
-        url: data.formData.heroVideo?.url ? 'has URL' : 'no URL',
-        hasFile: !!data.formData.heroVideo?.file,
-        fileType: data.formData.heroVideo?.file?.type,
-        fileSize: data.formData.heroVideo?.file?.size,
-      });
-      console.log('heroBanner:', {
-        name: data.formData.heroBanner?.name,
-        hasFile: !!data.formData.heroBanner?.file,
-        fileType: data.formData.heroBanner?.file?.type,
-      });
-
-      // Lưu data từ form vào state thay vì sessionStorage
       setPreviewData({
         formData: data.formData,
         showcaseSections: data.showcaseSections,
       });
-
-      console.log('✅ Preview data saved to state successfully');
     }
 
-    console.log('📋 Form will remain mounted, only CSS visibility changes');
     setViewMode(mode);
   };
 

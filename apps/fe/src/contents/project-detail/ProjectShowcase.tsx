@@ -157,12 +157,11 @@ const ShowcaseItem = memo(
   ({ item, priority = false }: { item: ShowcaseItem; priority?: boolean }) => {
     const commonClasses =
       'object-cover transition-transform duration-700 group-hover:scale-[1.02]';
-
     if (item.type === 'video') {
       return (
         <video
           src={item.src}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+          className="pointer-events-none h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           controls
           muted
           loop
@@ -173,13 +172,16 @@ const ShowcaseItem = memo(
     }
 
     if (item.type === 'flipbook') {
+      // Validate PDF URL and provide fallback
+      let pdfUrl = item.src;
+
       return (
-        <div className="h-[800px] w-full overflow-hidden bg-[#dedede]">
+        <div
+          className={`h-[${item?.height}px] w-full overflow-hidden bg-[#dedede]`}
+        >
           <MinimalFlipBook
-            pdfUrl={
-              item.src ||
-              'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf'
-            }
+            height={item?.height}
+            pdfUrl={pdfUrl}
             bookData={
               item.bookData || {
                 title: 'Project Title',
@@ -218,16 +220,40 @@ ShowcaseItem.displayName = 'ShowcaseItem';
 const ShowcaseSection = memo(
   ({ section, index }: { section: any; index: number }) => {
     // Transform admin data structure to match expected format
-    const transformItem = (item: any, index: number = 0) => ({
-      id: item.id || `item-${index}`,
-      src: item.src || '',
-      alt: item.alt || item.title || '',
-      width: item.width || 1300,
-      height: item.height || 600, // Default height for better UX
-      type: item.type || 'image',
-      bookData: item.bookData || {},
-      colSpan: item.colSpan || 1,
-    });
+    const transformItem = (item: any, index: number = 0) => {
+      // Handle flipbook items specially
+      if (item.type === 'flipbook') {
+        // Validate and clean the PDF URL
+        let pdfUrl = item.src || item.url || '';
+
+        return {
+          id: item.id || `item-${index}`,
+          src: pdfUrl,
+          alt: item.alt || item.title || 'Interactive FlipBook',
+          width: item.width || 1300,
+          height: item.height || 800,
+          type: 'flipbook',
+          bookData: item.bookData || {
+            title: 'Project Portfolio',
+            websiteUrl: 'https://example.com',
+            phoneNumber: '+1234567890',
+            downloadUrl: '/download-file.pdf',
+          },
+          colSpan: item.colSpan || 1,
+        };
+      }
+
+      return {
+        id: item.id || `item-${index}`,
+        src: item.src || '',
+        alt: item.alt || item.title || '',
+        width: item.width || 1300,
+        height: item.height || 600, // Default height for better UX
+        type: item.type || 'image',
+        bookData: item.bookData || {},
+        colSpan: item.colSpan || 1,
+      };
+    };
 
     if (section.layout === 'single') {
       // Handle both admin structure (items array) and legacy structure
@@ -340,7 +366,6 @@ const ShowcaseSection = memo(
       ? section.items
       : [section.items];
     const gridCols = section.gridCols || 2;
-
     return (
       <div
         key={section.id}

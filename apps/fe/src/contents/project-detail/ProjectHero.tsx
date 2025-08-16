@@ -20,13 +20,15 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
     ? new Date(project.createdAt).getFullYear()
     : new Date().getFullYear();
   const projectUrl = project?.projectUrl || '';
-  console.log('project', project);
   const router = useRouter();
 
   const mode = router.query.mode;
 
   return (
-    <header id="project-header" className={clsx('relative overflow-hidden')}>
+    <header
+      id="project-header"
+      className={clsx('max-sd:mt-[60px] relative mt-[65px] overflow-hidden')}
+    >
       {/* Background Video hoặc Banner */}
       {project?.heroVideo?.url ? (
         <HeaderVideo
@@ -39,7 +41,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
         <div
           className={clsx(
             'header-video-container relative inset-0 z-0 overflow-hidden',
-            'max-sd:h-[calc(100vh-60px)] max-sd:mt-[60px] mt-[65px] h-[calc(100vh-65px)]'
+            'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-65px)]'
           )}
         >
           {/* Hero Banner Image */}

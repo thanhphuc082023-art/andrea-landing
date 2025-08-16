@@ -97,12 +97,6 @@ export default function ProjectFormPage({
   const title = watch('title') || '';
   const description = watch('description') || '';
 
-  console.log('thumbnail', thumbnail);
-  console.log('heroVideo', heroVideo);
-  console.log('heroBanner', heroBanner);
-  console.log('title', title);
-  console.log('description', description);
-
   const handleCancel = () => {
     cleanup();
     formCleanup();
@@ -118,27 +112,6 @@ export default function ProjectFormPage({
   const handlePreview = () => {
     // Bỏ saveDataForPreview() vì chúng ta pass data trực tiếp
     if (onViewModeChange) {
-      console.log('🎯 Starting handlePreview...');
-      console.log('Current fileObjects state:', fileObjects);
-      console.log('Current form values:', {
-        thumbnail: {
-          hasFile: !!thumbnail?.file,
-          fileName: thumbnail?.file?.name,
-          hasUrl: !!thumbnail?.url,
-          url: thumbnail?.url?.substring(0, 50) + '...',
-        },
-        heroVideo: {
-          hasFile: !!heroVideo?.file,
-          fileName: heroVideo?.file?.name,
-          hasUrl: !!heroVideo?.url,
-        },
-        heroBanner: {
-          hasFile: !!heroBanner?.file,
-          fileName: heroBanner?.file?.name,
-          hasUrl: !!heroBanner?.url,
-        },
-      });
-
       // Lấy form data từ watch() và merge với file objects từ state riêng
       const baseFormData = watch(); // Base form data
       const currentFormData = {
@@ -172,25 +145,6 @@ export default function ProjectFormPage({
         gallery: baseFormData.gallery,
       };
 
-      console.log('🔍 Final merged data for preview:');
-      console.log('thumbnail final:', {
-        hasFile: !!currentFormData.thumbnail?.file,
-        fileName: currentFormData.thumbnail?.file?.name,
-        fileSize: currentFormData.thumbnail?.file?.size,
-        hasUrl: !!currentFormData.thumbnail?.url,
-        name: currentFormData.thumbnail?.name,
-      });
-      console.log('heroVideo final:', {
-        hasFile: !!currentFormData.heroVideo?.file,
-        fileName: currentFormData.heroVideo?.file?.name,
-        hasUrl: !!currentFormData.heroVideo?.url,
-      });
-      console.log('heroBanner final:', {
-        hasFile: !!currentFormData.heroBanner?.file,
-        fileName: currentFormData.heroBanner?.file?.name,
-        hasUrl: !!currentFormData.heroBanner?.url,
-      });
-
       onViewModeChange('preview', {
         formData: currentFormData,
         showcaseSections,
@@ -219,8 +173,6 @@ export default function ProjectFormPage({
   };
   // Enhanced form submission
   const handleEnhancedFormSubmit = async (data: ProjectFormData) => {
-    console.log('data', data);
-    console.log('showcaseSections', showcaseSections);
     setIsUploading(true);
     try {
       // Submit form data directly

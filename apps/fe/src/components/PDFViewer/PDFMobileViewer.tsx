@@ -24,6 +24,7 @@ declare global {
 
 interface PDFMobileViewerProps {
   pdfUrl?: string;
+  height?: number; // Add height prop
   bookData?: {
     title?: string;
     websiteUrl?: string;
@@ -36,12 +37,14 @@ interface PDFMobileViewerProps {
 
 export default function PDFMobileViewer({
   pdfUrl = '',
+  height, // Destructure height
   bookData,
   isHideActions = false,
   isHideScrollDown = false,
 }: PDFMobileViewerProps) {
   // Only essential state that needs to trigger re-renders
   const [isLoading, setIsLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);

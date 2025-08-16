@@ -26,6 +26,7 @@ const PDFMobileViewer = dynamic(() => import('./PDFMobileViewer'), {
 
 interface AdaptivePDFViewerProps {
   pdfUrl?: string;
+  height?: number; // Add height prop
   bookData?: {
     title?: string;
     websiteUrl?: string;
@@ -43,6 +44,7 @@ interface AdaptivePDFViewerProps {
  */
 export default function AdaptivePDFViewer({
   pdfUrl = '',
+  height, // Destructure height
   bookData,
   isHideActions = false,
   isHideScrollDown = false,
@@ -67,6 +69,7 @@ export default function AdaptivePDFViewer({
           isHideActions={isHideActions}
           isHideScrollDown={isHideScrollDown}
           pdfUrl={pdfUrl}
+          height={height} // Pass height to mobile viewer
           bookData={bookData}
         />
       ) : (
@@ -74,6 +77,7 @@ export default function AdaptivePDFViewer({
           isHideActions={isHideActions}
           isHideScrollDown={isHideScrollDown}
           pdfUrl={pdfUrl}
+          height={height} // Pass height to desktop viewer
           bookData={bookData}
         />
       )}

@@ -143,42 +143,6 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
           setValue('heroVideo', parsedData.heroVideo || undefined);
           setValue('heroBanner', parsedData.heroBanner || undefined);
 
-          console.log(
-            '📥 [useProjectForm] Restored media from sessionStorage:',
-            {
-              thumbnail: parsedData.thumbnail
-                ? {
-                    name: parsedData.thumbnail.name,
-                    hasFile: !!parsedData.thumbnail.file,
-                    uploadId: parsedData.thumbnail.uploadId,
-                    url: parsedData.thumbnail.url?.startsWith('blob:')
-                      ? 'BLOB URL (will be lost)'
-                      : 'server URL',
-                  }
-                : null,
-              heroVideo: parsedData.heroVideo
-                ? {
-                    name: parsedData.heroVideo.name,
-                    hasFile: !!parsedData.heroVideo.file,
-                    uploadId: parsedData.heroVideo.uploadId,
-                    url: parsedData.heroVideo.url?.startsWith('blob:')
-                      ? 'BLOB URL (will be lost)'
-                      : 'server URL',
-                  }
-                : null,
-              heroBanner: parsedData.heroBanner
-                ? {
-                    name: parsedData.heroBanner.name,
-                    hasFile: !!parsedData.heroBanner.file,
-                    uploadId: parsedData.heroBanner.uploadId,
-                    url: parsedData.heroBanner.url?.startsWith('blob:')
-                      ? 'BLOB URL (will be lost)'
-                      : 'server URL',
-                  }
-                : null,
-            }
-          );
-
           // Important: File objects are lost during JSON serialization
           // Only preserve URLs and uploadIds, remove file references
           if (parsedData.thumbnail?.url?.startsWith('blob:')) {
@@ -300,22 +264,6 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
               .filter((item: any) => item.src || item.uploadId), // Remove items without src or uploadId
           }));
 
-          console.log('📥 [useProjectForm] Cleaned showcase sections:', {
-            originalSections: parsedSections.length,
-            cleanedSections: cleanedSections.length,
-            itemsRemoved:
-              parsedSections.reduce(
-                (acc: number, section: any) =>
-                  acc + (section.items?.length || 0),
-                0
-              ) -
-              cleanedSections.reduce(
-                (acc: number, section: any) =>
-                  acc + (section.items?.length || 0),
-                0
-              ),
-          });
-
           setShowcaseSections(cleanedSections);
         } catch (error) {
           console.error('Error parsing showcase sections:', error);
@@ -426,66 +374,6 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       heroBanner: currentData.heroBanner,
       thumbnail: currentData.thumbnail,
     };
-
-    console.log('🔄 [useProjectForm] Saving media to sessionStorage:', {
-      thumbnail: finalData.thumbnail
-        ? {
-            name: finalData.thumbnail.name,
-            hasFile: !!finalData.thumbnail.file,
-            uploadId: finalData.thumbnail.uploadId,
-            url: finalData.thumbnail.url?.startsWith('blob:')
-              ? 'blob URL'
-              : 'server URL',
-          }
-        : null,
-      heroVideo: finalData.heroVideo
-        ? {
-            name: finalData.heroVideo.name,
-            hasFile: !!finalData.heroVideo.file,
-            uploadId: finalData.heroVideo.uploadId,
-            url: finalData.heroVideo.url?.startsWith('blob:')
-              ? 'blob URL'
-              : 'server URL',
-          }
-        : null,
-      heroBanner: finalData.heroBanner
-        ? {
-            name: finalData.heroBanner.name,
-            hasFile: !!finalData.heroBanner.file,
-            uploadId: finalData.heroBanner.uploadId,
-            url: finalData.heroBanner.url?.startsWith('blob:')
-              ? 'blob URL'
-              : 'server URL',
-          }
-        : null,
-      showcase: {
-        sectionsCount: showcaseSections.length,
-        sectionsWithFiles: showcaseSections.filter((section) =>
-          section.items?.some((item) => item.file || item.uploadId)
-        ).length,
-        totalItems: showcaseSections.reduce(
-          (acc, section) =>
-            acc +
-            (section.items?.filter((item) => item.file || item.uploadId)
-              .length || 0),
-          0
-        ),
-        itemsWithFiles: showcaseSections.reduce(
-          (acc, section) =>
-            acc +
-            (section.items?.filter((item) => item.file || item.uploadId)
-              .length || 0),
-          0
-        ),
-        emptySlots: showcaseSections.reduce(
-          (acc, section) =>
-            acc +
-            (section.items?.filter((item) => !item.file && !item.uploadId)
-              .length || 0),
-          0
-        ),
-      },
-    });
 
     sessionStorage.setItem('projectFormData', JSON.stringify(finalData));
     sessionStorage.setItem(

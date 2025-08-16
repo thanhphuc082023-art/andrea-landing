@@ -42,6 +42,11 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
       );
     }
 
+    // Special case for Projects - match both /projects and /project/[slug]
+    if (item.url === '/projects') {
+      return currentPath === '/projects' || currentPath.startsWith('/project/');
+    }
+
     return currentPath.startsWith(item.url || '');
   };
 

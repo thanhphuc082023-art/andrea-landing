@@ -480,16 +480,6 @@ const SortableSection = ({
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      console.log(
-                        `📋 [ShowcaseSection] File selected for section "${section.title}" (lazy upload):`,
-                        {
-                          name: file.name,
-                          size: file.size,
-                          type: file.type,
-                          sectionId: section.id,
-                        }
-                      );
-
                       setShowcaseSections((prevSections) => {
                         const updatedSections = prevSections.map((s) =>
                           s.id === section.id
@@ -519,17 +509,6 @@ const SortableSection = ({
                                 ],
                               }
                             : s
-                        );
-
-                        // Debug: Log updated sections
-                        console.log(
-                          'Updated showcase sections:',
-                          updatedSections.map((s) => ({
-                            id: s.id,
-                            title: s.title,
-                            itemsCount: s.items?.length,
-                            hasFile: s.items?.some((item) => item.file),
-                          }))
                         );
 
                         return updatedSections;

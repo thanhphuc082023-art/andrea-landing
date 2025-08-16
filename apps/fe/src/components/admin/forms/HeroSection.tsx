@@ -253,14 +253,6 @@ export default function HeroSection({
                     url: URL.createObjectURL(file),
                     name: file.name,
                   });
-                  console.log(
-                    '🖼️ [HeroSection] Thumbnail selected (lazy upload):',
-                    {
-                      name: file.name,
-                      size: file.size,
-                      type: file.type,
-                    }
-                  );
                 }}
                 onFileRemove={removeThumbnail}
                 selectedFile={thumbnail?.file}
@@ -322,14 +314,6 @@ export default function HeroSection({
                     url: URL.createObjectURL(file),
                     name: file.name,
                   });
-                  console.log(
-                    '🎥 [HeroSection] Hero video selected (lazy upload):',
-                    {
-                      name: file.name,
-                      size: file.size,
-                      type: file.type,
-                    }
-                  );
                 }}
                 onFileRemove={removeHeroVideo}
                 selectedFile={heroVideo?.file}
@@ -390,14 +374,6 @@ export default function HeroSection({
                     url: URL.createObjectURL(file),
                     name: file.name,
                   });
-                  console.log(
-                    '🖼️ [HeroSection] Hero banner selected (lazy upload):',
-                    {
-                      name: file.name,
-                      size: file.size,
-                      type: file.type,
-                    }
-                  );
                 }}
                 onFileRemove={removeHeroBanner}
                 selectedFile={heroBanner?.file}

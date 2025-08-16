@@ -5,6 +5,7 @@ import clsx from 'clsx';
 
 interface MinimalFlipBookProps {
   pdfUrl?: string;
+  height?: number;
   bookData?: {
     title?: string;
     websiteUrl?: string;
@@ -23,6 +24,7 @@ interface MinimalFlipBookProps {
  */
 export default function MinimalFlipBook({
   pdfUrl = '',
+  height,
   bookData,
   isSimpleLayout = false,
   isHideActions = false,
@@ -31,16 +33,20 @@ export default function MinimalFlipBook({
   return (
     <div
       className={clsx(
-        isSimpleLayout
-          ? 'h-screen min-h-screen'
-          : 'max-sd:h-[calc(100vh-60px)] max-sd:min-h-[calc(100vh-60px)] h-[calc(100vh-65px)] min-h-[calc(100vh-65px)]',
+        height
+          ? 'h-full'
+          : isSimpleLayout
+            ? 'h-screen min-h-screen'
+            : 'max-sd:h-[calc(100vh-60px)] max-sd:min-h-[calc(100vh-60px)] h-[calc(100vh-65px)] min-h-[calc(100vh-65px)]',
         'relative overflow-hidden'
       )}
+      style={height ? { height: `${height}px` } : undefined}
     >
       <AdaptivePDFViewer
         isHideActions={isHideActions}
         isHideScrollDown={isHideScrollDown}
         pdfUrl={pdfUrl}
+        height={height} // Pass height to AdaptivePDFViewer
         bookData={bookData}
       />
     </div>

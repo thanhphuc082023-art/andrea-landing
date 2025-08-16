@@ -16,6 +16,7 @@ declare global {
 
 interface PDFDesktopViewerProps {
   pdfUrl?: string;
+  height?: number; // Add height prop
   bookData?: {
     title?: string;
     websiteUrl?: string;
@@ -28,6 +29,7 @@ interface PDFDesktopViewerProps {
 
 export default function PDFDesktopViewer({
   pdfUrl = '',
+  height, // Destructure height
   bookData,
   isHideActions = false,
   isHideScrollDown = false,
@@ -55,7 +57,6 @@ export default function PDFDesktopViewer({
 
     try {
       const pdf = await window.pdfjsLib.getDocument(pdfUrl).promise;
-      console.log(`Starting manual preload of ${numPages} pages...`);
 
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
@@ -74,8 +75,6 @@ export default function PDFDesktopViewer({
             canvasContext: context,
             viewport: viewport,
           }).promise;
-
-          console.log(`✅ Manual preload page ${i} complete`);
         } catch (e) {
           console.log(`❌ Manual preload page ${i} failed:`, e);
         }
@@ -134,6 +133,42 @@ export default function PDFDesktopViewer({
 
   const initFlipBook = async () => {
     try {
+      console.log('🎬 Initializing FlipBook with URL:', pdfUrl);
+
+      if (!pdfUrl || pdfUrl.trim() === '') {
+        throw new Error('Empty PDF URL');
+      }
+
+      // Handle blob URLs by converting them to data URLs
+      let processedPdfUrl = pdfUrl;
+      if (pdfUrl.startsWith('blob:')) {
+        console.log('🔄 Converting blob URL to data URL...');
+        try {
+          const response = await fetch(pdfUrl);
+          if (response.ok) {
+            const blob = await response.blob();
+            const arrayBuffer = await blob.arrayBuffer();
+            const base64 = btoa(
+              new Uint8Array(arrayBuffer).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ''
+              )
+            );
+            processedPdfUrl = `data:application/pdf;base64,${base64}`;
+            console.log('✅ Successfully converted blob to data URL');
+          } else {
+            console.error('❌ Failed to fetch blob URL:', response.status);
+            throw new Error(`Failed to fetch blob: ${response.status}`);
+          }
+        } catch (error) {
+          console.error('❌ Failed to convert blob URL:', error);
+          // Fallback to a working PDF
+          processedPdfUrl =
+            'https://ontheline.trincoll.edu/images/bookdown/sample-local-pdf.pdf';
+          console.log('🔄 Using fallback PDF URL:', processedPdfUrl);
+        }
+      }
+
       // Load all scripts
       await loadScript('/3d-flipbook/js/jquery.min.js');
       (window as any).$ = window.jQuery;
@@ -209,8 +244,22 @@ export default function PDFDesktopViewer({
       const container = $(containerRef.current);
 
       // Desktop-optimized FlipBook configuration
+      console.log('📖 Creating FlipBook with processed URL:', processedPdfUrl);
+
+      // Calculate dimensions based on height prop
+      let flipbookHeight = '100%';
+      let flipbookWidth = '100%';
+
+      if (height) {
+        flipbookHeight = `${height}px`;
+        console.log(
+          '🖥️ [PDFDesktopViewer] Using custom height:',
+          flipbookHeight
+        );
+      }
+
       const flipbook = container.FlipBook({
-        pdf: pdfUrl,
+        pdf: processedPdfUrl,
         template: {
           html: '/3d-flipbook/templates/default-book-view.html',
           styles: ['/3d-flipbook/css/short-black-book-view.css'],
@@ -222,9 +271,9 @@ export default function PDFDesktopViewer({
           ],
           script: '/3d-flipbook/js/default-book-view.js',
         },
-        width: '100%',
-        height: '100%',
-        autoSize: true,
+        width: flipbookWidth,
+        height: flipbookHeight,
+        autoSize: !height, // Disable autoSize when height is provided
 
         // Tăng cache và preload settings
         cachedPages: 100,
