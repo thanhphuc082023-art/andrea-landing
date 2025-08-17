@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { InfiniteScroll } from './InfiniteScroll';
+import Link from 'next/link';
 
 export const HeroParallax = ({
   products,
@@ -160,7 +161,10 @@ export const ProductCard = ({
       key={product.title}
       className="group/product relative h-[300px] w-[350px] max-w-full shrink-0 md:h-[400px] md:w-[450px]" // Fixed width for infinite scroll
     >
-      <a href={product.link} className="block group-hover/product:shadow-2xl">
+      <Link
+        href={product.link}
+        className="block group-hover/product:shadow-2xl"
+      >
         <img
           src={product.thumbnail}
           height="400"
@@ -168,7 +172,7 @@ export const ProductCard = ({
           className={`absolute inset-0 h-full w-full object-cover object-left-top transition-opacity duration-300`}
           alt={product.title}
         />
-      </a>
+      </Link>
       <div className="pointer-events-none absolute inset-0 h-full w-full bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover/product:opacity-50"></div>
       <div className="absolute bottom-4 left-4 right-4 translate-y-4 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/product:translate-y-0 group-hover/product:opacity-100">
         <h2 className="mb-2 text-lg font-semibold">{product.title}</h2>
