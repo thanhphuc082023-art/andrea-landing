@@ -32,6 +32,8 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
       {/* Background Video hoặc Banner */}
       {project?.heroVideo?.url ? (
         <HeaderVideo
+          aspectRatio="full"
+          mobileAspectRatio="9:16"
           heroData={{
             desktopVideo: project.heroVideo,
             mobileVideo: project.heroVideo,
@@ -71,7 +73,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
       {/* Content */}
       <div
         className={clsx(
-          'relative z-10 flex min-h-[511px] items-center py-[50px]'
+          'relative z-10 flex min-h-[511px] items-center py-[50px] max-md:py-[40px]'
         )}
       >
         <div className={clsx('content-wrapper')}>
@@ -87,14 +89,14 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
               <h1
                 className={clsx(
                   'font-playfair text-primary text-[50px] font-medium leading-[80px]',
-                  'max-lg:text-4xl max-lg:leading-[1.2] max-md:text-3xl dark:text-white'
+                  'max-lg:text-4xl max-lg:leading-[1.2] max-md:text-[30px] dark:text-white'
                 )}
               >
                 {projectTitle}
               </h1>
 
               {/* Project Meta Info */}
-              <div className="mt-[117px] text-xl leading-[35px] tracking-[0.5px] text-black max-lg:mt-8 max-lg:text-lg dark:text-white">
+              <div className="mt-[117px] text-xl leading-[35px] tracking-[0.5px] text-black max-lg:mt-8 max-lg:text-lg max-md:mt-[13px] max-md:text-[16px] dark:text-white">
                 {projectMetaInfo.map((info, index) => (
                   <div key={index} className="mb-0">
                     <span>{info}</span>
@@ -105,12 +107,12 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
 
             {/* Right side - Project Description */}
             <div className="max-w-[642px] max-lg:flex-1">
-              <h2 className="mb-4 text-2xl font-bold text-[#484848] dark:text-gray-300">
+              <h2 className="mb-4 text-2xl font-bold text-[#484848] max-md:text-[24px] dark:text-gray-300">
                 {projectIntroTitle}
               </h2>
               <div
                 className={clsx(
-                  'text-base font-normal leading-6 tracking-[0.5px] text-[#7D7D7D] dark:text-gray-400'
+                  'text-base font-normal leading-6 tracking-[0.5px] text-[#7D7D7D] max-md:text-[16px] dark:text-gray-400'
                 )}
               >
                 <p>{projectDescription}</p>

@@ -176,11 +176,13 @@ const ShowcaseItem = memo(
       let pdfUrl = item.src;
 
       return (
-        <div
-          className={`h-[${item?.height}px] w-full overflow-hidden bg-[#dedede]`}
-        >
+        <div className="w-full overflow-hidden bg-[#dedede]">
           <MinimalFlipBook
+            className={`!h-auto max-md:!aspect-[1]`}
             height={item?.height}
+            style={{
+              aspectRatio: `${item?.width || 1300} / ${item?.height || 800}`,
+            }}
             pdfUrl={pdfUrl}
             bookData={
               item.bookData || {
@@ -210,6 +212,7 @@ const ShowcaseItem = memo(
             : '(max-width: 1024px) 100vw, 50vw'
         }
         priority={priority}
+        style={{ objectFit: 'cover' }}
       />
     );
   }
@@ -255,6 +258,12 @@ const ShowcaseSection = memo(
       };
     };
 
+    // Calculate aspect ratio for all devices
+    const getAspectRatio = (width: number, height: number) => {
+      const ratio = width / height;
+      return ratio;
+    };
+
     if (section.layout === 'single') {
       // Handle both admin structure (items array) and legacy structure
       const items = Array.isArray(section.items)
@@ -278,12 +287,12 @@ const ShowcaseSection = memo(
       return (
         <div key={section.id} className="group">
           <div
-            className="relative overflow-hidden bg-white shadow-sm"
+            className="relative w-full overflow-hidden bg-white shadow-sm"
             style={{
-              height:
-                transformedItem.type === 'video'
-                  ? `${Math.min(transformedItem.height || 600, 600)}px`
-                  : `${transformedItem.height || 600}px`,
+              aspectRatio:
+                transformedItem.type !== 'flipbook'
+                  ? `${transformedItem.width} / ${transformedItem.height}`
+                  : undefined,
             }}
           >
             <ShowcaseItem item={transformedItem} priority={index === 0} />
@@ -299,18 +308,17 @@ const ShowcaseSection = memo(
         : [section.items];
 
       return (
-        <div key={section.id} className="grid grid-cols-1 lg:grid-cols-2">
+        <div key={section.id} className="grid grid-cols-2">
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
+            // For half-half layout, divide width by 2 for proper aspect ratio
+            const adjustedWidth = items[0].width / 2;
             return (
               <div key={itemIndex} className="group">
                 <div
-                  className="relative overflow-hidden bg-white shadow-sm"
+                  className="relative w-full overflow-hidden bg-white shadow-sm"
                   style={{
-                    height:
-                      transformedItem.type === 'video'
-                        ? `${Math.min(transformedItem.height || 400, 400)}px`
-                        : `${transformedItem.height || 400}px`,
+                    aspectRatio: `${adjustedWidth} / ${transformedItem.height}`,
                   }}
                 >
                   <ShowcaseItem
@@ -332,21 +340,23 @@ const ShowcaseSection = memo(
         : [section.items];
 
       return (
-        <div key={section.id} className="grid grid-cols-1 lg:grid-cols-3">
+        <div key={section.id} className="grid grid-cols-3">
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
+            // For one-third layout: first item gets 1/3 width, second item gets 2/3 width
+            const adjustedWidth =
+              itemIndex === 0
+                ? items[0].width / 3 // First item: 33%
+                : (items[0].width * 2) / 3; // Second item: 67%
             return (
               <div
                 key={itemIndex}
-                className={`group ${itemIndex === 1 ? 'lg:col-span-2' : ''}`}
+                className={`group ${itemIndex === 1 ? 'col-span-2' : ''}`}
               >
                 <div
-                  className="relative overflow-hidden bg-white shadow-sm"
+                  className="relative w-full overflow-hidden bg-white shadow-sm"
                   style={{
-                    height:
-                      transformedItem.type === 'video'
-                        ? `${Math.min(transformedItem.height || 400, 400)}px`
-                        : `${transformedItem.height || 400}px`,
+                    aspectRatio: `${adjustedWidth} / ${transformedItem.height}`,
                   }}
                 >
                   <ShowcaseItem
@@ -366,25 +376,62 @@ const ShowcaseSection = memo(
       ? section.items
       : [section.items];
     const gridCols = section.gridCols || 2;
+
+    // Use specific grid classes instead of dynamic ones
+    const getGridClass = (cols: number) => {
+      switch (cols) {
+        case 1:
+          return 'grid-cols-1';
+        case 2:
+          return 'grid-cols-2';
+        case 3:
+          return 'grid-cols-3';
+        case 4:
+          return 'grid-cols-2 lg:grid-cols-4'; // 2 cols on mobile, 4 on desktop
+        case 5:
+          return 'grid-cols-2 lg:grid-cols-5'; // 2 cols on mobile, 5 on desktop
+        case 6:
+          return 'grid-cols-2 lg:grid-cols-6'; // 2 cols on mobile, 6 on desktop
+        default:
+          return 'grid-cols-2';
+      }
+    };
+
+    const getColSpanClass = (colSpan: number) => {
+      switch (colSpan) {
+        case 1:
+          return 'lg:col-span-1';
+        case 2:
+          return 'lg:col-span-2';
+        case 3:
+          return 'lg:col-span-3';
+        case 4:
+          return 'lg:col-span-4';
+        case 5:
+          return 'lg:col-span-5';
+        case 6:
+          return 'lg:col-span-6';
+        default:
+          return '';
+      }
+    };
+
     return (
-      <div
-        key={section.id}
-        className={`grid grid-cols-1 lg:grid-cols-${gridCols}`}
-      >
+      <div key={section.id} className={`grid ${getGridClass(gridCols)}`}>
         {items.map((item: any, itemIndex: number) => {
           const transformedItem = transformItem(item, itemIndex);
+          // For grid layout, adjust width based on column span and total columns
+          const effectiveColSpan = transformedItem.colSpan || 1;
+          const adjustedWidth = (items[0].width * effectiveColSpan) / gridCols;
           return (
             <div
               key={itemIndex}
-              className={`group ${transformedItem.colSpan ? `lg:col-span-${transformedItem.colSpan}` : ''}`}
+              className={`group ${transformedItem.colSpan ? getColSpanClass(transformedItem.colSpan) : ''}`}
             >
               <div
-                className="relative overflow-hidden bg-white shadow-sm"
+                className="relative w-full overflow-hidden bg-white shadow-sm"
                 style={{
-                  height:
-                    transformedItem.type === 'video'
-                      ? `${Math.min(transformedItem.height || 400, 400)}px`
-                      : `${transformedItem.height || 400}px`,
+                  aspectRatio: `${adjustedWidth} / ${transformedItem.height}`,
                 }}
               >
                 <ShowcaseItem item={transformedItem} />
@@ -403,7 +450,7 @@ function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
   const sections = project?.showcaseSections || legacyShowcaseData;
 
   return (
-    <section className="content-wrapper">
+    <section className="content-wrapper max-md:px-0">
       <div>
         {sections.map((section, index) => (
           <ShowcaseSection key={section.id} section={section} index={index} />

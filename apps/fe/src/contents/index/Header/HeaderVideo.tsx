@@ -4,9 +4,15 @@ import ScrollDownButton from '@/components/ScrollDownButton';
 
 interface HeaderVideoProps {
   heroData?: any;
+  aspectRatio?: 'full' | '16:9' | '4:3' | '1:1' | 'auto';
+  mobileAspectRatio?: '16:9' | '4:3' | '1:1' | '9:16' | 'auto';
 }
 
-function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
+function HeaderVideo({
+  heroData = {},
+  aspectRatio = 'full',
+  mobileAspectRatio = '9:16',
+}: HeaderVideoProps) {
   // Handle different video data formats
   const getVideoUrl = (videoData: any) => {
     if (!videoData) return null;
@@ -29,6 +35,44 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
     return null;
   };
 
+  // Get aspect ratio classes for desktop
+  const getDesktopAspectRatioClasses = (ratio: string) => {
+    switch (ratio) {
+      case '16:9':
+        return 'aspect-video'; // Tailwind's 16:9 aspect ratio
+      case '4:3':
+        return 'aspect-[4/3]';
+      case '1:1':
+        return 'aspect-square';
+      case 'auto':
+        return 'h-auto';
+      case 'full':
+      default:
+        return 'h-[calc(100vh-65px)]'; // Full viewport height on desktop
+    }
+  };
+
+  // Get aspect ratio classes for mobile
+  const getMobileAspectRatioClasses = (ratio: string) => {
+    switch (ratio) {
+      case '16:9':
+        return 'aspect-video'; // 16:9 aspect ratio
+      case '4:3':
+        return 'aspect-[4/3]';
+      case '1:1':
+        return 'aspect-square';
+      case '9:16':
+        return 'aspect-[9/16]'; // Portrait aspect ratio for mobile
+      case 'auto':
+        return 'h-auto';
+      default:
+        return 'aspect-[9/16]'; // Default mobile portrait
+    }
+  };
+
+  const desktopClasses = getDesktopAspectRatioClasses(aspectRatio);
+  const mobileClasses = getMobileAspectRatioClasses(mobileAspectRatio);
+
   const desktopVideo =
     getVideoUrl(heroData?.desktopVideo) ||
     'https://andrea.vn/uploads/videos/intro-website_3.mp4';
@@ -39,8 +83,11 @@ function HeaderVideo({ heroData = {} }: HeaderVideoProps) {
   return (
     <div
       className={clsx(
-        'header-video-container relative inset-0 z-0 overflow-hidden',
-        'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-65px)]'
+        'header-video-container relative inset-0 z-0 w-full overflow-hidden',
+        // Desktop aspect ratio
+        `md:${desktopClasses}`,
+        // Mobile aspect ratio
+        `max-md:${mobileClasses}`
       )}
     >
       {/* Custom shimmer skeleton */}
