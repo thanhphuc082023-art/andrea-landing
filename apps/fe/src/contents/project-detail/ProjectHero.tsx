@@ -32,7 +32,6 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
       {/* Background Video hoặc Banner */}
       {project?.heroVideo?.url ? (
         <HeaderVideo
-          aspectRatio="full"
           mobileAspectRatio="9:16"
           heroData={{
             desktopVideo: project.heroVideo,

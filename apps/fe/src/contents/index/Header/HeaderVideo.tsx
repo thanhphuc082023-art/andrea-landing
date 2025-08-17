@@ -4,14 +4,12 @@ import ScrollDownButton from '@/components/ScrollDownButton';
 
 interface HeaderVideoProps {
   heroData?: any;
-  aspectRatio?: 'full' | '16:9' | '4:3' | '1:1' | 'auto';
-  mobileAspectRatio?: '16:9' | '4:3' | '1:1' | '9:16' | 'auto';
+  mobileAspectRatio?: '16:9' | '4:3' | '1:1' | '9:16' | '';
 }
 
 function HeaderVideo({
   heroData = {},
-  aspectRatio = 'full',
-  mobileAspectRatio = '9:16',
+  mobileAspectRatio = '',
 }: HeaderVideoProps) {
   // Handle different video data formats
   const getVideoUrl = (videoData: any) => {
@@ -35,23 +33,6 @@ function HeaderVideo({
     return null;
   };
 
-  // Get aspect ratio classes for desktop
-  const getDesktopAspectRatioClasses = (ratio: string) => {
-    switch (ratio) {
-      case '16:9':
-        return 'aspect-video'; // Tailwind's 16:9 aspect ratio
-      case '4:3':
-        return 'aspect-[4/3]';
-      case '1:1':
-        return 'aspect-square';
-      case 'auto':
-        return 'h-auto';
-      case 'full':
-      default:
-        return 'h-[calc(100vh-65px)]'; // Full viewport height on desktop
-    }
-  };
-
   // Get aspect ratio classes for mobile
   const getMobileAspectRatioClasses = (ratio: string) => {
     switch (ratio) {
@@ -70,7 +51,6 @@ function HeaderVideo({
     }
   };
 
-  const desktopClasses = getDesktopAspectRatioClasses(aspectRatio);
   const mobileClasses = getMobileAspectRatioClasses(mobileAspectRatio);
 
   const desktopVideo =
@@ -84,10 +64,10 @@ function HeaderVideo({
     <div
       className={clsx(
         'header-video-container relative inset-0 z-0 w-full overflow-hidden',
-        // Desktop aspect ratio
-        `md:${desktopClasses}`,
+        'header-video-container relative inset-0 z-0 overflow-hidden',
+        'h-[calc(100vh-65px)]',
         // Mobile aspect ratio
-        `max-md:${mobileClasses}`
+        mobileAspectRatio ? `max-sd:${mobileClasses} max-sd:!h-auto` : ''
       )}
     >
       {/* Custom shimmer skeleton */}
