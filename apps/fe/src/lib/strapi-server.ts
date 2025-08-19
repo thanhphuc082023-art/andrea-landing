@@ -215,8 +215,6 @@ export async function getFeaturedProjectsSettings(): Promise<
   };
 
   const response = await fetchStrapiAPI('home-featured-project', params);
-  console.log(response.data);
-
   if (response?.data) {
     response.data.projects.sort(
       (a: any, b: any) =>

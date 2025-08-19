@@ -39,34 +39,30 @@ export default function AdminProjects({
     router.push('/admin/projects/create');
   };
 
-  const handleUpdateProject = (project: Project) => {
-    router.push(`/admin/projects/${project.id}/edit`);
-  };
-
   const handleEditProject = (project: Project) => {
-    router.push(`/admin/projects/${project.id}/edit`);
+    router.push(`/admin/projects/${project.slug}/edit`);
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      draft: { label: 'Bản nháp', color: 'bg-gray-100 text-gray-800' },
-      'in-progress': {
-        label: 'Đang thực hiện',
-        color: 'bg-yellow-100 text-yellow-800',
-      },
-      completed: { label: 'Hoàn thành', color: 'bg-green-100 text-green-800' },
-    };
+  // const getStatusBadge = (status: string) => {
+  //   const statusConfig = {
+  //     draft: { label: 'Bản nháp', color: 'bg-gray-100 text-gray-800' },
+  //     'in-progress': {
+  //       label: 'Đang thực hiện',
+  //       color: 'bg-yellow-100 text-yellow-800',
+  //     },
+  //     completed: { label: 'Hoàn thành', color: 'bg-green-100 text-green-800' },
+  //   };
 
-    const config =
-      statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
-    return (
-      <span
-        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}
-      >
-        {config.label}
-      </span>
-    );
-  };
+  //   const config =
+  //     statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
+  //   return (
+  //     <span
+  //       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}
+  //     >
+  //       {config.label}
+  //     </span>
+  //   );
+  // };
 
   if (error) {
     return (
@@ -209,13 +205,13 @@ export default function AdminProjects({
                             >
                               <EyeIcon className="h-5 w-5" />
                             </button>
-                            {/* <button
+                            <button
                               onClick={() => handleEditProject(project)}
                               className="text-gray-400 hover:text-gray-600"
                               title="Chỉnh sửa"
                             >
                               <PencilIcon className="h-5 w-5" />
-                            </button> */}
+                            </button>
                           </div>
                         </div>
                       </div>

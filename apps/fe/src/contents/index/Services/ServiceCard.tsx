@@ -121,7 +121,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
           <p
             className={clsx(
               'font-normal leading-6 tracking-wide',
-              'text-text-primary',
+              'text-[#7d7d7d]',
               // Responsive text sizes
               'text-base max-lg:text-sm max-md:text-sm'
             )}
@@ -139,7 +139,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                   key={`${item}-${id}-${index + 1}`}
                   className={clsx(
                     'font-normal leading-6 tracking-wide',
-                    'group-hover:text-brand-orange text-text-primary transition-colors duration-300',
+                    'group-hover:text-brand-orange text-[#979797] transition-colors duration-300',
                     'mt-1',
                     // Responsive text sizes
                     'text-base max-lg:text-sm max-md:text-sm'

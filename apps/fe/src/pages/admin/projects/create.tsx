@@ -298,7 +298,7 @@ export default function CreateProjectPage() {
           ?.map((item) => item.name)
           .filter(Boolean),
       };
-
+      console.log('projectData', projectData);
       const response = await fetch('/api/admin/projects/create-from-chunks', {
         method: 'POST',
         headers: {

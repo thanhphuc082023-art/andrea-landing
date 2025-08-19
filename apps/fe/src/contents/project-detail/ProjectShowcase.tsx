@@ -224,10 +224,38 @@ const ShowcaseSection = memo(
   ({ section, index }: { section: any; index: number }) => {
     // Transform admin data structure to match expected format
     const transformItem = (item: any, index: number = 0) => {
+      // Helper to resolve source URLs coming from admin/Strapi or local blobs
+      const resolveSrc = (rawSrc?: string) => {
+        const src = rawSrc || '';
+        if (!src) return '';
+
+        // Keep absolute URLs, data or blob URLs unchanged
+        if (
+          src.startsWith('http') ||
+          src.startsWith('data:') ||
+          src.startsWith('blob:')
+        ) {
+          return src;
+        }
+
+        // If it's a server-relative path (e.g. /uploads/...), prepend public Strapi base URL
+        if (src.startsWith('/')) {
+          const base = process.env.NEXT_PUBLIC_STRAPI_URL || '';
+          // Ensure no double slash
+          if (base) {
+            return `${base.replace(/\/+$/, '')}${src}`;
+          }
+          return src; // fallback to relative path
+        }
+
+        // Otherwise return as-is
+        return src;
+      };
+
       // Handle flipbook items specially
       if (item.type === 'flipbook') {
         // Validate and clean the PDF URL
-        let pdfUrl = item.src || item.url || '';
+        let pdfUrl = resolveSrc(item.src || item.url || '');
 
         return {
           id: item.id || `item-${index}`,
@@ -246,9 +274,11 @@ const ShowcaseSection = memo(
         };
       }
 
+      const resolvedSrc = resolveSrc(item.src || item.url || '');
+
       return {
         id: item.id || `item-${index}`,
-        src: item.src || '',
+        src: resolvedSrc,
         alt: item.alt || item.title || '',
         width: item.width || 1300,
         height: item.height || 600, // Default height for better UX
@@ -272,7 +302,6 @@ const ShowcaseSection = memo(
       const item = items[0];
 
       if (!item) return null;
-
       const transformedItem = transformItem(item, 0);
 
       // Special handling for flipbook sections
@@ -448,7 +477,7 @@ ShowcaseSection.displayName = 'ShowcaseSection';
 
 function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
   const sections = project?.showcaseSections || legacyShowcaseData;
-
+  console.log('sections', sections);
   return (
     <section className="content-wrapper max-md:px-0">
       <div>

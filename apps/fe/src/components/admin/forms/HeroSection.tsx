@@ -215,12 +215,20 @@ export default function HeroSection({
               <div className="space-y-2">
                 <div className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-2">
                   <div className="flex items-center space-x-2">
-                    {thumbnail.url && (
-                      <img
-                        src={thumbnail.url}
-                        alt="Thumbnail preview"
-                        className="h-8 w-8 rounded object-cover"
+                    {thumbnail.url ? (
+                      <div
+                        style={{
+                          backgroundImage: `url(${thumbnail.url})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                        }}
+                        className="h-8 w-8 rounded border border-gray-200"
+                        title={`Preview: ${thumbnail.name || 'thumbnail'}`}
                       />
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded border border-gray-200 bg-gray-100">
+                        <span className="text-xs text-gray-400">📷</span>
+                      </div>
                     )}
                     <span className="text-sm text-gray-700">
                       {thumbnail.name || thumbnail.fileName}
@@ -232,6 +240,10 @@ export default function HeroSection({
                     ) : thumbnail.file ? (
                       <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
                         Sẵn sàng
+                      </span>
+                    ) : thumbnail.url ? (
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                        Đã có
                       </span>
                     ) : null}
                   </div>
@@ -295,6 +307,10 @@ export default function HeroSection({
                       <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
                         Sẵn sàng
                       </span>
+                    ) : heroVideo.url ? (
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                        Đã có
+                      </span>
                     ) : null}
                   </div>
                   <button
@@ -337,12 +353,20 @@ export default function HeroSection({
               <div className="space-y-2">
                 <div className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-2">
                   <div className="flex items-center space-x-2">
-                    {heroBanner.url && (
-                      <img
-                        src={heroBanner.url}
-                        alt="Hero banner preview"
-                        className="h-8 w-12 rounded object-cover"
+                    {heroBanner.url ? (
+                      <div
+                        style={{
+                          backgroundImage: `url(${heroBanner.url})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                        }}
+                        className="h-8 w-12 rounded border border-gray-200"
+                        title={`Preview: ${heroBanner.name || 'hero banner'}`}
                       />
+                    ) : (
+                      <div className="flex h-8 w-12 items-center justify-center rounded border border-gray-200 bg-gray-100">
+                        <span className="text-xs text-gray-400">🖼️</span>
+                      </div>
                     )}
                     <span className="text-sm text-gray-700">
                       {heroBanner.name || heroBanner.fileName}
@@ -354,6 +378,10 @@ export default function HeroSection({
                     ) : heroBanner.file ? (
                       <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
                         Sẵn sàng
+                      </span>
+                    ) : heroBanner.url ? (
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                        Đã có
                       </span>
                     ) : null}
                   </div>

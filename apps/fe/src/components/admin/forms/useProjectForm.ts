@@ -84,7 +84,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
   );
   const [newCredit, setNewCredit] = useState('');
   const [showcaseSections, setShowcaseSections] = useState<ShowcaseSection[]>(
-    []
+    initialData?.showcase || []
   );
 
   // Initialize projectManager field with credits
@@ -97,6 +97,13 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
   useEffect(() => {
     setValue('projectMetaInfo', projectMetaInfo);
   }, [projectMetaInfo, setValue]);
+
+  // Update showcaseSections when initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData?.showcase && initialData.showcase.length > 0) {
+      setShowcaseSections(initialData.showcase);
+    }
+  }, [initialData?.showcase]);
 
   // Load saved data from sessionStorage after component mounts
   useEffect(() => {

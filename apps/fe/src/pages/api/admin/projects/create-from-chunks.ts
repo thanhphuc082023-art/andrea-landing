@@ -328,7 +328,7 @@ export default async function handler(
     }
 
     const requestData = req.body;
-
+    console.log('requestData', requestData);
     // Validate required fields
     const requiredFields = ['title', 'description', 'projectIntroTitle'];
     const missingFields = requiredFields.filter((field) => !requestData[field]);
@@ -342,16 +342,6 @@ export default async function handler(
 
     // Process media uploads
     const mediaResults: any = {};
-
-    console.log('=== API MEDIA PROCESSING DEBUG ===');
-    console.log('Request media fields:', {
-      heroVideoUploadId: requestData.heroVideoUploadId,
-      heroBannerUploadId: requestData.heroBannerUploadId,
-      thumbnailUploadId: requestData.thumbnailUploadId,
-      existingHeroVideoUrl: requestData.existingHeroVideoUrl,
-      existingHeroBannerUrl: requestData.existingHeroBannerUrl,
-      existingThumbnailUrl: requestData.existingThumbnailUrl,
-    });
 
     // Upload hero video
     if (requestData.heroVideoUploadId) {

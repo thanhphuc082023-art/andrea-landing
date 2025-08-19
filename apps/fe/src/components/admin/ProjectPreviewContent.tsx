@@ -26,7 +26,10 @@ export default function ProjectPreviewContent({
     featured: formData.featured || false,
     technologies: formData.technologies || [],
     gallery: [], // Empty gallery for preview
+
+    // Transform showcase sections to ensure items have valid URLs
     showcaseSections: showcaseSections,
+
     results: [], // Empty results for preview
     metrics: [], // Empty metrics for preview
 
@@ -34,7 +37,11 @@ export default function ProjectPreviewContent({
     heroVideo: formData.heroVideo
       ? {
           id: 0,
-          url: formData.heroVideo.url,
+          url:
+            formData.heroVideo.url ||
+            (formData.heroVideo.file
+              ? URL.createObjectURL(formData.heroVideo.file)
+              : ''),
           name: 'Hero Video',
           mime: 'video/mp4',
           alt: 'Hero Video',
@@ -45,7 +52,11 @@ export default function ProjectPreviewContent({
     heroBanner: formData.heroBanner
       ? {
           id: 0,
-          url: formData.heroBanner.url,
+          url:
+            formData.heroBanner.url ||
+            (formData.heroBanner.file
+              ? URL.createObjectURL(formData.heroBanner.file)
+              : ''),
           name: 'Hero Banner',
           mime: 'image/jpeg',
           alt: 'Hero Banner',
@@ -79,7 +90,7 @@ export default function ProjectPreviewContent({
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white [&>#project-header]:!mt-0">
       <ProjectDetailContents
         project={projectData as any} // Cast to any because ProjectCredits component expects different structure
       />

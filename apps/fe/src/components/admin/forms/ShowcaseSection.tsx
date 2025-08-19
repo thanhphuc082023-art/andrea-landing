@@ -203,12 +203,14 @@ const SortableSection = ({
         {/* Media Preview */}
         {section.items.length > 0 &&
           section.items.some(
-            (item) => item.src && (item.file || item.uploadId)
+            (item) => item.src || item.url || item.uploadId || item.file
           ) && (
             <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
               <div className="space-y-3">
                 {section.items
-                  .filter((item) => item.src && (item.file || item.uploadId)) // Only show items with files
+                  .filter(
+                    (item) => item.src || item.url || item.uploadId || item.file
+                  ) // Only show items with source (existing uploads or new files)
                   .map((item, index) => (
                     <div key={item.id} className="flex items-center space-x-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
@@ -236,7 +238,7 @@ const SortableSection = ({
                           </span>
                         ) : (
                           <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
-                            No file
+                            Có sẵn
                           </span>
                         )}
                         <button
@@ -271,7 +273,7 @@ const SortableSection = ({
 
               {/* Width/Height Inputs - Updated logic for layouts */}
               {section.items.filter(
-                (item) => item.src && (item.file || item.uploadId)
+                (item) => item.src || item.url || item.uploadId || item.file
               ).length > 0 && (
                 <div className="mt-3 space-y-3">
                   {section.layout === 'single' ? (
@@ -285,7 +287,11 @@ const SortableSection = ({
                           type="number"
                           value={
                             section.items.find(
-                              (item) => item.src && (item.file || item.uploadId)
+                              (item) =>
+                                item.src ||
+                                item.url ||
+                                item.uploadId ||
+                                item.file
                             )?.width || ''
                           }
                           onChange={(e) => {
@@ -320,7 +326,11 @@ const SortableSection = ({
                           type="number"
                           value={
                             section.items.find(
-                              (item) => item.src && (item.file || item.uploadId)
+                              (item) =>
+                                item.src ||
+                                item.url ||
+                                item.uploadId ||
+                                item.file
                             )?.height || ''
                           }
                           onChange={(e) => {
