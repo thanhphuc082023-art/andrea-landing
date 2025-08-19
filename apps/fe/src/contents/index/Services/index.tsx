@@ -169,6 +169,7 @@ export default Services;
 const servicesExample = [
   {
     id: 1,
+    position: 1,
     title: 'Thiết kế thương hiệu',
     description:
       'Không chỉ dừng lại ở việc tạo ra logo hay bộ nhận diện, mà là quá trình khai mở bản chất thương hiệu và thể hiện nó bằng hình ảnh một cách nhất quán, có chiều sâu.',
@@ -182,6 +183,7 @@ const servicesExample = [
   },
   {
     id: 2,
+    position: 2,
     title: 'Tư vấn chiến lược',
     description:
       'Đồng hành tư vấn để tìm ra câu chuyện ý nghĩa và giá trị khác biệt của thương hiệu.',
@@ -189,6 +191,7 @@ const servicesExample = [
   },
   {
     id: 3,
+    position: 3,
     title: 'Thiết kế bao bì',
     description:
       "Lorem ipsum ullisae adipisci hul remonte al industrie de l'imprimerie au XVIe siècle. Un imprimeur inconnue à utilisé une version modifiée du livre philosophique de Cicéron.",
@@ -196,18 +199,21 @@ const servicesExample = [
   },
   {
     id: 4,
+    position: 4,
     title: 'Profile, Catalogue',
     description: 'Biến tài liệu doanh nghiệp thành tuyên ngôn thương hiệu.',
     isLarge: false,
   },
   {
     id: 5,
+    position: 5,
     title: 'Thiết kế nhận diện sự kiện',
     description: 'Tạo dấu ấn sâu sắc – Kết nối cảm xúc – Nâng tầm trải nghiệm',
     isLarge: false,
   },
   {
     id: 6,
+    position: 6,
     title: 'Thiết kế web',
     description:
       'Thiết kế không gian số có linh hồn – kết nối cảm xúc, thể hiện tầm vóc thương hiệu.',
@@ -215,6 +221,7 @@ const servicesExample = [
   },
   {
     id: 7,
+    position: 7,
     title: 'Social Branding',
     description:
       "Lorem ipsum ullisae adipisci hul remonte al industrie de l'imprimerie au XVIe siècle. Un imprimeur inconnue à utilisé une version modifiée du livre philosophique de Cicéron.",
@@ -222,6 +229,7 @@ const servicesExample = [
   },
   {
     id: 8,
+    position: 8,
     title: 'Quay phim, chụp hình',
     description:
       "Lorem ipsum ullisae adipisci hul remonte al industrie de l'imprimerie au XVIe siècle. Un imprimeur inconnue à utilisé une version modifiée du livre philosophique de Cicéron.",

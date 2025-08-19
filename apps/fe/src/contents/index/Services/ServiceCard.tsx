@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
+import ServiceIcon from '@/assets/icons/ServiceIcon';
 import { getStrapiMediaUrl } from '@/utils/helper';
 
 interface Service {
@@ -26,8 +27,8 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
   const { id, position, title, description, slogan, icon, iconActive } =
     service;
 
-  const iconUrl = getStrapiMediaUrl(icon);
-  const iconActiveUrl = getStrapiMediaUrl(iconActive);
+  const iconUrl = icon ? getStrapiMediaUrl(icon) : null;
+  const iconActiveUrl = iconActive ? getStrapiMediaUrl(iconActive) : null;
 
   return (
     <div
@@ -74,13 +75,13 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
           </div>
 
           {/* Icon positioned absolutely in top right */}
-          {iconUrl && (
-            <div
-              className={clsx(
-                'absolute shrink-0 opacity-100 group-hover:opacity-0',
-                'right-[25px] top-[35px] max-md:right-4 max-md:top-4'
-              )}
-            >
+          <div
+            className={clsx(
+              'absolute shrink-0 opacity-100 group-hover:opacity-0',
+              'right-[25px] top-[35px] max-md:right-4 max-md:top-4'
+            )}
+          >
+            {iconUrl ? (
               <img
                 src={iconUrl}
                 alt={`${title} icon`}
@@ -89,16 +90,24 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                   'h-8 w-8 max-lg:h-6 max-lg:w-6 max-md:h-5 max-md:w-5'
                 )}
               />
-            </div>
-          )}
-          {iconActiveUrl && (
-            <div
-              className={clsx(
-                'absolute shrink-0 opacity-0 group-hover:opacity-100',
-                'right-[25px] top-[35px] max-md:right-4 max-md:top-4',
-                active ? 'opacity-100' : 'opacity-0'
-              )}
-            >
+            ) : (
+              <ServiceIcon
+                className={clsx(
+                  'object-contain',
+                  'h-8 w-8 max-lg:h-6 max-lg:w-6 max-md:h-5 max-md:w-5'
+                )}
+              />
+            )}
+          </div>
+
+          <div
+            className={clsx(
+              'absolute shrink-0 opacity-0 group-hover:opacity-100',
+              'right-[25px] top-[35px] max-md:right-4 max-md:top-4',
+              active ? 'opacity-100' : 'opacity-0'
+            )}
+          >
+            {iconActiveUrl ? (
               <img
                 src={iconActiveUrl}
                 alt={`${title} icon`}
@@ -107,8 +116,15 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                   'h-8 w-8 max-lg:h-6 max-lg:w-6 max-md:h-5 max-md:w-5'
                 )}
               />
-            </div>
-          )}
+            ) : (
+              <ServiceIcon
+                className={clsx(
+                  'text-brand-orange object-contain',
+                  'h-8 w-8 max-lg:h-6 max-lg:w-6 max-md:h-5 max-md:w-5'
+                )}
+              />
+            )}
+          </div>
         </div>
 
         {/* Description */}
@@ -145,7 +161,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                     'text-base max-lg:text-sm max-md:text-sm'
                   )}
                 >
-                  {item?.title}
+                  {item || item?.title}
                 </li>
               ))}
             </ul>
