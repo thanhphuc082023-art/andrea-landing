@@ -209,29 +209,9 @@ export default function EditProjectPage({
         section.items?.some((item) => item.file)
       );
 
-      // Prepare showcase sections in the required format
-      let formattedShowcaseSections =
-        data.showcase?.map((section, sectionIndex) => ({
-          id: section.id || `section-${Date.now() + sectionIndex}`,
-          type: section.type || 'image',
-          items:
-            section.items?.map((item, itemIndex) => ({
-              id: item.id || `item-${Date.now() + itemIndex}`,
-              alt: item.title || item.name || '',
-              src: item.url || '',
-              file: null,
-              size: item.size || 0,
-              type: item.type || 'image',
-              order: itemIndex,
-              title: item.title || item.name || '',
-              width: item.width || 1300,
-              height: item.height || 800,
-              uploadId: item.uploadId || '',
-            })) || [],
-          order: sectionIndex,
-          title: section.title || `Section ${sectionIndex + 1}`,
-          layout: section.layout || 'single',
-        })) || [];
+      // Process showcase data for API
+      let showcaseUploadIds: string[] = [];
+      let showcaseOriginalNames: string[] = [];
 
       // Process showcase files if any have the file property
       if (showcaseHasFiles) {
@@ -245,32 +225,26 @@ export default function EditProjectPage({
         console.log('showcaseMediaFiles', showcaseMediaFiles);
         console.log('uploadResults', uploadResults);
 
-        // Update upload IDs in the formatted showcase sections
+        // Get upload IDs and original names for processing on the server
         if (
           uploadResults.showcaseUploadIds &&
           uploadResults.showcaseUploadIds.length > 0
         ) {
-          let uploadIdIndex = 0;
-          formattedShowcaseSections = formattedShowcaseSections.map(
-            (section) => ({
-              ...section,
-              items: section.items.map((item) => {
-                if (
-                  item.file &&
-                  uploadIdIndex < uploadResults.showcaseUploadIds.length
-                ) {
-                  const uploadId =
-                    uploadResults.showcaseUploadIds[uploadIdIndex++];
-                  return {
-                    ...item,
-                    uploadId,
-                    src: `/uploads/${uploadId}`,
-                  };
-                }
-                return item;
-              }),
-            })
-          );
+          showcaseUploadIds = uploadResults.showcaseUploadIds;
+
+          // Extract original names from showcase sections
+          showcaseOriginalNames =
+            data.showcase?.flatMap(
+              (section) =>
+                section.items
+                  ?.filter((item) => item.file)
+                  .map(
+                    (item) =>
+                      item.file?.name ||
+                      item.title ||
+                      `showcase-item-${Date.now()}`
+                  ) || []
+            ) || [];
         }
       }
 
@@ -295,8 +269,10 @@ export default function EditProjectPage({
         thumbnailUploadId: uploadResults.thumbnailUploadId || thumbnailId,
         featuredImageUploadId: uploadResults.featuredImageUploadId,
         galleryUploadIds: uploadResults.galleryUploadIds,
-        // Use the properly formatted showcase sections
-        showcaseSections: formattedShowcaseSections,
+        // Include showcase data for processing on the server
+        showcase: data.showcase || [],
+        showcaseUploadIds: showcaseUploadIds,
+        showcaseOriginalNames: showcaseOriginalNames,
         // Pass existing URLs if no new upload happened (and they're not blob URLs)
         existingHeroVideoUrl:
           !uploadResults.heroVideoUploadId &&
@@ -423,7 +399,9 @@ export default function EditProjectPage({
           metrics: projectData.metrics,
           credits: projectData.credits,
           seo: projectData.seo,
-          showcaseSections: formattedShowcaseSections,
+          showcase: data.showcase || [],
+          showcaseUploadIds: showcaseUploadIds,
+          showcaseOriginalNames: showcaseOriginalNames,
         };
 
         // Call the updateProject function
