@@ -1,4 +1,48 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import fs from 'fs';
+import path from 'path';
+import formidable from 'formidable';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function uploadFileToStrapi(
+  filePath: string,
+  originalName: string,
+  token: string,
+  strapiUrl: string,
+  category = 'projects'
+) {
+  const buffer = fs.readFileSync(filePath);
+  const form = new FormData();
+  // Node 18+ has global Blob/FormData
+  const blob = new Blob([buffer]);
+  form.append('files', blob, originalName);
+  form.append('path', category);
+
+  const res = await fetch(`${strapiUrl}/api/upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: form as any,
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => null);
+    throw new Error(
+      `Upload to Strapi failed: ${res.status} ${res.statusText} ${text || ''}`
+    );
+  }
+
+  const data = await res.json().catch(() => null);
+  if (Array.isArray(data) && data.length > 0) return data[0].id;
+  if (data && Array.isArray(data.data) && data.data[0]) return data.data[0].id;
+  return null;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,31 +54,190 @@ export default async function handler(
 
   try {
     const { id } = req.query;
-    const projectData = req.body;
-
     if (!id) {
       return res.status(400).json({ message: 'Project id is required in URL' });
     }
-
-    // normalize id param
     const idParam = Array.isArray(id) ? id[0] : id;
 
-    console.log('DEBUG - Project update request:', {
+    // prefer server API token
+    const STRAPI_API_TOKEN =
+      process.env.STRAPI_API_TOKEN || process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
+    const STRAPI_URL =
+      process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+
+    // Get authorization token from request header (fallback if no server token)
+    const authToken = req.headers.authorization?.replace('Bearer ', '');
+    const headerToken = STRAPI_API_TOKEN ?? authToken;
+    if (!headerToken) {
+      return res.status(401).json({ message: 'Authorization token required' });
+    }
+
+    let projectData: any = {};
+    const mediaFiles: Record<string, { path: string; name: string } | null> = {
+      thumbnail: null,
+      heroBanner: null,
+      heroVideo: null,
+      featuredImage: null,
+    };
+
+    const contentType = req.headers['content-type'] || '';
+
+    // Ensure tmp dir exists for formidable
+    const TMP_DIR = path.join(process.cwd(), 'tmp');
+    if (!fs.existsSync(TMP_DIR)) {
+      fs.mkdirSync(TMP_DIR, { recursive: true });
+    }
+
+    if (contentType.includes('multipart/form-data')) {
+      // parse multipart with formidable
+      const form = formidable({
+        multiples: false,
+        uploadDir: TMP_DIR,
+        keepExtensions: true,
+      });
+
+      const parsed: any = await new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) return reject(err);
+          resolve({ fields, files });
+        });
+      });
+
+      const { fields, files } = parsed;
+      // fields.data expected to contain JSON string with project fields
+      if (fields?.data) {
+        try {
+          projectData = JSON.parse(
+            Array.isArray(fields.data) ? fields.data[0] : fields.data
+          );
+        } catch (e) {
+          projectData = fields;
+        }
+      } else {
+        projectData = fields;
+      }
+
+      // map files
+      if (files) {
+        const mapFile = (f: any) => {
+          if (!f) return null;
+          // formidable may return array or single
+          const fileObj = Array.isArray(f) ? f[0] : f;
+          let filePath = fileObj.filepath || fileObj.path;
+          if (typeof filePath === 'string' && !path.isAbsolute(filePath)) {
+            filePath = path.join(process.cwd(), filePath);
+          }
+          return {
+            path: filePath,
+            name: fileObj.originalFilename || fileObj.name,
+          };
+        };
+
+        mediaFiles.thumbnail = mapFile(files.thumbnail);
+        mediaFiles.heroBanner = mapFile(files.heroBanner);
+        mediaFiles.heroVideo = mapFile(files.heroVideo);
+        mediaFiles.featuredImage = mapFile(files.featuredImage);
+      }
+    } else {
+      // JSON body
+      projectData = req.body || {};
+    }
+
+    console.log('DEBUG - Project update request (server):', {
       id: idParam,
-      heroVideoUploadId: projectData.heroVideoUploadId,
-      heroBannerUploadId: projectData.heroBannerUploadId,
-      thumbnailUploadId: projectData.thumbnailUploadId,
-      featuredImageUploadId: projectData.featuredImageUploadId,
-      title: projectData.title,
-      hasHeroVideo: !!projectData.heroVideo,
-      hasHeroBanner: !!projectData.heroBanner,
-      hasThumbnail: !!projectData.thumbnail,
+      hasThumbnailFile: !!mediaFiles.thumbnail,
+      hasHeroBannerFile: !!mediaFiles.heroBanner,
+      hasHeroVideoFile: !!mediaFiles.heroVideo,
+      incomingDataKeys: Object.keys(projectData || {}),
     });
 
-    // Get authorization token from request
-    const authToken = req.headers.authorization?.replace('Bearer ', '');
-    if (!authToken) {
-      return res.status(401).json({ message: 'Authorization token required' });
+    // Upload any provided files to Strapi and collect IDs
+    const uploadedIds: Record<string, number | null> = {
+      thumbnail: null,
+      heroBanner: null,
+      heroVideo: null,
+      featuredImage: null,
+    };
+
+    if (mediaFiles.thumbnail) {
+      try {
+        // ensure file exists before uploading
+        const thumbPath = mediaFiles.thumbnail.path;
+        if (!fs.existsSync(thumbPath)) {
+          throw new Error(`Temporary file not found: ${thumbPath}`);
+        }
+
+        const id = await uploadFileToStrapi(
+          thumbPath,
+          mediaFiles.thumbnail.name,
+          headerToken,
+          STRAPI_URL
+        );
+        uploadedIds.thumbnail = id;
+        console.log('DEBUG - Uploaded thumbnail id:', id);
+      } catch (e) {
+        console.error('Thumbnail upload error', e);
+      }
+    }
+
+    if (mediaFiles.heroBanner) {
+      try {
+        const bannerPath = mediaFiles.heroBanner.path;
+        if (!fs.existsSync(bannerPath)) {
+          throw new Error(`Temporary file not found: ${bannerPath}`);
+        }
+
+        const id = await uploadFileToStrapi(
+          bannerPath,
+          mediaFiles.heroBanner.name,
+          headerToken,
+          STRAPI_URL
+        );
+        uploadedIds.heroBanner = id;
+        console.log('DEBUG - Uploaded heroBanner id:', id);
+      } catch (e) {
+        console.error('Hero banner upload error', e);
+      }
+    }
+
+    if (mediaFiles.heroVideo) {
+      try {
+        const videoPath = mediaFiles.heroVideo.path;
+        if (!fs.existsSync(videoPath)) {
+          throw new Error(`Temporary file not found: ${videoPath}`);
+        }
+
+        const id = await uploadFileToStrapi(
+          videoPath,
+          mediaFiles.heroVideo.name,
+          headerToken,
+          STRAPI_URL
+        );
+        uploadedIds.heroVideo = id;
+        console.log('DEBUG - Uploaded heroVideo id:', id);
+      } catch (e) {
+        console.error('Hero video upload error', e);
+      }
+    }
+
+    if (mediaFiles.featuredImage) {
+      try {
+        const featuredPath = mediaFiles.featuredImage.path;
+        if (!fs.existsSync(featuredPath)) {
+          throw new Error(`Temporary file not found: ${featuredPath}`);
+        }
+
+        const id = await uploadFileToStrapi(
+          featuredPath,
+          mediaFiles.featuredImage.name,
+          headerToken,
+          STRAPI_URL
+        );
+        uploadedIds.featuredImage = id;
+        console.log('DEBUG - Uploaded featuredImage id:', id);
+      } catch (e) {
+        console.error('Featured image upload error', e);
+      }
     }
 
     // Prepare update data for Strapi (only include known fields)
@@ -57,93 +260,89 @@ export default async function handler(
       seo: projectData.seo,
     };
 
-    // preserve media and gallery fields if present
-    // Handle both new uploads and existing media
-    // For Strapi v4, media relations should be numeric IDs
-    if (projectData.heroVideoUploadId) {
-      const id = parseInt(projectData.heroVideoUploadId);
-      updateData.heroVideo = isNaN(id) ? null : id;
+    // Set media IDs (prefer newly uploaded ids, otherwise use uploadId fields from client)
+    if (uploadedIds.heroVideo) {
+      updateData.heroVideo = uploadedIds.heroVideo;
+    } else if (projectData.heroVideoUploadId) {
+      const n = parseInt(projectData.heroVideoUploadId as any);
+      updateData.heroVideo = isNaN(n) ? null : n;
     } else if (projectData.heroVideo?.uploadId) {
-      const id = parseInt(projectData.heroVideo.uploadId);
-      updateData.heroVideo = isNaN(id) ? null : id;
+      const n = parseInt(projectData.heroVideo.uploadId);
+      updateData.heroVideo = isNaN(n) ? null : n;
     }
 
-    if (projectData.heroBannerUploadId) {
-      const id = parseInt(projectData.heroBannerUploadId);
-      updateData.heroBanner = isNaN(id) ? null : id;
+    if (uploadedIds.heroBanner) {
+      updateData.heroBanner = uploadedIds.heroBanner;
+    } else if (projectData.heroBannerUploadId) {
+      const n = parseInt(projectData.heroBannerUploadId as any);
+      updateData.heroBanner = isNaN(n) ? null : n;
     } else if (projectData.heroBanner?.uploadId) {
-      const id = parseInt(projectData.heroBanner.uploadId);
-      updateData.heroBanner = isNaN(id) ? null : id;
+      const n = parseInt(projectData.heroBanner.uploadId);
+      updateData.heroBanner = isNaN(n) ? null : n;
     }
 
-    if (projectData.thumbnailUploadId) {
-      const id = parseInt(projectData.thumbnailUploadId);
-      updateData.thumbnail = isNaN(id) ? null : id;
+    if (uploadedIds.thumbnail) {
+      updateData.thumbnail = uploadedIds.thumbnail;
+    } else if (projectData.thumbnailUploadId) {
+      const n = parseInt(projectData.thumbnailUploadId as any);
+      updateData.thumbnail = isNaN(n) ? null : n;
     } else if (projectData.thumbnail?.uploadId) {
-      const id = parseInt(projectData.thumbnail.uploadId);
-      updateData.thumbnail = isNaN(id) ? null : id;
+      const n = parseInt(projectData.thumbnail.uploadId);
+      updateData.thumbnail = isNaN(n) ? null : n;
     }
 
-    if (projectData.featuredImageUploadId) {
-      const id = parseInt(projectData.featuredImageUploadId);
-      updateData.featuredImage = isNaN(id) ? null : id;
+    if (uploadedIds.featuredImage) {
+      updateData.featuredImage = uploadedIds.featuredImage;
+    } else if (projectData.featuredImageUploadId) {
+      const n = parseInt(projectData.featuredImageUploadId as any);
+      updateData.featuredImage = isNaN(n) ? null : n;
     } else if (projectData.featuredImage?.uploadId) {
-      const id = parseInt(projectData.featuredImage.uploadId);
-      updateData.featuredImage = isNaN(id) ? null : id;
+      const n = parseInt(projectData.featuredImage.uploadId);
+      updateData.featuredImage = isNaN(n) ? null : n;
     }
 
     if (projectData.galleryUploadIds && projectData.galleryUploadIds.length) {
       updateData.gallery = projectData.galleryUploadIds
-        .map((id) => parseInt(id))
-        .filter((id) => !isNaN(id));
+        .map((i: any) => parseInt(i))
+        .filter((i: number) => !isNaN(i));
     } else if (projectData.gallery && Array.isArray(projectData.gallery)) {
       updateData.gallery = projectData.gallery
-        .map((item) => parseInt(item.uploadId || item.id))
-        .filter((id) => !isNaN(id));
+        .map((item: any) => parseInt(item.uploadId || item.id))
+        .filter((i: number) => !isNaN(i));
     }
 
-    if (projectData.showcase)
-      updateData.showcaseSections = projectData.showcase;
-
-    console.log('DEBUG - Final payload to Strapi:', updateData);
-    console.log('DEBUG - Media field types:', {
-      heroVideo: typeof updateData.heroVideo,
-      heroBanner: typeof updateData.heroBanner,
-      thumbnail: typeof updateData.thumbnail,
-      featuredImage: typeof updateData.featuredImage,
-      gallery: Array.isArray(updateData.gallery)
-        ? updateData.gallery.map((id) => typeof id)
-        : 'not array',
-    });
-
-    // Test approach: Remove media fields temporarily to isolate the issue
-    if (process.env.NODE_ENV === 'development') {
-      console.log('DEBUG - Removing media fields for testing...');
-      delete updateData.heroVideo;
-      delete updateData.heroBanner;
-      delete updateData.thumbnail;
-      delete updateData.featuredImage;
-      delete updateData.gallery;
-      console.log('DEBUG - Test payload without media:', updateData);
+    // Accept both older `showcase` key and new `showcaseSections` key from client
+    const incomingShowcase =
+      projectData.showcaseSections ?? projectData.showcase;
+    if (incomingShowcase) {
+      // ensure it's an array
+      updateData.showcaseSections = Array.isArray(incomingShowcase)
+        ? incomingShowcase
+        : typeof incomingShowcase === 'string'
+          ? JSON.parse(incomingShowcase)
+          : incomingShowcase;
     }
 
-    // prefer server API token
-    const STRAPI_API_TOKEN =
-      process.env.STRAPI_API_TOKEN || process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
-    const STRAPI_URL =
-      process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+    console.log('DEBUG - Final payload to Strapi (server):', updateData);
 
     const apiUrl = `${STRAPI_URL}/api/projects/${idParam}`;
-    const headerToken = STRAPI_API_TOKEN ?? authToken;
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${headerToken}`,
-    };
+
+    // Build the Strapi payload with proper relations for Strapi v4
+    const strapiPayload: any = { data: {} };
+    Object.keys(updateData || {}).forEach((key) => {
+      strapiPayload.data[key] = updateData[key];
+    });
+
+    // For single media relations ensure numeric id is set as value (Strapi accepts set: id for relations when using relational endpoints)
+    // We'll send the simple numeric value; Strapi should accept it in data for single media fields.
 
     const updateResponse = await fetch(apiUrl, {
       method: 'PUT',
-      headers,
-      body: JSON.stringify({ data: updateData }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${headerToken}`,
+      },
+      body: JSON.stringify({ data: strapiPayload.data }),
     });
 
     console.log('DEBUG - Strapi response status:', updateResponse.status);
@@ -158,40 +357,29 @@ export default async function handler(
         errorData = await updateResponse.text().catch(() => null);
         console.log('DEBUG - Strapi error text:', errorData);
       }
-    }
 
-    if (!updateResponse) {
-      return res.status(502).json({ message: 'Failed to contact Strapi' });
-    }
+      if (!STRAPI_API_TOKEN && updateResponse.status === 401) {
+        return res.status(401).json({
+          message:
+            'Provided user token does not have permission to update projects. Create a STRAPI_API_TOKEN with update permissions and set STRAPI_API_TOKEN in env, or use an admin JWT.',
+        });
+      }
 
-    if (updateResponse.ok) {
-      const updated = await updateResponse.json().catch(() => null);
-      return res.status(200).json({
-        message: 'Project updated successfully',
-        project: updated?.data ?? updated,
-      });
-    }
-
-    // If update returned 401 when using user token, instruct to use API token
-    if (!STRAPI_API_TOKEN && updateResponse.status === 401) {
-      return res.status(401).json({
+      return res.status(updateResponse.status || 500).json({
         message:
-          'Provided user token does not have permission to update projects. Create a STRAPI_API_TOKEN with update permissions and set STRAPI_API_TOKEN in env, or use an admin JWT.',
+          errorData?.error?.message || errorData || 'Failed to update project',
       });
     }
 
-    let errorData: any = null;
-    try {
-      errorData = await updateResponse.json();
-    } catch (e) {
-      errorData = await updateResponse.text().catch(() => null);
-    }
+    const updated = await updateResponse.json().catch(() => null);
 
-    return res.status(updateResponse.status || 500).json({
-      message:
-        errorData?.error?.message || errorData || 'Failed to update project',
+    return res.status(200).json({
+      message: 'Project updated successfully',
+      project: updated?.data ?? updated,
+      debug: { uploadedIds },
     });
   } catch (error: any) {
+    console.error('Update handler error', error);
     return res
       .status(500)
       .json({ message: error.message || 'Internal server error' });

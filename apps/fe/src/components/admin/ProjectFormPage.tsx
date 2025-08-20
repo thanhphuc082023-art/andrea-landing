@@ -35,11 +35,12 @@ export default function ProjectFormPage({
   categories = [],
   isLoading = false,
   onLogout,
-  viewMode = 'create', // Default là create mode
+  viewMode = 'create',
   onViewModeChange,
 }: ProjectFormPageProps) {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // State để lưu file objects riêng (vì React Hook Form có thể không preserve chúng)
   const [fileObjects, setFileObjects] = useState<{
@@ -96,7 +97,7 @@ export default function ProjectFormPage({
   const thumbnail = watch('thumbnail');
   const title = watch('title') || '';
   const description = watch('description') || '';
-
+  console.log('errors', errors);
   const handleCancel = () => {
     cleanup();
     formCleanup();
@@ -174,6 +175,8 @@ export default function ProjectFormPage({
   // Enhanced form submission
   const handleEnhancedFormSubmit = async (data: ProjectFormData) => {
     setIsUploading(true);
+    console.log('clicked');
+    console.log('showcaseSections', showcaseSections);
     try {
       // Submit form data directly
       await onSubmit({ ...data, showcase: showcaseSections });
@@ -218,23 +221,23 @@ export default function ProjectFormPage({
       {/* Header */}
       <div className="border-b border-gray-200 bg-white shadow-sm">
         <div className="content-wrapper">
-          <div className="flex min-h-16 items-center justify-between py-2">
+          <div className="flex items-center justify-between py-2">
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleBack}
                 className="flex items-center space-x-2 text-gray-600 transition-colors hover:text-gray-900"
               >
                 <ArrowLeftIcon className="h-5 w-5" />
-                <span>Quay lại</span>
+                <span className="text-sm sm:inline">Quay lại</span>
               </button>
-              <div className="h-6 w-px bg-gray-300" />
-              <h1 className="text-xl font-semibold text-gray-900">
+              <div className="hidden h-6 w-px bg-gray-300 sm:block" />
+              <h1 className="text-lg font-semibold text-gray-900 sm:text-xl">
                 {initialData ? 'Chỉnh sửa dự án' : 'Tạo dự án mới'}
               </h1>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-3">
+            {/* Desktop actions */}
+            <div className="hidden items-center space-x-3 sm:flex">
               <button
                 type="button"
                 onClick={handleCancel}
@@ -263,10 +266,80 @@ export default function ProjectFormPage({
                     : 'Tạo dự án'}
               </button>
             </div>
+
+            {/* Mobile menu button */}
+            <div className="flex items-center sm:hidden">
+              <button
+                onClick={() => setMobileMenuOpen((s) => !s)}
+                aria-expanded={mobileMenuOpen}
+                aria-label="Open actions"
+                className="rounded-md p-2 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {mobileMenuOpen ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  // Three vertical dots (kebab-vertical) icon for closed state
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="5" r="1.5" />
+                    <circle cx="12" cy="12" r="1.5" />
+                    <circle cx="12" cy="19" r="1.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile stacked actions */}
+          {mobileMenuOpen && (
+            <div className="mt-2 flex flex-col space-y-2 pb-2 sm:hidden">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={handlePreview}
+                className="inline-flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <EyeIcon className="mr-2 h-4 w-4" />
+                Xem Preview
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading || isUploading}
+                onClick={handleSubmit(handleEnhancedFormSubmit)}
+                className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-2 text-left text-sm font-medium text-white shadow-sm disabled:opacity-50"
+              >
+                {isLoading || isUploading
+                  ? 'Đang lưu...'
+                  : initialData
+                    ? 'Cập nhật'
+                    : 'Tạo dự án'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
-
       {/* Main Content */}
       <div className="content-wrapper pb-6">
         <Tab.Group>

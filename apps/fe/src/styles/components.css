@@ -197,7 +197,7 @@
 
   /* Infinite scroll animation */
   .animate-scroll {
-    animation: scroll var(--animation-duration, 100s)
+    animation: scroll var(--animation-duration, 50s)
       var(--animation-direction, forwards) linear infinite;
   }
 

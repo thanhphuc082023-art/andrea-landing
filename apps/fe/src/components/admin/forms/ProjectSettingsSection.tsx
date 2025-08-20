@@ -51,9 +51,6 @@ export default function ProjectSettingsSection({
         </div>
         <h3 className="text-lg font-semibold text-gray-900">Cài đặt dự án</h3>
       </div>
-      <p className="mb-4 text-sm text-gray-600">
-        Công nghệ, trạng thái, danh mục và tùy chọn của dự án
-      </p>
 
       <div className="space-y-6">
         {/* Technologies */}

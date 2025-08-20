@@ -12,8 +12,6 @@ import {
   useSessionCleanup,
   sessionCleanupConfigs,
 } from '@/hooks/useSessionCleanup';
-import { StrapiAPI } from '@/lib/strapi';
-import { ProjectEntity } from '@/types/strapi';
 import { transformStrapiProjectToFormData } from '@/utils/project-form-transform';
 
 // Component Preview Wrapper để hiển thị preview
@@ -102,7 +100,7 @@ export default function EditProjectPage({
   const [viewMode, setViewMode] = useState<'create' | 'preview'>('create');
   const [previewData, setPreviewData] = useState<{
     formData: Partial<ProjectFormData> | null;
-    showcaseSections: any[];
+    showcaseSections?: any[];
   }>({
     formData: null,
     showcaseSections: [],
@@ -125,10 +123,69 @@ export default function EditProjectPage({
       );
 
       // Set initial preview data with showcase sections
+      // Also include the formData so the preview component has full data to render
+      // Use transformed showcase from formData so item.src/url are normalized
       setPreviewData((prev) => ({
         ...prev,
-        showcaseSections: showcaseSections,
+        formData: formData,
       }));
+
+      // If any showcase items still reference uploadId (no src/url), request server to resolve them so preview can render immediately
+      const needsProcessing = (formData.showcase || []).some((section: any) =>
+        (section.items || []).some(
+          (it: any) => !it.src && !it.url && typeof it.uploadId === 'string'
+        )
+      );
+
+      if (needsProcessing) {
+        (async () => {
+          try {
+            const token = localStorage.getItem('strapiToken');
+            // collect uploadIds and original names in order
+            const showcaseUploadIds: string[] = [];
+            const showcaseOriginalNames: string[] = [];
+            (formData.showcase || []).forEach((section: any) => {
+              (section.items || []).forEach((it: any) => {
+                if (it.uploadId) {
+                  showcaseUploadIds.push(it.uploadId);
+                  showcaseOriginalNames.push(
+                    it.title || it.name || it.alt || 'showcase'
+                  );
+                }
+              });
+            });
+
+            const res = await fetch('/api/admin/projects/process-showcase', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                showcaseSections: formData.showcase || [],
+                showcaseUploadIds,
+                showcaseOriginalNames,
+              }),
+            });
+
+            if (res.ok) {
+              const json = await res.json();
+              const processed =
+                json.processedShowcase || formData.showcase || [];
+              setPreviewData((prev) => ({
+                ...prev,
+                formData,
+                showcaseSections: processed,
+              }));
+              console.log('✅ Processed showcase for preview:', processed);
+            } else {
+              console.warn('process-showcase failed on mount:', res.status);
+            }
+          } catch (err) {
+            console.warn('Error auto-processing showcase for preview:', err);
+          }
+        })();
+      }
     }
   }, [project]);
 
@@ -161,9 +218,52 @@ export default function EditProjectPage({
     data?: { formData: Partial<ProjectFormData>; showcaseSections: any[] }
   ) => {
     if (mode === 'preview' && data) {
-      setPreviewData({
-        formData: data.formData,
-        showcaseSections: data.showcaseSections,
+      console.log('data.showcaseSections', data.showcaseSections);
+      setPreviewData((prev) => {
+        const incomingSections =
+          data.showcaseSections ?? (data.formData?.showcase as any) ?? [];
+
+        const prevSections = Array.isArray(prev?.showcaseSections)
+          ? prev!.showcaseSections!
+          : [];
+
+        const mergedSections = Array.isArray(incomingSections)
+          ? incomingSections.map((incSec: any, idx: number) => {
+              const prevSec = prevSections[idx];
+              const prevItems = Array.isArray(prevSec?.items)
+                ? prevSec.items
+                : [];
+              const incItems = Array.isArray(incSec?.items) ? incSec.items : [];
+
+              const mergedItems = incItems.map((incItem: any) => {
+                if (incItem && incItem.uploadId) {
+                  const match = prevItems.find(
+                    (pi: any) =>
+                      pi && pi.uploadId && pi.uploadId === incItem.uploadId
+                  );
+                  if (match && (match.src || match.url)) {
+                    return {
+                      ...incItem,
+                      src: match.src ?? match.url ?? incItem.src,
+                      url: incItem.url ?? match.url ?? match.src,
+                    };
+                  }
+                }
+                return incItem;
+              });
+
+              return {
+                ...incSec,
+                items: mergedItems,
+              };
+            })
+          : [];
+
+        return {
+          ...prev,
+          formData: data.formData,
+          showcaseSections: mergedSections,
+        };
       });
     }
     setViewMode(mode);
@@ -322,6 +422,9 @@ export default function EditProjectPage({
         _dataFormat: 'enhanced_v2',
       };
 
+      // Use a mutable copy for final payload modifications
+      let finalProjectData: any = { ...projectData };
+
       console.log('DEBUG - Client sending to API:', projectData);
 
       // Determine if we need to use the chunked upload endpoint
@@ -331,10 +434,6 @@ export default function EditProjectPage({
         !!uploadResults.heroBannerUploadId ||
         !!uploadResults.thumbnailUploadId ||
         !!uploadResults.featuredImageUploadId;
-      console.log('updateData', projectData);
-
-      // Import the project service function
-      const { updateProject } = await import('@/utils/project');
 
       let result;
 
@@ -343,8 +442,14 @@ export default function EditProjectPage({
         // Use the improved v2 endpoint for better thumbnail handling
         const apiUrl = `/api/admin/projects/${project.documentId}/update-from-chunks`;
 
+        // Ensure server receives 'showcaseSections' key for consistent updates
+        const payloadForJson = {
+          ...projectData,
+          showcaseSections: projectData.showcase || [],
+        };
+
         // Create a JSON representation for the API
-        const jsonString = JSON.stringify(projectData);
+        const jsonString = JSON.stringify(payloadForJson);
         console.log(
           'DEBUG - Client sending to API:',
           jsonString.substring(0, 1000) + '...'
@@ -374,45 +479,127 @@ export default function EditProjectPage({
 
         result = await response.json();
       } else {
-        // Use the new project service function for regular updates
-        // Extract the media files if they exist
+        // Send media files and project data to server-side update endpoint
         const thumbnailFile = data.thumbnail?.file || null;
         const heroBannerFile = data.heroBanner?.file || null;
         const heroVideoFile = data.heroVideo?.file || null;
+        console.log('showcaseObject', {
+          showcaseSections: data.showcase || [],
+          showcaseUploadIds,
+          showcaseOriginalNames,
+        });
+        // If there are showcase upload IDs, finalize/process them on the server
+        // so we can include processed showcaseSections (with Strapi URLs) in the
+        // update payload. This separates showcase processing from the other
+        // large-media multipart uploads (thumbnail/heroBanner/heroVideo).
+        if (
+          showcaseUploadIds &&
+          Array.isArray(showcaseUploadIds) &&
+          showcaseUploadIds.length > 0
+        ) {
+          try {
+            const procRes = await fetch(
+              '/api/admin/projects/process-showcase',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  showcaseSections: data.showcase || [],
+                  showcaseUploadIds,
+                  showcaseOriginalNames,
+                }),
+              }
+            );
 
-        // Prepare fields for the updateProject function
-        // We need to extract the relevant project data fields without the metadata
-        const projectFields = {
-          title: projectData.title,
-          description: projectData.description,
-          slug: projectData.slug,
-          projectIntroTitle: projectData.projectIntroTitle,
-          content: projectData.content,
-          overview: projectData.overview,
-          challenge: projectData.challenge,
-          solution: projectData.solution,
-          projectStatus: projectData.status,
-          featured: projectData.featured,
-          technologies: projectData.technologies,
-          projectMetaInfo: projectData.projectMetaInfo,
-          results: projectData.results,
-          metrics: projectData.metrics,
-          credits: projectData.credits,
-          seo: projectData.seo,
-          showcase: data.showcase || [],
-          showcaseUploadIds: showcaseUploadIds,
-          showcaseOriginalNames: showcaseOriginalNames,
-        };
+            if (!procRes.ok) {
+              const errBody = await procRes.json().catch(() => null);
+              console.warn('Failed to process showcase on server:', errBody);
+              throw new Error(errBody?.message || 'Failed to process showcase');
+            }
 
-        // Call the updateProject function
-        result = await updateProject(
-          project.documentId,
-          projectFields,
-          thumbnailFile,
-          heroBannerFile,
-          heroVideoFile,
-          token
-        );
+            const procJson = await procRes.json();
+            // server returns processedShowcase (array of sections with src/url fields)
+            const processedShowcase =
+              procJson.processedShowcase || data.showcase || [];
+
+            // Merge processed showcase into previewData so preview shows resolved src/url immediately
+            setPreviewData((prev) => ({
+              ...prev,
+              showcaseSections:
+                Array.isArray(processedShowcase) && processedShowcase.length > 0
+                  ? processedShowcase
+                  : prev?.showcaseSections || processedShowcase,
+            }));
+
+            // Build a finalProjectData object (use any to avoid strict typing issues)
+            // Ensure showcaseSections is set even if processedShowcase is empty
+            finalProjectData = {
+              ...projectData,
+              showcaseSections:
+                Array.isArray(processedShowcase) && processedShowcase.length > 0
+                  ? processedShowcase
+                  : projectData.showcase || [],
+            };
+            console.log('processedShowcase', processedShowcase);
+            // Remove transient client-only fields from the final payload if present
+            // by creating a clean copy rather than using delete on typed object.
+            delete (finalProjectData as any).showcase;
+            delete (finalProjectData as any).showcaseUploadIds;
+            delete (finalProjectData as any).showcaseOriginalNames;
+
+            // Use finalProjectData below when building the multipart form
+            // (do not reassign the original 'projectData' const)
+          } catch (err) {
+            console.warn('Showcase processing error, aborting update:', err);
+            throw err;
+          }
+        }
+
+        // Use multipart branch: build form from either finalProjectData (if modified) or original projectData
+        const dataForForm =
+          typeof finalProjectData !== 'undefined' && finalProjectData
+            ? finalProjectData
+            : projectData;
+
+        const form = new FormData();
+        form.append('data', JSON.stringify(dataForForm));
+        if (thumbnailFile) form.append('thumbnail', thumbnailFile as Blob);
+        if (heroBannerFile) form.append('heroBanner', heroBannerFile as Blob);
+        if (heroVideoFile) form.append('heroVideo', heroVideoFile as Blob);
+
+        // Also include featuredImage if present
+        const featuredImageFile = data.featuredImage?.file || null;
+        if (featuredImageFile)
+          form.append('featuredImage', featuredImageFile as Blob);
+
+        // Send multipart/form-data to the server API that now handles uploads
+        const apiUrl = `/api/admin/projects/${project.documentId}/update`;
+
+        const response = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: form,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+
+          if (response.status === 401) {
+            localStorage.removeItem('strapiToken');
+            localStorage.removeItem('strapiUser');
+            router.push('/admin/projects');
+            return;
+          }
+
+          throw new Error(errorData?.message || 'Lỗi khi cập nhật dự án');
+        }
+
+        result = await response.json();
       }
       console.log('DEBUG - API response:', result);
 
@@ -506,12 +693,12 @@ export default function EditProjectPage({
             }`}
           >
             <ProjectFormPage
+              initialData={initialFormData}
               onSubmit={handleSubmit}
               isLoading={isLoading}
-              onLogout={handleLogout}
-              viewMode={viewMode}
-              onViewModeChange={handleViewModeChange}
-              initialData={initialFormData}
+              onViewModeChange={(mode, payload) =>
+                handleViewModeChange(mode, payload)
+              }
             />
           </div>
 
@@ -564,7 +751,12 @@ export const getServerSideProps: GetServerSideProps<
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return {
+        props: {
+          project: null,
+          error: 'Không thể tải thông tin dự án. Vui lòng thử lại sau.',
+        },
+      };
     }
 
     const data = await response.json();

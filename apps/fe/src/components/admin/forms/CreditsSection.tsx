@@ -35,9 +35,6 @@ export default function CreditsSection({
   setValue,
   watch,
 }: CreditsSectionProps) {
-  // Watch current projectManager value
-  const currentProjectManager = watch('credits.projectManager') || '';
-
   // Update projectManager when credits array changes
   const updateProjectManager = (newCredits: string[]) => {
     const projectManagerText = newCredits.join('\n');
@@ -73,9 +70,6 @@ export default function CreditsSection({
           Thông tin Credits
         </h3>
       </div>
-      <p className="mb-4 text-sm text-gray-600">
-        Thông tin về team và credits của dự án
-      </p>
 
       <div className="space-y-4">
         <div>
@@ -225,41 +219,35 @@ export default function CreditsSection({
               <PlusIcon className="h-4 w-4" />
             </button>
           </div>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {credits.map((credit) => (
-              <span
-                key={credit}
-                className="inline-flex items-center rounded-full bg-emerald-100/80 px-2.5 py-0.5 text-xs font-medium text-emerald-800 backdrop-blur-sm"
-              >
-                {credit}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveCredit(credit)}
-                  className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-emerald-400 hover:bg-emerald-200 hover:text-emerald-500"
+          {credits?.length > 0 ? (
+            <div className="mt-1 flex flex-wrap gap-2">
+              {credits.map((credit) => (
+                <span
+                  key={credit}
+                  className="inline-flex items-center rounded-full bg-emerald-100/80 px-2.5 py-0.5 text-xs font-medium text-emerald-800 backdrop-blur-sm"
                 >
-                  <XMarkIcon className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-          </div>
+                  {credit}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCredit(credit)}
+                    className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-emerald-400 hover:bg-emerald-200 hover:text-emerald-500"
+                  >
+                    <XMarkIcon className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          ) : null}
           <p className="mt-1 text-xs text-gray-500">
             Mỗi dòng sẽ được hiển thị như một credit riêng biệt
           </p>
+          {/* Show validation error for projectManager */}
+          {errors.credits?.projectManager && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.credits.projectManager.message}
+            </p>
+          )}
         </div>
-
-        {/* Hidden input for projectManager to satisfy validation */}
-        <input
-          type="hidden"
-          {...register('credits.projectManager')}
-          value={currentProjectManager}
-        />
-
-        {/* Show validation error for projectManager */}
-        {errors.credits?.projectManager && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.credits.projectManager.message}
-          </p>
-        )}
       </div>
     </div>
   );

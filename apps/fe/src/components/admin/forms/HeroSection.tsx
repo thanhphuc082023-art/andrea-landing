@@ -62,9 +62,6 @@ export default function HeroSection({
           Thông tin Hero Section
         </h3>
       </div>
-      <p className="mb-4 text-sm text-gray-600">
-        Thông tin chính sẽ hiển thị ở phần đầu trang dự án
-      </p>
 
       <div className="space-y-4">
         <div>
@@ -222,27 +219,27 @@ export default function HeroSection({
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                         }}
-                        className="h-8 w-8 rounded border border-gray-200"
+                        className="h-8 w-8 shrink-0 rounded border border-gray-200"
                         title={`Preview: ${thumbnail.name || 'thumbnail'}`}
                       />
                     ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded border border-gray-200 bg-gray-100">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-gray-200 bg-gray-100">
                         <span className="text-xs text-gray-400">📷</span>
                       </div>
                     )}
-                    <span className="text-sm text-gray-700">
+                    <span className="block max-w-[12rem] flex-1 truncate text-sm text-gray-700">
                       {thumbnail.name || thumbnail.fileName}
                     </span>
                     {thumbnail.uploadId ? (
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                        ✓ Uploaded
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        ✓ Đã tải lên
                       </span>
                     ) : thumbnail.file ? (
-                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
                         Sẵn sàng
                       </span>
                     ) : thumbnail.url ? (
-                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
                         Đã có
                       </span>
                     ) : null}
@@ -296,19 +293,19 @@ export default function HeroSection({
                         muted
                       />
                     )}
-                    <span className="text-sm text-gray-700">
+                    <span className="block max-w-[12rem] truncate text-sm text-gray-700">
                       {heroVideo.name || heroVideo.fileName}
                     </span>
                     {heroVideo.uploadId ? (
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                        ✓ Uploaded
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        ✓ Đã tải lên
                       </span>
                     ) : heroVideo.file ? (
-                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
                         Sẵn sàng
                       </span>
                     ) : heroVideo.url ? (
-                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
                         Đã có
                       </span>
                     ) : null}
@@ -368,19 +365,19 @@ export default function HeroSection({
                         <span className="text-xs text-gray-400">🖼️</span>
                       </div>
                     )}
-                    <span className="text-sm text-gray-700">
+                    <span className="block max-w-[12rem] truncate text-sm text-gray-700">
                       {heroBanner.name || heroBanner.fileName}
                     </span>
                     {heroBanner.uploadId ? (
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                        ✓ Uploaded
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        ✓ Đã tải lên
                       </span>
                     ) : heroBanner.file ? (
-                      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
                         Sẵn sàng
                       </span>
                     ) : heroBanner.url ? (
-                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
                         Đã có
                       </span>
                     ) : null}

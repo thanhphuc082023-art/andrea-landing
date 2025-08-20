@@ -28,7 +28,7 @@ function ProjectPage({
   nextProjects = [],
 }: ProjectPageProps) {
   const router = useRouter();
-  console.log('project', project);
+  console.log('nextProjects', nextProjects);
   if (router.isFallback) {
     return (
       <div className="flex min-h-screen items-center justify-center">

@@ -37,13 +37,9 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
-      content: initialData?.content || '',
       slug: initialData?.slug || '',
       status: initialData?.status || 'draft',
       featured: initialData?.featured || false,
-      overview: initialData?.overview || '',
-      challenge: initialData?.challenge || '',
-      solution: initialData?.solution || '',
       categoryId: initialData?.categoryId || '',
       projectIntroTitle: initialData?.projectIntroTitle || '',
       credits: initialData?.credits || {
@@ -120,13 +116,9 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
           // Update form values
           setValue('title', parsedData.title || '');
           setValue('description', parsedData.description || '');
-          setValue('content', parsedData.content || '');
           setValue('slug', parsedData.slug || '');
           setValue('status', parsedData.status || 'draft');
           setValue('featured', parsedData.featured || false);
-          setValue('overview', parsedData.overview || '');
-          setValue('challenge', parsedData.challenge || '');
-          setValue('solution', parsedData.solution || '');
           setValue('categoryId', parsedData.categoryId || '');
           setValue('projectIntroTitle', parsedData.projectIntroTitle || '');
           setValue(
@@ -192,13 +184,9 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
           // Update other form values
           setValue('title', parsedData.title || '');
           setValue('description', parsedData.description || '');
-          setValue('content', parsedData.content || '');
           setValue('slug', parsedData.slug || '');
           setValue('status', parsedData.status || 'draft');
           setValue('featured', parsedData.featured || false);
-          setValue('overview', parsedData.overview || '');
-          setValue('challenge', parsedData.challenge || '');
-          setValue('solution', parsedData.solution || '');
           setValue('categoryId', parsedData.categoryId || '');
           setValue('projectIntroTitle', parsedData.projectIntroTitle || '');
           setValue(

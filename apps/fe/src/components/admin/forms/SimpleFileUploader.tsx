@@ -352,7 +352,7 @@ export default function SimpleFileUploader({
             />
           </svg>
           <p className="text-sm text-gray-600">{label}</p>
-          <p className="text-xs text-gray-500">{description}</p>
+          <p className="text-center text-xs text-gray-500">{description}</p>
         </label>
       )}
 

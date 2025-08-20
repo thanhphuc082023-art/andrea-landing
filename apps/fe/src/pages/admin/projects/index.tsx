@@ -110,7 +110,7 @@ export default function AdminProjects({
               </div>
               <button
                 onClick={handleCreateProject}
-                className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="bg-brand-orage hover:bg-brand-orange-dark inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none"
               >
                 <PlusIcon className="mr-2 h-5 w-5" />
                 Tạo dự án mới
@@ -148,7 +148,7 @@ export default function AdminProjects({
                     <li key={project.id}>
                       <div className="px-4 py-4 sm:px-6">
                         <div className="flex items-center justify-between gap-16">
-                          <div className="flex items-center">
+                          <div className="flex flex-1 items-center">
                             <div className="flex-shrink-0">
                               {project.thumbnail ? (
                                 <div className="h-10 w-10 overflow-hidden rounded-full">
@@ -163,14 +163,14 @@ export default function AdminProjects({
                                   />
                                 </div>
                               ) : (
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
-                                  <span className="font-medium text-indigo-600">
+                                <div className="bg-brand-orange/10 flex h-10 w-10 items-center justify-center rounded-full">
+                                  <span className="text-brand-orange font-medium">
                                     {project.title.charAt(0).toUpperCase()}
                                   </span>
                                 </div>
                               )}
                             </div>
-                            <div className="ml-4">
+                            <div className="ml-4 flex-1">
                               <div className="flex items-center">
                                 <p className="text-sm font-medium text-gray-900">
                                   {project.title}
@@ -181,9 +181,6 @@ export default function AdminProjects({
                                   </span>
                                 )}
                               </div>
-                              <p className="line-clamp-2 text-sm text-gray-500">
-                                {project.description}
-                              </p>
                               <div className="mt-1 flex items-center space-x-4">
                                 <span className="text-xs text-gray-400">
                                   /{project.slug}
@@ -192,7 +189,7 @@ export default function AdminProjects({
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex shrink-0 items-center space-x-2">
                             <button
                               onClick={() =>
                                 window.open(

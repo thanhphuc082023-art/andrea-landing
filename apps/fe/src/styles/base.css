@@ -113,3 +113,7 @@
     BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     'Noto Sans', sans-serif;
 }
+
+.shadow-top {
+  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1);
+}

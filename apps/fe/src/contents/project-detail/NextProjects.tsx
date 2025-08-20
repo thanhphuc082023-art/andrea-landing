@@ -1,12 +1,15 @@
 import clsx from 'clsx';
 import { RegularProjectCard } from '@/components/projects';
 import SubmitButton from '@/components/SubmitButton';
+import { useRouter } from 'next/router';
 
 interface NextProjectsProps {
   projects?: any[];
 }
 
 function NextProjects({ projects = [] }: NextProjectsProps) {
+  const router = useRouter();
+
   if (projects.length === 0) {
     return (
       <section className={clsx('content-wrapper mx-auto')}>
@@ -60,6 +63,7 @@ function NextProjects({ projects = [] }: NextProjectsProps) {
           hoverTextColor="hover:text-white"
           focusRingColor="focus:ring-brand-orange"
           focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
+          onClick={() => router.push('/projects')}
         >
           Xem thêm
         </SubmitButton>
