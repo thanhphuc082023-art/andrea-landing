@@ -30,6 +30,15 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
   const iconUrl = icon ? getStrapiMediaUrl(icon) : null;
   const iconActiveUrl = iconActive ? getStrapiMediaUrl(iconActive) : null;
 
+  // Safely render slogan items which may be string or object ({ id, title, subtitle, description })
+  const getText = (val: any) =>
+    typeof val === 'string'
+      ? val
+      : (val?.title ??
+        val?.subtitle ??
+        val?.description ??
+        (val ? String(val) : '--'));
+
   return (
     <div
       className={clsx(
@@ -109,7 +118,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
           >
             {iconActiveUrl ? (
               <img
-                src={iconActiveUrl}
+                src={iconActiveUrl || ''}
                 alt={`${title} icon`}
                 className={clsx(
                   'object-contain',
@@ -146,13 +155,13 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
               letterSpacing: '0.5px',
             }}
           >
-            {description}
+            {description || '--'}
           </p>
           {(slogan?.length ?? 0) > 0 && (
             <ul>
               {slogan?.map((item, index) => (
                 <li
-                  key={`${item}-${id}-${index + 1}`}
+                  key={`slogan-${item?.id ?? index}`}
                   className={clsx(
                     'font-normal leading-6 tracking-wide',
                     'group-hover:text-brand-orange text-[#979797] transition-colors duration-300',
@@ -161,7 +170,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                     'text-base max-lg:text-sm max-md:text-sm'
                   )}
                 >
-                  {item || item?.title}
+                  {getText(item)}
                 </li>
               ))}
             </ul>
