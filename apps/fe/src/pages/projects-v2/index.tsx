@@ -1,17 +1,77 @@
-'use client';
+import { GetStaticProps } from 'next';
 import { HeroParallax } from '@/components/ui/HeroParallaxAutomation';
-import { projects } from '@/data/projects';
 import Head from 'next/head';
 import React from 'react';
+import {
+  getStaticPropsWithGlobalAndData,
+  type PagePropsWithGlobal,
+} from '@/lib/page-helpers';
+import { getStrapiMediaUrl } from '@/utils/helper';
 
-export default function ProjectsList() {
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  slug: string;
+  status: string;
+  featured: boolean;
+  thumbnail?: {
+    url: string;
+    name: string;
+  } | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ProjectsPageProps extends PagePropsWithGlobal {
+  projects: Project[];
+  error?: string;
+}
+
+export default function ProjectsList({ projects, error }: ProjectsPageProps) {
+  // Đảm bảo có đủ items cho layout (tối thiểu 12 items cho 4 rows x 3 items)
+  const MIN_ITEMS = 12;
+  let allProjects = [...projects];
+
+  // Duplicate projects nếu không đủ items
+  while (allProjects.length < MIN_ITEMS && projects.length > 0) {
+    const remaining = MIN_ITEMS - allProjects.length;
+    const duplicateCount = Math.min(remaining, projects.length);
+    allProjects = [...allProjects, ...projects.slice(0, duplicateCount)];
+  }
+
   // Chuyển đổi format dữ liệu từ projects để phù hợp với HeroParallax
-  const products = projects.map((project) => ({
+  const products = allProjects.map((project, index) => ({
     title: project.title,
     description: project.description,
     link: `/project/${project.slug}`,
-    thumbnail: project.image,
+    thumbnail:
+      getStrapiMediaUrl(project.thumbnail) ||
+      '/assets/images/projects/project-sample.jpg',
+    // Thêm unique key để tránh duplicate key warning
+    key: `${project.id}-${index}`,
   }));
+
+  if (error) {
+    return (
+      <>
+        <Head>
+          <title>Lỗi - Danh Sách Dự Án</title>
+          <meta
+            name="description"
+            content="Có lỗi xảy ra khi tải danh sách dự án"
+          />
+          <meta name="robots" content="noindex, nofollow" />
+        </Head>
+        <div className="mt-[65px] flex min-h-screen items-center justify-center bg-gray-50 max-md:mt-[60px]">
+          <div className="text-center">
+            <h1 className="mb-4 text-3xl font-bold text-gray-900">Lỗi</h1>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -45,3 +105,46 @@ export default function ProjectsList() {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps<ProjectsPageProps> = async () => {
+  return getStaticPropsWithGlobalAndData(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/projects?populate=*&sort=createdAt:desc`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const projects: Project[] = data.data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        slug: item.slug,
+        status: item.projectStatus,
+        featured: item.featured,
+        thumbnail: item.thumbnail,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      }));
+
+      return {
+        projects: projects,
+      };
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      return {
+        projects: [],
+        // error: 'Không thể tải danh sách dự án. Vui lòng thử lại sau.',
+      };
+    }
+  });
+};

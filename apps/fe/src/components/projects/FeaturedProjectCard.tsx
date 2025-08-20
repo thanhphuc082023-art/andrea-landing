@@ -5,10 +5,11 @@ import type { ProjectCardProps } from '@/types/project';
 import { getStrapiMediaUrl } from '@/utils/helper';
 
 function FeaturedProjectCard({ project, className }: ProjectCardProps) {
-  if (project.isLarge) {
+  console.log('project?.thumbnail', project?.thumbnail);
+  if (project?.isLarge) {
     return (
       <div className={clsx('lg:col-span-8', className)}>
-        <Link href={`/project/${project.slug}`}>
+        <Link href={`/project/${project?.slug}`}>
           <div className={clsx('group relative cursor-pointer')}>
             {/* Main Image */}
             <div
@@ -18,7 +19,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
             >
               <Image
                 src={getStrapiMediaUrl(project?.thumbnail) || ''}
-                alt={project.title}
+                alt={project?.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 60vw"
@@ -34,14 +35,14 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
                   'text-text-primary mb-2 text-[22px] font-semibold lg:text-[22px]'
                 )}
               >
-                {project.title}
+                {project?.title}
               </h3>
               <p
                 className={clsx(
                   'text-text-secondary line-clamp-2 text-base font-normal tracking-wide'
                 )}
               >
-                {project.description}
+                {project?.description}
               </p>
             </div>
           </div>
@@ -52,7 +53,7 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
 
   return (
     <div className={clsx('lg:col-span-4', className)}>
-      <Link href={`/project/${project.slug}`}>
+      <Link href={`/project/${project?.slug}`}>
         <div className={clsx('group relative cursor-pointer')}>
           {/* Featured Image */}
           <div
@@ -61,8 +62,8 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
             )}
           >
             <Image
-              src={project.image}
-              alt={project.title}
+              src={getStrapiMediaUrl(project?.thumbnail) || ''}
+              alt={project?.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 1024px) 100vw, 40vw"
@@ -78,14 +79,14 @@ function FeaturedProjectCard({ project, className }: ProjectCardProps) {
                 'text-text-primary mb-2 text-[22px] font-semibold'
               )}
             >
-              {project.title}
+              {project?.title}
             </h3>
             <p
               className={clsx(
                 'text-text-secondary line-clamp-2 text-base font-normal tracking-wide'
               )}
             >
-              {project.description}
+              {project?.description}
             </p>
           </div>
         </div>
@@ -100,10 +101,10 @@ export function FeaturedProjectCardOld({
   project,
   className,
 }: ProjectCardProps) {
-  if (project.isLarge) {
+  if (project?.isLarge) {
     return (
       <div className={clsx('lg:col-span-8', className)}>
-        <Link href={`/project/${project.slug}`}>
+        <Link href={`/project/${project?.slug}`}>
           <div className={clsx('group relative cursor-pointer')}>
             {/* Main Image */}
             <div
@@ -112,8 +113,8 @@ export function FeaturedProjectCardOld({
               )}
             >
               <Image
-                src={project.image}
-                alt={project.title}
+                src={getStrapiMediaUrl(project?.thumbnail) || ''}
+                alt={project?.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 60vw"
@@ -129,14 +130,14 @@ export function FeaturedProjectCardOld({
                   'text-text-primary mb-2 text-[22px] font-semibold lg:text-[22px]'
                 )}
               >
-                {project.title}
+                {project?.title}
               </h3>
               <p
                 className={clsx(
                   'text-text-secondary text-base font-normal tracking-wide'
                 )}
               >
-                {project.description}
+                {project?.description}
               </p>
             </div>
           </div>
@@ -147,7 +148,7 @@ export function FeaturedProjectCardOld({
 
   return (
     <div className={clsx('lg:col-span-4', className)}>
-      <Link href={`/project/${project.slug}`}>
+      <Link href={`/project/${project?.slug}`}>
         <div className={clsx('group relative cursor-pointer')}>
           {/* Featured Image */}
           <div
@@ -156,8 +157,8 @@ export function FeaturedProjectCardOld({
             )}
           >
             <Image
-              src={project.image}
-              alt={project.title}
+              src={getStrapiMediaUrl(project?.thumbnail) || ''}
+              alt={project?.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 1024px) 100vw, 40vw"
@@ -173,14 +174,14 @@ export function FeaturedProjectCardOld({
                 'text-text-primary mb-2 text-[22px] font-semibold'
               )}
             >
-              {project.title}
+              {project?.title}
             </h3>
             <p
               className={clsx(
                 'text-text-secondary text-base font-normal tracking-wide'
               )}
             >
-              {project.description}
+              {project?.description}
             </p>
           </div>
         </div>

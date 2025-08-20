@@ -7,7 +7,7 @@ import { getStrapiMediaUrl } from '@/utils/helper';
 function RegularProjectCard({ project, className }: ProjectCardProps) {
   return (
     <div className={clsx('group relative cursor-pointer', className)}>
-      <Link href={`/project/${project.slug}`}>
+      <Link href={`/project/${project?.slug}`}>
         {/* Project Image */}
         <div
           className={clsx(
@@ -15,8 +15,8 @@ function RegularProjectCard({ project, className }: ProjectCardProps) {
           )}
         >
           <Image
-            src={getStrapiMediaUrl(project?.thumbnail) || ''}
-            alt={project.title}
+            src={getStrapiMediaUrl(project?.thumbnail?.formats?.medium) || ''}
+            alt={project?.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -30,14 +30,14 @@ function RegularProjectCard({ project, className }: ProjectCardProps) {
           <h3
             className={clsx('text-text-primary mb-2 text-[22px] font-semibold')}
           >
-            {project.title}
+            {project?.title}
           </h3>
           <p
             className={clsx(
               'text-text-secondary line-clamp-2 text-base font-normal tracking-wide'
             )}
           >
-            {project.description}
+            {project?.description}
           </p>
         </div>
       </Link>
@@ -53,7 +53,7 @@ export function RegularProjectCardOld({
 }: ProjectCardProps) {
   return (
     <div className={clsx('group relative cursor-pointer', className)}>
-      <Link href={`/project/${project.slug}`}>
+      <Link href={`/project/${project?.slug}`}>
         {/* Project Image */}
         <div
           className={clsx(
@@ -61,8 +61,8 @@ export function RegularProjectCardOld({
           )}
         >
           <Image
-            src={project.image}
-            alt={project.title}
+            src={project?.image}
+            alt={project?.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -76,14 +76,14 @@ export function RegularProjectCardOld({
           <h3
             className={clsx('text-text-primary mb-2 text-[22px] font-semibold')}
           >
-            {project.title}
+            {project?.title}
           </h3>
           <p
             className={clsx(
               'text-text-secondary text-base font-normal tracking-wide'
             )}
           >
-            {project.description}
+            {project?.description}
           </p>
         </div>
       </Link>

@@ -40,13 +40,13 @@ function IndexContents({
         <Workflow workflowData={workflowData} />
       </div>
 
-      {/* <div className={clsx('pb-[50px]')}>
-        <ProjectGrid featuredProjectsData={featuredProjectsData} />
-      </div> */}
-
       <div className={clsx('pb-[50px]')}>
-        <ProjectGridOld />
+        <ProjectGrid featuredProjectsData={featuredProjectsData} />
       </div>
+
+      {/* <div className={clsx('pb-[50px]')}>
+        <ProjectGridOld />
+      </div> */}
 
       <Partners partnersData={partnersData} />
 

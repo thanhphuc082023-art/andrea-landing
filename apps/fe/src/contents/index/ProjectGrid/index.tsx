@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import SubmitButton from '@/components/SubmitButton';
 import { FeaturedProjectCard, RegularProjectCard } from '@/components/projects';
+import { useRouter } from 'next/router';
 
 interface ProjectGridProps {
   featuredProjectsData?: {
@@ -10,6 +11,7 @@ interface ProjectGridProps {
 }
 
 function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
+  const router = useRouter();
   const featuredTitle = featuredProjectsData?.title || 'Dự án tiêu biểu';
   const allProjects = featuredProjectsData?.projects || [];
   const featuredProjects = allProjects.slice(0, 2).map((project, index) => ({
@@ -17,7 +19,10 @@ function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
     isLarge: index === 0, // First item is large
   }));
 
-  const regularProjects = allProjects.slice(2)?.map((item) => item?.project); //
+  const regularProjects = allProjects
+    .slice(2)
+    ?.map((item) => item?.projectItem?.project);
+
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto max-md:!px-0')}>
@@ -55,13 +60,14 @@ function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
             )}
           >
             {regularProjects.map((project) => (
-              <RegularProjectCard key={project.id} project={project} />
+              <RegularProjectCard key={project?.id} project={project} />
             ))}
           </div>
         )}
 
         <div className={clsx('mt-9 text-center')}>
           <SubmitButton
+            onClick={() => router.push('/projects')}
             textColor="text-brand-orange"
             borderColor="border-brand-orange"
             beforeBgColor="before:bg-brand-orange"
