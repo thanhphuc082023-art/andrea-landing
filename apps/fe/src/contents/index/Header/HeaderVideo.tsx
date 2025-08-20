@@ -164,7 +164,10 @@ function HeaderVideo({
 
       {/* Scroll Down Button */}
       <ScrollDownButton
-        className={clsx('absolute bottom-6 left-1/2 z-30 -translate-x-1/2')}
+        className={clsx(
+          'absolute bottom-6 left-1/2 z-30 -translate-x-1/2',
+          mobileAspectRatio ? 'max-sd:hidden' : ''
+        )}
         text="Kéo xuống"
       />
 
