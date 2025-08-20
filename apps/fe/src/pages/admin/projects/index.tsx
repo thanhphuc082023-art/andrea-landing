@@ -110,7 +110,7 @@ export default function AdminProjects({
               </div>
               <button
                 onClick={handleCreateProject}
-                className="bg-brand-orage hover:bg-brand-orange-dark inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none"
+                className="bg-brand-orange hover:bg-brand-orange-dark inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none"
               >
                 <PlusIcon className="mr-2 h-5 w-5" />
                 Tạo dự án mới

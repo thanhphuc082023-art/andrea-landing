@@ -70,18 +70,14 @@ export const HeroParallax = ({
     useTransform(
       scrollYProgress,
       [0, 0.2],
-      [isMobile ? -560 : -980, isMobile ? 50 : 100]
+      [isMobile ? -560 : -980, isMobile ? 50 : 0]
     ),
     springConfig
   );
 
   // Dynamic translateX cho container dựa trên scroll progress - responsive
   const containerTranslateX = useSpring(
-    useTransform(
-      scrollYProgress,
-      [0, 0.2],
-      [isMobile ? -200 : -295, isMobile ? -2.5 : -5]
-    ),
+    useTransform(scrollYProgress, [0, 0.2], [isMobile ? -200 : -295, 0]),
     springConfig
   );
 
