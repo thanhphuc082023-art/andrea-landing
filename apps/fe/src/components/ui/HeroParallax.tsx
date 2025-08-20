@@ -184,7 +184,7 @@ export const HeroParallax = ({
     useTransform(
       scrollYProgress,
       [0, 0.2],
-      [isMobile ? -625 : -980, isMobile ? 260 : 0]
+      [isMobile ? -625 : -980, isMobile ? 270 : 0]
     ),
     springConfig
   );
@@ -378,7 +378,7 @@ export const HeroParallax = ({
                 >
                   <div className={`w-full`}>
                     <div
-                      className={`grid grid-cols-1 sm:grid-cols-${ITEMS_PER_ROW} gap-6 max-md:gap-4`}
+                      className={`grid max-md:grid-cols-1 grid-cols-${ITEMS_PER_ROW} gap-6 max-md:gap-4`}
                     >
                       {row.map((product, productIndex) => (
                         <ProductCard
