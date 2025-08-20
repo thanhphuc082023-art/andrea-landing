@@ -63,9 +63,10 @@ function ProjectPage({
   return (
     <>
       <StrapiHead
-        title={`${projectTitle} - Andrea`}
+        title={`Dự án: ${projectTitle}`}
         description={projectDescription}
-        ogImage={getStrapiMediaUrl(project?.featuredImage?.url)}
+        overrideTitle
+        ogImage={getStrapiMediaUrl(project?.thumbnail)}
         seo={project?.seo}
         global={currentGlobal}
       />

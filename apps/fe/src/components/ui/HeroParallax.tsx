@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
-import { ScrollHideWrapper } from './ScrollHideWrapper';
 import { InfiniteScroll } from './InfiniteScroll';
+import { useRouter } from 'next/router';
 
 export const HeroParallax = ({
   products,
@@ -429,6 +429,7 @@ export const ProductCard = ({
   };
   gridMode?: boolean;
 }) => {
+  const router = useRouter();
   return (
     <motion.div
       key={product.title}
@@ -452,7 +453,10 @@ export const ProductCard = ({
         <div className="flex items-center justify-between">
           <h2 className="truncate text-lg font-semibold">{product.title}</h2>
           <span className="relative inline-block">
-            <button className="after:bg-brand-orange relative z-30 overflow-hidden rounded-md bg-black/10 px-2 py-1 text-sm font-semibold text-white after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700">
+            <button
+              onClick={() => router.push(product.link)}
+              className="after:bg-brand-orange relative z-30 overflow-hidden rounded-md bg-black/10 px-2 py-1 text-sm font-semibold text-white after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700"
+            >
               Xem thêm
             </button>
           </span>

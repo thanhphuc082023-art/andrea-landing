@@ -66,11 +66,11 @@ export const InfiniteScroll = ({
   const getSpeed = () => {
     if (containerRef.current) {
       if (speed === 'fast') {
-        containerRef.current.style.setProperty('--animation-duration', '1000s');
+        containerRef.current.style.setProperty('--animation-duration', '250s');
       } else if (speed === 'normal') {
-        containerRef.current.style.setProperty('--animation-duration', '1000s');
+        containerRef.current.style.setProperty('--animation-duration', '250s');
       } else {
-        containerRef.current.style.setProperty('--animation-duration', '1500s');
+        containerRef.current.style.setProperty('--animation-duration', '250s');
       }
     }
   };
