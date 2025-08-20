@@ -42,7 +42,8 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
         <div
           className={clsx(
             'header-video-container relative inset-0 z-0 overflow-hidden',
-            'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-65px)]'
+            'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-65px)]',
+            `max-sd:aspect-[430/194] max-sd:!h-auto`
           )}
         >
           {/* Hero Banner Image */}
@@ -61,7 +62,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
           {mode !== 'edit' && mode !== 'create' && (
             <ScrollDownButton
               className={clsx(
-                'absolute bottom-6 left-1/2 z-30 -translate-x-1/2'
+                'max-sd:hidden absolute bottom-6 left-1/2 z-30 -translate-x-1/2'
               )}
               text="Kéo xuống"
             />

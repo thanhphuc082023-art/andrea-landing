@@ -12,7 +12,7 @@ function NextProjects({ projects = [] }: NextProjectsProps) {
 
   if (projects.length === 0) {
     return (
-      <section className={clsx('content-wrapper mx-auto')}>
+      <section className={clsx('content-wrapper mx-auto max-md:!px-0')}>
         <div className={clsx('mb-6')}>
           <h2
             className={clsx(
@@ -30,12 +30,12 @@ function NextProjects({ projects = [] }: NextProjectsProps) {
   }
 
   return (
-    <section className={clsx('content-wrapper mx-auto')}>
+    <section className={clsx('content-wrapper mx-auto max-md:!px-0')}>
       {/* Title */}
       <div className={clsx('mb-6')}>
         <h2
           className={clsx(
-            'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
+            'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:px-[25px] max-md:text-[35px]'
           )}
         >
           Dự án tiếp theo
