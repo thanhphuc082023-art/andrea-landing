@@ -18,7 +18,7 @@ export function PerformanceOptimizations() {
       <link rel="preconnect" href="https://cdn.builder.io" />
       <link rel="preconnect" href="https://www.googletagmanager.com" />
       <link rel="preconnect" href="https://www.google-analytics.com" />
-      <link rel="preconnect" href="https://andrea.vn" />
+      <link rel="preconnect" href="https://andrea.com.vn" />
 
       {/* Preload critical images for LCP optimization */}
       <link

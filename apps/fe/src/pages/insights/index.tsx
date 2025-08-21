@@ -16,8 +16,7 @@ export default function InsightsPage({ article, currentGlobal }: any) {
   const articleSeo = {
     metaTitle: article?.title || defaultSeo?.metaTitle,
     metaDescription: article?.excerpt || defaultSeo?.metaDescription,
-    shareImage:
-      getStrapiMediaUrl(article?.hero?.desktop) || defaultSeo?.shareImage,
+    shareImage: article?.hero?.mobile,
   };
   const seo = { ...defaultSeo, ...articleSeo };
 
