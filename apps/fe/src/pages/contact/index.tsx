@@ -47,7 +47,7 @@ export default function ContactSection({
         <div className="w-full">
           <div className="grid justify-between gap-12 lg:grid-cols-[420px_1fr] lg:gap-[131px]">
             {/* Left Column - Company Info */}
-            <div className="space-y-10">
+            <div className="space-y-10 max-md:space-y-5">
               {/* Andrea Branding Image */}
               <div>
                 <img
@@ -159,7 +159,7 @@ export default function ContactSection({
               </div>
 
               {/* Google Maps (embedded) */}
-              <div>
+              <div className="max-lg:hidden">
                 <h3 className="mb-8 text-[24px] font-semibold text-red-500">
                   Tìm kiếm chúng tôi trên Google Map
                 </h3>
@@ -181,7 +181,7 @@ export default function ContactSection({
             <div className="grid grid-cols-1 grid-rows-3 space-y-5">
               {/* Work Contact */}
               <div className="rounded-10 overflow-hidden bg-[#EFEFEF]">
-                <div className="aspect-[750/387] w-full">
+                <div className="aspect-[750/387] min-h-[355px] w-full">
                   <div className="flex h-full flex-col justify-start p-6 lg:p-[48px]">
                     <h3 className="text-brand-orange font-playfair mb-3 break-words text-[40px] font-medium max-md:text-[30px]">
                       Liên hệ công việc
@@ -199,7 +199,7 @@ export default function ContactSection({
 
               {/* Partnership Contact */}
               <div className="rounded-10 overflow-hidden bg-[#EFEFEF]">
-                <div className="aspect-[750/387] w-full">
+                <div className="aspect-[750/387] min-h-[355px] w-full">
                   <div className="flex h-full flex-col justify-start p-6 lg:p-[48px]">
                     <h3 className="text-brand-orange font-playfair mb-3 break-words text-[40px] font-medium max-md:text-[30px]">
                       Liên hệ hợp tác
@@ -217,7 +217,7 @@ export default function ContactSection({
 
               {/* Career Opportunities */}
               <div className="rounded-10 overflow-hidden bg-[#EFEFEF]">
-                <div className="aspect-[750/387] w-full">
+                <div className="aspect-[750/387] min-h-[355px] w-full">
                   <div className="flex h-full flex-col justify-start p-6 lg:p-[48px]">
                     <h3 className="text-brand-orange font-playfair mb-3 break-words text-[40px] font-medium max-md:text-[30px]">
                       Cơ hội nghề nghiệp
@@ -228,6 +228,23 @@ export default function ContactSection({
                     </p>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden max-lg:block">
+            <h3 className="mb-4 mt-[60px] text-[24px] font-semibold text-red-500">
+              Tìm kiếm chúng tôi trên Google Map
+            </h3>
+            <div className="w-full">
+              <div className="rounded-10 aspect-[420/250] w-full max-w-[420px] overflow-hidden">
+                <iframe
+                  src={mapSrc}
+                  className="h-full w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Andrea - Google Map"
+                />
               </div>
             </div>
           </div>
