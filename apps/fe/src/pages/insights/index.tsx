@@ -22,7 +22,11 @@ export default function InsightsPage({ article, currentGlobal }: any) {
 
   return (
     <div className="mt-[65px] max-md:mt-[60px]">
-      <StrapiHead global={currentGlobal} seo={seo} />
+      <StrapiHead
+        ogImage={article?.hero?.mobile}
+        global={currentGlobal}
+        seo={seo}
+      />
 
       {/* Hero Section */}
       <div className="w-full">
