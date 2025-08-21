@@ -37,10 +37,6 @@ const EProfileListPage: React.FC<EProfileListPageProps> = ({
   initialBooks,
   pagination: initialPagination,
   error,
-  // Global props from getStaticPropsWithGlobal
-  serverGlobal,
-  menuItems,
-  footerData,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [books, setBooks] = useState<Book[]>(initialBooks);

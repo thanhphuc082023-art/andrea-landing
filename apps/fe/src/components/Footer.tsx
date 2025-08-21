@@ -410,7 +410,7 @@ function Footer({ footerData = {} }: FooterProps) {
                       <WebsiteIcon />
                     </div>
                     <a
-                      href="https://www.andrea.vn"
+                      href="https://www.andrea.com.vn"
                       target="_blank"
                       rel="noreferrer nofollow"
                       className={clsx(
@@ -418,7 +418,7 @@ function Footer({ footerData = {} }: FooterProps) {
                         'dark:text-slate-400 dark:hover:text-slate-100'
                       )}
                     >
-                      www.andrea.vn
+                      www.andrea.com.vn
                     </a>
                   </div>
                   <div className={clsx('flex items-center gap-2')}>
