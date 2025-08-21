@@ -126,7 +126,7 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
   );
 }
 
-function Blog() {
+function Blog({ title }: { title: string }) {
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
@@ -137,7 +137,7 @@ function Blog() {
               'font-playfair text-brand-orange max-sd:text-[40px] text-[50px] font-medium max-md:text-[35px]'
             )}
           >
-            Góc nhìn của Andrea
+            {title || 'Góc nhìn của Andrea'}
           </h2>
         </div>
 
