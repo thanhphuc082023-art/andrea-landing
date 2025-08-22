@@ -28,7 +28,7 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
       <StrapiHead
         global={currentGlobal}
         seo={seo}
-        ogImage={'assets/images/services/baobi/baobi_thumb_mobile.png'}
+        ogImage={'/assets/images/services/baobi/baobi_thumb_mobile.png'}
       />
       {/* Hero Section */}
       <div className="w-full">
