@@ -20,7 +20,9 @@ interface ShowcaseItem {
   width: number;
   height: number;
   colSpan?: number;
-  type?: 'image' | 'video' | 'flipbook';
+  type?: 'image' | 'video' | 'flipbook' | 'text';
+  title?: string;
+  description?: string;
   bookData?: {
     title?: string;
     websiteUrl?: string;
@@ -157,6 +159,33 @@ const ShowcaseItem = memo(
   ({ item, priority = false }: { item: ShowcaseItem; priority?: boolean }) => {
     const commonClasses =
       'object-cover transition-transform duration-700 group-hover:scale-[1.02]';
+    const html = item.description?.replace(/\n/g, '<br/>') || '';
+
+    if (item.type === 'text') {
+      return (
+        <div
+          className={clsx(
+            'pointer-events-none flex h-full w-full items-center justify-center bg-white p-6 max-lg:h-fit max-md:p-[28px]',
+            !item?.description && !item?.title ? 'max-lg:hidden' : ''
+          )}
+          style={{ height: item?.height }}
+        >
+          <div className="max-w-full">
+            {item.title ? (
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                {item.title}
+              </h3>
+            ) : null}
+            {item.description ? (
+              <div
+                className="whitespace-pre-wrap text-sm text-[#7D7D7D]"
+                dangerouslySetInnerHTML={{ __html: html }}
+              />
+            ) : null}
+          </div>
+        </div>
+      );
+    }
     if (item.type === 'video') {
       return (
         <video
@@ -222,7 +251,6 @@ ShowcaseItem.displayName = 'ShowcaseItem';
 
 const ShowcaseSection = memo(
   ({ section, index }: { section: any; index: number }) => {
-    // Transform admin data structure to match expected format
     const transformItem = (item: any, index: number = 0) => {
       // Helper to resolve source URLs coming from admin/Strapi or local blobs
       const resolveSrc = (rawSrc?: string) => {
@@ -252,8 +280,22 @@ const ShowcaseSection = memo(
         return src;
       };
 
+      // Normalize type to the expected union
+      const normalizeType = (
+        t: any
+      ): 'image' | 'video' | 'flipbook' | 'text' => {
+        if (!t) return 'image';
+        const tt = String(t).toLowerCase();
+        if (tt === 'flipbook') return 'flipbook';
+        if (tt === 'video') return 'video';
+        if (tt === 'text') return 'text';
+        return 'image';
+      };
+
+      const itemType = normalizeType(item?.type);
+
       // Handle flipbook items specially
-      if (item.type === 'flipbook') {
+      if (itemType === 'flipbook') {
         // Validate and clean the PDF URL
         let pdfUrl = resolveSrc(item.src || item.url || '');
 
@@ -263,7 +305,7 @@ const ShowcaseSection = memo(
           alt: item.alt || item.title || 'Interactive FlipBook',
           width: item.width || 1300,
           height: item.height || 800,
-          type: 'flipbook',
+          type: 'flipbook' as const,
           bookData: item.bookData || {
             title: 'Project Portfolio',
             websiteUrl: 'https://example.com',
@@ -280,18 +322,14 @@ const ShowcaseSection = memo(
         id: item.id || `item-${index}`,
         src: resolvedSrc,
         alt: item.alt || item.title || '',
+        title: item?.title || '',
+        description: item?.description || '',
         width: item.width || 1300,
         height: item.height || 600, // Default height for better UX
-        type: item.type || 'image',
+        type: itemType,
         bookData: item.bookData || {},
         colSpan: item.colSpan || 1,
       };
-    };
-
-    // Calculate aspect ratio for all devices
-    const getAspectRatio = (width: number, height: number) => {
-      const ratio = width / height;
-      return ratio;
     };
 
     if (section.layout === 'single') {
@@ -303,7 +341,6 @@ const ShowcaseSection = memo(
 
       if (!item) return null;
       const transformedItem = transformItem(item, 0);
-
       // Special handling for flipbook sections
       if (transformedItem.type === 'flipbook') {
         return (
@@ -316,11 +353,13 @@ const ShowcaseSection = memo(
       return (
         <div key={section.id} className="group">
           <div
-            className="relative w-full overflow-hidden bg-white shadow-sm"
+            className="relative w-full overflow-hidden bg-white"
             style={{
               aspectRatio:
-                transformedItem.type !== 'flipbook'
-                  ? `${transformedItem.width} / ${transformedItem.height}`
+                transformedItem.type !== 'text'
+                  ? `${Number(transformedItem.width || 1300)} / ${Number(
+                      transformedItem.height || 800
+                    )}`
                   : undefined,
             }}
           >
@@ -337,17 +376,28 @@ const ShowcaseSection = memo(
         : [section.items];
 
       return (
-        <div key={section.id} className="grid grid-cols-2">
+        <div
+          key={section.id}
+          className={clsx(
+            'grid grid-cols-2',
+            section.type === 'text' ? 'max-lg:grid-cols-1' : ''
+          )}
+        >
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
+            console.log('transformedItem', transformedItem);
+
             // For half-half layout, divide width by 2 for proper aspect ratio
             const adjustedWidth = items[0].width / 2;
             return (
               <div key={itemIndex} className="group">
                 <div
-                  className="relative w-full overflow-hidden bg-white shadow-sm"
+                  className="relative w-full overflow-hidden bg-white"
                   style={{
-                    aspectRatio: `${adjustedWidth} / ${transformedItem.height}`,
+                    aspectRatio:
+                      transformedItem.type !== 'text'
+                        ? `${adjustedWidth} / ${transformedItem.height}`
+                        : undefined,
                   }}
                 >
                   <ShowcaseItem
@@ -383,9 +433,12 @@ const ShowcaseSection = memo(
                 className={`group ${itemIndex === 1 ? 'col-span-2' : ''}`}
               >
                 <div
-                  className="relative w-full overflow-hidden bg-white shadow-sm"
+                  className="relative w-full overflow-hidden bg-white"
                   style={{
-                    aspectRatio: `${adjustedWidth} / ${transformedItem.height}`,
+                    aspectRatio:
+                      transformedItem.type !== 'text'
+                        ? `${adjustedWidth} / ${transformedItem.height}`
+                        : undefined,
                   }}
                 >
                   <ShowcaseItem
@@ -458,9 +511,12 @@ const ShowcaseSection = memo(
               className={`group ${transformedItem.colSpan ? getColSpanClass(transformedItem.colSpan) : ''}`}
             >
               <div
-                className="relative w-full overflow-hidden bg-white shadow-sm"
+                className="relative w-full overflow-hidden bg-white"
                 style={{
-                  aspectRatio: `${adjustedWidth} / ${transformedItem.height}`,
+                  aspectRatio:
+                    transformedItem.type !== 'text'
+                      ? `${adjustedWidth} / ${transformedItem.height}`
+                      : undefined,
                 }}
               >
                 <ShowcaseItem item={transformedItem} />

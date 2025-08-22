@@ -78,6 +78,8 @@ const SortableSection = ({
         return <VideoCameraIcon className="h-5 w-5 text-red-500" />;
       case 'flipbook':
         return <DocumentTextIcon className="h-5 w-5 text-green-500" />;
+      case 'text':
+        return <DocumentTextIcon className="h-5 w-5 text-purple-500" />;
       default:
         return <DocumentTextIcon className="h-5 w-5 text-gray-500" />;
     }
@@ -91,6 +93,8 @@ const SortableSection = ({
         return 'from-red-50 to-red-100 border-red-200';
       case 'flipbook':
         return 'from-green-50 to-green-100 border-green-200';
+      case 'text':
+        return 'from-purple-50 to-purple-100 border-purple-200';
       default:
         return 'from-gray-50 to-gray-100 border-gray-200';
     }
@@ -156,12 +160,54 @@ const SortableSection = ({
                   <select
                     value={section.layout}
                     onChange={(e) => {
+                      const newLayout = e.target.value as any;
                       setShowcaseSections((prevSections) =>
                         prevSections.map((s) =>
                           s.id === section.id
-                            ? {
+                            ? // If section is text, ensure items array matches layout (single vs two columns)
+                              {
                                 ...s,
-                                layout: e.target.value as any,
+                                layout: newLayout,
+                                items:
+                                  s.type === 'text'
+                                    ? // For text: single -> keep only first item; for 2-col layouts ensure two items exist
+                                      newLayout === 'single'
+                                      ? [
+                                          {
+                                            ...(s.items[0] || {}),
+                                            id:
+                                              s.items[0]?.id ||
+                                              `item-${Date.now()}`,
+                                            title: s.items[0]?.title || '',
+                                            description:
+                                              s.items[0]?.description || '',
+                                            order: 0,
+                                          },
+                                        ]
+                                      : // half-half or one-third: ensure two items
+                                        [
+                                          {
+                                            ...(s.items[0] || {}),
+                                            id:
+                                              s.items[0]?.id ||
+                                              `item-${Date.now()}`,
+                                            title: s.items[0]?.title || '',
+                                            description:
+                                              s.items[0]?.description || '',
+                                            order: 0,
+                                          },
+                                          {
+                                            ...(s.items[1] || {}),
+                                            id:
+                                              s.items[1]?.id ||
+                                              `item-${Date.now()}-2`,
+                                            title: s.items[1]?.title || '',
+                                            description:
+                                              s.items[1]?.description || '',
+                                            order: 1,
+                                          },
+                                        ]
+                                    : s.items,
                               }
                             : s
                         )
@@ -196,6 +242,514 @@ const SortableSection = ({
             </button>
           </div>
         </div>
+
+        {/* Text Section Editor */}
+        {section.type === 'text' && (
+          <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
+            <div className="space-y-3">
+              {/* Title & Description editors (kept after size controls) */}
+              {section.layout === 'single' ? (
+                // Single text block
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Tiêu đề
+                  </label>
+                  <input
+                    type="text"
+                    value={section.items[0]?.title || ''}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                items:
+                                  s.items && s.items.length
+                                    ? s.items.map((it, idx) =>
+                                        idx === 0 ? { ...it, title: v } : it
+                                      )
+                                    : [
+                                        {
+                                          id: `item-${Date.now()}`,
+                                          type: 'text',
+                                          title: v,
+                                          description: '',
+                                          width: 1300,
+                                          height: 800,
+                                          order: 0,
+                                        },
+                                      ],
+                              }
+                            : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                    placeholder="Tiêu đề..."
+                  />
+                  <label className="mt-2 block text-xs font-medium text-gray-700">
+                    Mô tả
+                  </label>
+                  <textarea
+                    value={section.items[0]?.description || ''}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                items:
+                                  s.items && s.items.length
+                                    ? s.items.map((it, idx) =>
+                                        idx === 0
+                                          ? { ...it, description: v }
+                                          : it
+                                      )
+                                    : [
+                                        {
+                                          id: `item-${Date.now()}`,
+                                          type: 'text',
+                                          title: '',
+                                          description: v,
+                                          width: 1300,
+                                          height: 800,
+                                          order: 0,
+                                        },
+                                      ],
+                              }
+                            : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                    placeholder="Mô tả..."
+                    rows={4}
+                  />
+                </div>
+              ) : (
+                // Two-column text blocks (left / right)
+                <div className="grid grid-cols-2 gap-3">
+                  {[0, 1].map((i) => (
+                    <div key={i}>
+                      <label className="block text-xs font-medium text-gray-700">
+                        {i === 0 ? 'Trái' : 'Phải'} - Tiêu đề
+                      </label>
+                      <input
+                        type="text"
+                        value={section.items[i]?.title || ''}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setShowcaseSections((prev) =>
+                            prev.map((s) =>
+                              s.id === section.id
+                                ? {
+                                    ...s,
+                                    items:
+                                      s.items && s.items.length >= 2
+                                        ? s.items.map((it, idx) =>
+                                            idx === i ? { ...it, title: v } : it
+                                          )
+                                        : i === 0
+                                          ? [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title: v,
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title: '',
+                                                description: '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ]
+                                          : [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title: v,
+                                                description:
+                                                  s.items?.[1]?.description ||
+                                                  '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ],
+                                  }
+                                : s
+                            )
+                          );
+                        }}
+                        className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                        placeholder="Tiêu đề..."
+                      />
+                      <label className="mt-2 block text-xs font-medium text-gray-700">
+                        Mô tả
+                      </label>
+                      <textarea
+                        value={section.items[i]?.description || ''}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setShowcaseSections((prev) =>
+                            prev.map((s) =>
+                              s.id === section.id
+                                ? {
+                                    ...s,
+                                    items:
+                                      s.items && s.items.length >= 2
+                                        ? s.items.map((it, idx) =>
+                                            idx === i
+                                              ? { ...it, description: v }
+                                              : it
+                                          )
+                                        : i === 0
+                                          ? [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                description: v,
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title: '',
+                                                description: '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ]
+                                          : [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[1]?.title || '',
+                                                description: v,
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ],
+                                  }
+                                : s
+                            )
+                          );
+                        }}
+                        className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                        rows={4}
+                        placeholder="Mô tả..."
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Width/Height controls for text sections */}
+              {section.layout === 'single' ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700">
+                      Chiều ngang (px)
+                    </label>
+                    <input
+                      type="number"
+                      value={section.items[0]?.width || ''}
+                      onChange={(e) => {
+                        const v = parseInt(e.target.value) || 0;
+                        setShowcaseSections((prev) =>
+                          prev.map((s) =>
+                            s.id === section.id
+                              ? {
+                                  ...s,
+                                  items:
+                                    s.items && s.items.length
+                                      ? s.items.map((it, idx) =>
+                                          idx === 0 ? { ...it, width: v } : it
+                                        )
+                                      : [
+                                          {
+                                            id: `item-${Date.now()}`,
+                                            type: 'text',
+                                            title: '',
+                                            description: '',
+                                            width: v,
+                                            height: 800,
+                                            order: 0,
+                                          },
+                                        ],
+                                }
+                              : s
+                          )
+                        );
+                      }}
+                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                      placeholder="1300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700">
+                      Chiều cao (px)
+                    </label>
+                    <input
+                      type="number"
+                      value={section.items[0]?.height || ''}
+                      onChange={(e) => {
+                        const v = parseInt(e.target.value) || 0;
+                        setShowcaseSections((prev) =>
+                          prev.map((s) =>
+                            s.id === section.id
+                              ? {
+                                  ...s,
+                                  items:
+                                    s.items && s.items.length
+                                      ? s.items.map((it, idx) =>
+                                          idx === 0 ? { ...it, height: v } : it
+                                        )
+                                      : [
+                                          {
+                                            id: `item-${Date.now()}`,
+                                            type: 'text',
+                                            title: '',
+                                            description: '',
+                                            width: 1300,
+                                            height: v,
+                                            order: 0,
+                                          },
+                                        ],
+                                }
+                              : s
+                          )
+                        );
+                      }}
+                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                      placeholder="800"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700">
+                      Tổng chiều ngang (px) -{' '}
+                      {section.layout === 'half-half'
+                        ? 'Chia 50% - 50%'
+                        : 'Chia 33% - 67%'}
+                    </label>
+                    <input
+                      type="number"
+                      value={section.items[0]?.width || ''}
+                      onChange={(e) => {
+                        const totalWidth = parseInt(e.target.value) || 0;
+                        const firstItemWidth =
+                          section.layout === 'half-half'
+                            ? Math.floor(totalWidth / 2)
+                            : Math.floor(totalWidth / 3);
+                        const secondItemWidth = totalWidth - firstItemWidth;
+
+                        setShowcaseSections((prev) =>
+                          prev.map((s) =>
+                            s.id === section.id
+                              ? {
+                                  ...s,
+                                  items:
+                                    s.items && s.items.length >= 2
+                                      ? s.items.map((it, idx) =>
+                                          idx === 0
+                                            ? { ...it, width: totalWidth }
+                                            : idx === 1
+                                              ? {
+                                                  ...it,
+                                                  width: secondItemWidth,
+                                                }
+                                              : it
+                                        )
+                                      : [
+                                          {
+                                            id:
+                                              s.items?.[0]?.id ||
+                                              `item-${Date.now()}`,
+                                            type: 'text',
+                                            title: s.items?.[0]?.title || '',
+                                            description:
+                                              s.items?.[0]?.description || '',
+                                            width: totalWidth,
+                                            height: s.items?.[0]?.height || 800,
+                                            order: 0,
+                                          },
+                                          {
+                                            id:
+                                              s.items?.[1]?.id ||
+                                              `item-${Date.now()}-2`,
+                                            type: 'text',
+                                            title: s.items?.[1]?.title || '',
+                                            description:
+                                              s.items?.[1]?.description || '',
+                                            width: secondItemWidth,
+                                            height: s.items?.[1]?.height || 800,
+                                            order: 1,
+                                          },
+                                        ],
+                                }
+                              : s
+                          )
+                        );
+                      }}
+                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                      placeholder="1300"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      {section.layout === 'half-half'
+                        ? `Sẽ chia: ${Math.floor(
+                            (section.items[0]?.width || 1300) / 2
+                          )}px + ${
+                            (section.items[0]?.width || 1300) -
+                            Math.floor((section.items[0]?.width || 1300) / 2)
+                          }px`
+                        : `Sẽ chia: ${Math.floor(
+                            (section.items[0]?.width || 1300) / 3
+                          )}px + ${
+                            (section.items[0]?.width || 1300) -
+                            Math.floor((section.items[0]?.width || 1300) / 3)
+                          }px`}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700">
+                      Chiều cao chung (px) - Áp dụng cho cả 2
+                    </label>
+                    <input
+                      type="number"
+                      value={section.items[0]?.height || ''}
+                      onChange={(e) => {
+                        const sharedHeight = parseInt(e.target.value) || 0;
+
+                        setShowcaseSections((prev) =>
+                          prev.map((s) =>
+                            s.id === section.id
+                              ? {
+                                  ...s,
+                                  items:
+                                    s.items && s.items.length >= 2
+                                      ? s.items.map((it) => ({
+                                          ...it,
+                                          height: sharedHeight,
+                                        }))
+                                      : [
+                                          {
+                                            id:
+                                              s.items?.[0]?.id ||
+                                              `item-${Date.now()}`,
+                                            type: 'text',
+                                            title: s.items?.[0]?.title || '',
+                                            description:
+                                              s.items?.[0]?.description || '',
+                                            width: s.items?.[0]?.width || 1300,
+                                            height: sharedHeight,
+                                            order: 0,
+                                          },
+                                          {
+                                            id:
+                                              s.items?.[1]?.id ||
+                                              `item-${Date.now()}-2`,
+                                            type: 'text',
+                                            title: s.items?.[1]?.title || '',
+                                            description:
+                                              s.items?.[1]?.description || '',
+                                            width: s.items?.[1]?.width || 1300,
+                                            height: sharedHeight,
+                                            order: 1,
+                                          },
+                                        ],
+                                }
+                              : s
+                          )
+                        );
+                      }}
+                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                      placeholder="800"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Media Preview */}
         {section.items.length > 0 &&
@@ -468,110 +1022,33 @@ const SortableSection = ({
           )}
 
         {/* Upload Area - Show when no file uploaded or when layout needs more items */}
-        <div className="mt-4 space-y-3">
-          {/* First Item Upload - Hide when already has file */}
-          {!section.items.some((item) => item.order === 0 && item.file) && (
-            <div>
-              <label className="mb-2 block text-xs font-medium text-gray-700">
-                1.{' '}
-                {section.layout === 'half-half'
-                  ? '(50%)'
-                  : section.layout === 'one-third'
-                    ? '(33%)'
-                    : ''}
-              </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  id={`file-input-${section.id}-1`}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setShowcaseSections((prevSections) => {
-                        const updatedSections = prevSections.map((s) =>
-                          s.id === section.id
-                            ? {
-                                ...s,
-                                items: [
-                                  {
-                                    id: `item-${Date.now()}`,
-                                    type: (section.type === 'flipbook'
-                                      ? 'flipbook'
-                                      : section.type === 'video'
-                                        ? 'video'
-                                        : 'image') as
-                                      | 'image'
-                                      | 'video'
-                                      | 'text'
-                                      | 'flipbook',
-                                    title: file.name,
-                                    src: URL.createObjectURL(file),
-                                    alt: file.name,
-                                    size: file.size,
-                                    width: 1300,
-                                    height: 800,
-                                    order: 0,
-                                    file: file, // Lưu file object để uploadProjectMedia có thể xử lý
-                                  },
-                                ],
-                              }
-                            : s
-                        );
-
-                        return updatedSections;
-                      });
-                    }
-                  }}
-                  accept={
-                    section.type === 'image'
-                      ? 'image/*'
-                      : section.type === 'video'
-                        ? 'video/*'
-                        : section.type === 'flipbook'
-                          ? 'application/pdf'
-                          : '*'
-                  }
-                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                />
-                <label
-                  htmlFor={`file-input-${section.id}-1`}
-                  className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
-                >
-                  <PlusIcon className="mr-2 h-4 w-4" />
-                  Chọn tệp{' '}
-                  {section.type === 'image'
-                    ? 'hình ảnh'
-                    : section.type === 'video'
-                      ? 'video'
-                      : section.type === 'flipbook'
-                        ? 'PDF'
-                        : ''}
-                </label>
-              </div>
-            </div>
-          )}
-
-          {/* Second Item Upload for half-half and one-third layouts - Hide when already has file */}
-          {(section.layout === 'half-half' || section.layout === 'one-third') &&
-            !section.items.some((item) => item.order === 1 && item.file) && (
+        {/* Hide file upload UI for text sections */}
+        {section.type !== 'text' && (
+          <div className="mt-4 space-y-3">
+            {/* First Item Upload - Hide when already has file */}
+            {!section.items.some((item) => item.order === 0 && item.file) && (
               <div>
                 <label className="mb-2 block text-xs font-medium text-gray-700">
-                  2. {section.layout === 'half-half' ? '(50%)' : '(67%)'}
+                  1.{' '}
+                  {section.layout === 'half-half'
+                    ? '(50%)'
+                    : section.layout === 'one-third'
+                      ? '(33%)'
+                      : ''}
                 </label>
                 <div className="relative">
                   <input
                     type="file"
-                    id={`file-input-${section.id}-2`}
+                    id={`file-input-${section.id}-1`}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        setShowcaseSections((prevSections) =>
-                          prevSections.map((s) =>
+                        setShowcaseSections((prevSections) => {
+                          const updatedSections = prevSections.map((s) =>
                             s.id === section.id
                               ? {
                                   ...s,
                                   items: [
-                                    ...s.items,
                                     {
                                       id: `item-${Date.now()}`,
                                       type: (section.type === 'flipbook'
@@ -587,29 +1064,18 @@ const SortableSection = ({
                                       src: URL.createObjectURL(file),
                                       alt: file.name,
                                       size: file.size,
-                                      // Tính toán width dựa trên layout và item đầu tiên
-                                      width:
-                                        section.layout === 'half-half'
-                                          ? (s.items[0]?.width || 1300) -
-                                            Math.floor(
-                                              (s.items[0]?.width || 1300) / 2
-                                            )
-                                          : section.layout === 'one-third'
-                                            ? (s.items[0]?.width || 1300) -
-                                              Math.floor(
-                                                (s.items[0]?.width || 1300) / 3
-                                              )
-                                            : 1300,
-                                      // Sử dụng cùng height với item đầu tiên
-                                      height: s.items[0]?.height || 800,
-                                      order: 1,
+                                      width: 1300,
+                                      height: 800,
+                                      order: 0,
                                       file: file, // Lưu file object để uploadProjectMedia có thể xử lý
                                     },
                                   ],
                                 }
                               : s
-                          )
-                        );
+                          );
+
+                          return updatedSections;
+                        });
                       }
                     }}
                     accept={
@@ -624,8 +1090,8 @@ const SortableSection = ({
                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                   />
                   <label
-                    htmlFor={`file-input-${section.id}-2`}
-                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700 transition-colors hover:border-blue-400 hover:bg-blue-100"
+                    htmlFor={`file-input-${section.id}-1`}
+                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
                   >
                     <PlusIcon className="mr-2 h-4 w-4" />
                     Chọn tệp{' '}
@@ -635,13 +1101,106 @@ const SortableSection = ({
                         ? 'video'
                         : section.type === 'flipbook'
                           ? 'PDF'
-                          : ''}{' '}
-                    thứ 2
+                          : ''}
                   </label>
                 </div>
               </div>
             )}
-        </div>
+
+            {/* Second Item Upload for half-half and one-third layouts - Hide when already has file */}
+            {(section.layout === 'half-half' ||
+              section.layout === 'one-third') &&
+              !section.items.some((item) => item.order === 1 && item.file) && (
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                    2. {section.layout === 'half-half' ? '(50%)' : '(67%)'}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id={`file-input-${section.id}-2`}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setShowcaseSections((prevSections) =>
+                            prevSections.map((s) =>
+                              s.id === section.id
+                                ? {
+                                    ...s,
+                                    items: [
+                                      ...s.items,
+                                      {
+                                        id: `item-${Date.now()}`,
+                                        type: (section.type === 'flipbook'
+                                          ? 'flipbook'
+                                          : section.type === 'video'
+                                            ? 'video'
+                                            : 'image') as
+                                          | 'image'
+                                          | 'video'
+                                          | 'text'
+                                          | 'flipbook',
+                                        title: file.name,
+                                        src: URL.createObjectURL(file),
+                                        alt: file.name,
+                                        size: file.size,
+                                        // Tính toán width dựa trên layout và item đầu tiên
+                                        width:
+                                          section.layout === 'half-half'
+                                            ? (s.items[0]?.width || 1300) -
+                                              Math.floor(
+                                                (s.items[0]?.width || 1300) / 2
+                                              )
+                                            : section.layout === 'one-third'
+                                              ? (s.items[0]?.width || 1300) -
+                                                Math.floor(
+                                                  (s.items[0]?.width || 1300) /
+                                                    3
+                                                )
+                                              : 1300,
+                                        // Sử dụng cùng height với item đầu tiên
+                                        height: s.items[0]?.height || 800,
+                                        order: 1,
+                                        file: file, // Lưu file object để uploadProjectMedia có thể xử lý
+                                      },
+                                    ],
+                                  }
+                                : s
+                            )
+                          );
+                        }
+                      }}
+                      accept={
+                        section.type === 'image'
+                          ? 'image/*'
+                          : section.type === 'video'
+                            ? 'video/*'
+                            : section.type === 'flipbook'
+                              ? 'application/pdf'
+                              : '*'
+                      }
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    />
+                    <label
+                      htmlFor={`file-input-${section.id}-2`}
+                      className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700 transition-colors hover:border-blue-400 hover:bg-blue-100"
+                    >
+                      <PlusIcon className="mr-2 h-4 w-4" />
+                      Chọn tệp{' '}
+                      {section.type === 'image'
+                        ? 'hình ảnh'
+                        : section.type === 'video'
+                          ? 'video'
+                          : section.type === 'flipbook'
+                            ? 'PDF'
+                            : ''}{' '}
+                      thứ 2
+                    </label>
+                  </div>
+                </div>
+              )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -694,10 +1253,13 @@ export default function ShowcaseSection({
               ? 'flipbook'
               : type === 'video'
                 ? 'video'
-                : 'image',
-          title: `Item ${showcaseSections.length + 1}`,
-          src: '',
-          alt: '',
+                : type === 'text'
+                  ? 'text'
+                  : 'image',
+          title: type === 'text' ? '' : `Item ${showcaseSections.length + 1}`,
+          description: type === 'text' ? '' : undefined,
+          src: type === 'text' ? undefined : '',
+          alt: type === 'text' ? undefined : '',
           size: 0,
           width: 1300,
           height: 800,
@@ -706,6 +1268,18 @@ export default function ShowcaseSection({
       ],
       order: showcaseSections.length,
     };
+
+    // If text type and layout requires 2 columns, add a second empty text item
+    if (type === 'text' && layout !== 'single') {
+      newSection.items.push({
+        id: `item-${Date.now()}-2`,
+        type: 'text',
+        title: '',
+        description: '',
+        order: 1,
+      });
+    }
+
     setShowcaseSections([...showcaseSections, newSection]);
   };
 
@@ -794,6 +1368,14 @@ export default function ShowcaseSection({
                 >
                   <DocumentTextIcon className="h-6 w-6 text-green-500" />
                   <span className="mt-1 text-xs text-gray-600">Flipbook</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => addQuickSection('text', 'single')}
+                  className="flex flex-col items-center rounded-lg border border-gray-200 p-3 transition-colors hover:border-purple-300 hover:bg-purple-50"
+                >
+                  <DocumentTextIcon className="h-6 w-6 text-purple-500" />
+                  <span className="mt-1 text-xs text-gray-600">Text</span>
                 </button>
               </div>
             </div>

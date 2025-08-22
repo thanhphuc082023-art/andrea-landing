@@ -66,13 +66,69 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
   ): ProjectShowcaseSection[] => {
     if (!Array.isArray(sections)) return [];
 
-    return sections.map((section) => ({
-      ...section,
-      items: (section.items || []).map((item: any) => ({
-        ...item,
-        src: item.src ? StrapiAPI.getMediaUrl(item.src) : item.src || null,
-      })),
-    }));
+    return sections.map((section) => {
+      // Handle text sections specially (no media src)
+      if (section.type === 'text') {
+        const items =
+          Array.isArray(section.items) && section.items.length > 0
+            ? section.items.map((item: any, idx: number) => ({
+                id: item.id || `item-${section.id || 's'}-${idx}`,
+                type: 'text',
+                title: item.title || '',
+                description: item.description || '',
+                width: item.width || 1300,
+                height: item.height || 800,
+                order: item.order ?? idx,
+              }))
+            : // No items provided by Strapi -> create defaults depending on layout
+              section.layout && section.layout !== 'single'
+              ? [
+                  {
+                    id: `item-${section.id || 's'}-0`,
+                    type: 'text',
+                    title: '',
+                    description: '',
+                    width: 1300,
+                    height: 800,
+                    order: 0,
+                  },
+                  {
+                    id: `item-${section.id || 's'}-1`,
+                    type: 'text',
+                    title: '',
+                    description: '',
+                    width: 1300,
+                    height: 800,
+                    order: 1,
+                  },
+                ]
+              : [
+                  {
+                    id: `item-${section.id || 's'}-0`,
+                    type: 'text',
+                    title: '',
+                    description: '',
+                    width: 1300,
+                    height: 800,
+                    order: 0,
+                  },
+                ];
+
+        return {
+          ...section,
+          items,
+        } as ProjectShowcaseSection;
+      }
+
+      // Default: media sections - transform src via Strapi helper
+      return {
+        ...section,
+        items: (section.items || []).map((item: any) => ({
+          ...item,
+          src: item.src ? StrapiAPI.getMediaUrl(item.src) : item.src || null,
+        })),
+      } as ProjectShowcaseSection;
+    });
   };
 
   return {

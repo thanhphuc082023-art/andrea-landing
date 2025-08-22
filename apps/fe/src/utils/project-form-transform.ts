@@ -16,12 +16,6 @@ export function transformStrapiProjectToFormData(
     slug: project.slug || '',
     projectIntroTitle: project.projectIntroTitle || '',
 
-    // Content sections
-    content: project.content || '',
-    overview: project.overview || '',
-    challenge: project.challenge || '',
-    solution: project.solution || '',
-
     // Status and settings
     status: project.projectStatus || 'draft',
     featured: project.featured || false,
@@ -105,32 +99,79 @@ export function transformStrapiProjectToFormData(
         gridCols:
           section.gridCols || (section.layout === 'grid' ? 2 : undefined),
         items:
-          section.items?.map((item: any, itemIndex: number) => ({
-            id: item.id || `item-${sectionIndex}-${itemIndex}`,
-            title: item.title || item.alt || '',
-            alt: item.alt || item.title || '',
-            src: getStrapiMediaUrl(item) || item.src || item.url,
-            url: getStrapiMediaUrl(item) || item.src || item.url,
-            type: item.type || 'image',
-            width: item.width || 1300,
-            height: item.height || 800,
-            size: item.size || 0,
-            order: item.order || itemIndex,
-            colSpan: item.colSpan || 1,
-            file: undefined, // No file object for existing items
-            uploadId: item.uploadId || undefined,
-            // FlipBook specific data
-            bookData:
-              item.bookData ||
-              (item.type === 'flipbook'
-                ? {
-                    title: 'Project Title',
-                    websiteUrl: 'https://example.com',
-                    phoneNumber: '+1234567890',
-                    downloadUrl: '/download-file.pdf',
-                  }
-                : undefined),
-          })) || [],
+          // Special handling for text sections: map title/description and ensure defaults
+          section.type === 'text'
+            ? section.items && section.items.length > 0
+              ? section.items.map((item: any, itemIndex: number) => ({
+                  id: item.id || `item-${sectionIndex}-${itemIndex}`,
+                  title: item.title || '',
+                  description: item.description || '',
+                  type: 'text',
+                  order: item.order || itemIndex,
+                  // keep width/height for layout preview compatibility if present
+                  width: item.width || 1300,
+                  height: item.height || 800,
+                }))
+              : // No items in source: create default items depending on layout
+                section.layout && section.layout !== 'single'
+                ? [
+                    {
+                      id: `item-${sectionIndex}-0`,
+                      title: '',
+                      description: '',
+                      type: 'text',
+                      order: 0,
+                      width: 1300,
+                      height: 800,
+                    },
+                    {
+                      id: `item-${sectionIndex}-1`,
+                      title: '',
+                      description: '',
+                      type: 'text',
+                      order: 1,
+                      width: 1300,
+                      height: 800,
+                    },
+                  ]
+                : [
+                    {
+                      id: `item-${sectionIndex}-0`,
+                      title: '',
+                      description: '',
+                      type: 'text',
+                      order: 0,
+                      width: 1300,
+                      height: 800,
+                    },
+                  ]
+            : // Non-text sections: existing mapping for media/flipbook/etc.
+              section.items?.map((item: any, itemIndex: number) => ({
+                id: item.id || `item-${sectionIndex}-${itemIndex}`,
+                title: item.title || item.alt || '',
+                alt: item.alt || item.title || '',
+                src: getStrapiMediaUrl(item) || item.src || item.url,
+                url: getStrapiMediaUrl(item) || item.src || item.url,
+                type: item.type || 'image',
+                width: item.width || 1300,
+                height: item.height || 800,
+                size: item.size || 0,
+                order: item.order || itemIndex,
+                colSpan: item.colSpan || 1,
+                file: undefined, // No file object for existing items
+                uploadId: item.uploadId || undefined,
+                // FlipBook specific data
+                bookData:
+                  item.bookData ||
+                  (item.type === 'flipbook'
+                    ? {
+                        title: 'Project Title',
+                        websiteUrl: 'https://example.com',
+                        phoneNumber: '+1234567890',
+                        downloadUrl: '/download-file.pdf',
+                      }
+                    : undefined),
+              })) || [],
       })) || [],
 
     // Arrays
