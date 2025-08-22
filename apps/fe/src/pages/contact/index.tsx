@@ -30,7 +30,7 @@ export default function ContactSection({
   };
 
   return (
-    <div className="mt-[65px] max-md:mt-[60px]">
+    <div className="max-sd:mt-[60px] mt-[65px]">
       <StrapiHead
         title={`Liên hệ - ${siteTitle}`}
         description={pageDescription}

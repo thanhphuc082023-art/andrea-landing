@@ -255,7 +255,7 @@ export default function AuthLayout({
       </Head>
       <div className="min-h-screen">
         {/* Main content */}
-        <div className="mt-[65px] max-md:mt-[60px]">{children}</div>
+        <div className="max-sd:mt-[60px] mt-[65px]">{children}</div>
       </div>
     </>
   );

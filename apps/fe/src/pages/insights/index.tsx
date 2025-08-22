@@ -21,7 +21,7 @@ export default function InsightsPage({ article, currentGlobal }: any) {
   const seo = { ...defaultSeo, ...articleSeo };
 
   return (
-    <div className="mt-[65px] max-md:mt-[60px]">
+    <div className="max-sd:mt-[60px] mt-[65px]">
       <StrapiHead
         ogImage={article?.hero?.mobile}
         global={currentGlobal}

@@ -126,7 +126,7 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
   );
 }
 
-function Blog({ title }: { title: string }) {
+function Blog({ title }: { title?: string }) {
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto')}>
