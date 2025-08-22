@@ -385,7 +385,12 @@ const ShowcaseSection = memo(
         >
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
-            console.log('transformedItem', transformedItem);
+            console.log(
+              'transformedItem',
+              transformedItem?.title === 'hdcs-test.png'
+                ? transformedItem
+                : null
+            );
 
             // For half-half layout, divide width by 2 for proper aspect ratio
             const adjustedWidth = items[0].width / 2;

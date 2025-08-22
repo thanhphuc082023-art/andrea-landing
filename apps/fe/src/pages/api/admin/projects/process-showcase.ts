@@ -161,12 +161,10 @@ export default async function handler(
       process.env.STRAPI_API_TOKEN ||
       req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
-      return res
-        .status(401)
-        .json({
-          error: 'Unauthorized',
-          message: 'Missing authentication token',
-        });
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Missing authentication token',
+      });
     }
 
     const {
@@ -176,16 +174,18 @@ export default async function handler(
     } = req.body || {};
 
     // Upload files referenced by upload IDs and map them back
-    const uploadedFiles: Array<{ id: number; url: string }> = [];
+    const uploadedFiles: Array<{ id: number; url: string; name: string }> = [];
     const strapiBaseUrl =
       process.env.NEXT_PUBLIC_STRAPI_URL ||
       'https://tremendous-delight-4e1d7b6669.strapiapp.com';
 
     for (let i = 0; i < showcaseUploadIds.length; i++) {
       const uploadId = showcaseUploadIds[i];
-      const originalName = showcaseOriginalNames[i] || `showcase-${i}`;
+      const originalName =
+        `${showcaseOriginalNames[i]}-${uploadId}` || `showcase-${i}`;
 
       const fileInfo = findUploadedFile(uploadId);
+
       if (fileInfo) {
         const uploadResult = await uploadToStrapi(
           fileInfo.filePath,
@@ -193,45 +193,37 @@ export default async function handler(
           token,
           'showcase'
         );
+
         if (uploadResult) {
           // Ensure URL is absolute so client preview uses a full URL
           const url =
             uploadResult.url && uploadResult.url.startsWith('http')
               ? uploadResult.url
               : `${strapiBaseUrl}${uploadResult.url}`;
-          uploadedFiles.push({ id: uploadResult.id, url });
+          uploadedFiles.push({
+            id: uploadResult.id,
+            url,
+            name: uploadResult?.name,
+          });
         }
       }
     }
 
     // Map uploaded files back into showcaseSections
-    let fileIndex = 0;
     const processedSections = (showcaseSections || []).map(
       (section: any, sectionIndex: number) => {
         if (!section.items || section.items.length === 0) return section;
 
         const processedItems = section.items.map(
           (item: any, itemIndex: number) => {
-            if (fileIndex < uploadedFiles.length) {
-              const uploadedFile = uploadedFiles[fileIndex];
-              fileIndex++;
-
-              return {
-                ...item,
-                id: item.id || `item-${sectionIndex}-${itemIndex}`,
-                src: uploadedFile.url,
-                type: item.type || 'image',
-                title: item.title || `Item ${itemIndex + 1}`,
-                alt: item.alt || item.title || `Item ${itemIndex + 1}`,
-                width: item.width || 1300,
-                height: item.height || 800,
-                order: item.order !== undefined ? item.order : itemIndex,
-              };
-            }
+            const uploadedFile = uploadedFiles.find(
+              (file) => file.name === `${item?.name}-${item?.uploadId}`
+            );
 
             return {
               ...item,
               id: item.id || `item-${sectionIndex}-${itemIndex}`,
+              src: uploadedFile?.url || item?.url,
               type: item.type || 'image',
               title: item.title || `Item ${itemIndex + 1}`,
               alt: item.alt || item.title || `Item ${itemIndex + 1}`,
@@ -239,6 +231,17 @@ export default async function handler(
               height: item.height || 800,
               order: item.order !== undefined ? item.order : itemIndex,
             };
+
+            // return {
+            //   ...item,
+            //   id: item.id || `item-${sectionIndex}-${itemIndex}`,
+            //   type: item.type || 'image',
+            //   title: item.title || `Item ${itemIndex + 1}`,
+            //   alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+            //   width: item.width || 1300,
+            //   height: item.height || 800,
+            //   order: item.order !== undefined ? item.order : itemIndex,
+            // };
           }
         );
 
@@ -257,11 +260,9 @@ export default async function handler(
     return res.status(200).json({ processedShowcase: processedSections });
   } catch (error: any) {
     console.error('Error in process-showcase:', error);
-    return res
-      .status(500)
-      .json({
-        error: 'Internal server error',
-        message: error.message || 'Failed to process showcase',
-      });
+    return res.status(500).json({
+      error: 'Internal server error',
+      message: error.message || 'Failed to process showcase',
+    });
   }
 }
