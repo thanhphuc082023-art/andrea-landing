@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import formidable from 'formidable';
 
 export const config = {
@@ -82,10 +83,16 @@ export default async function handler(
 
     const contentType = req.headers['content-type'] || '';
 
-    // Ensure tmp dir exists for formidable
-    const TMP_DIR = path.join(process.cwd(), 'tmp');
-    if (!fs.existsSync(TMP_DIR)) {
+    // Use system temp dir (writable on serverless). Allow override via env.
+    const TMP_DIR =
+      process.env.TMP_DIR || path.join(os.tmpdir(), 'andrea-landing-tmp');
+    try {
       fs.mkdirSync(TMP_DIR, { recursive: true });
+    } catch (err) {
+      console.warn(
+        'Could not create TMP_DIR, falling back to os.tmpdir()',
+        err
+      );
     }
 
     if (contentType.includes('multipart/form-data')) {

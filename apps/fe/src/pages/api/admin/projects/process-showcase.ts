@@ -1,15 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 
-const UPLOAD_DIR =
-  process.env.UPLOAD_DIR || path.join(os.tmpdir(), 'andrea-landing-uploads');
+const UPLOAD_DIR = '/tmp/uploads';
 
-try {
+if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-} catch (err) {
-  console.error('Failed to create upload dir', UPLOAD_DIR, err);
 }
 
 function getMimeTypeFromExtension(ext: string): string {
