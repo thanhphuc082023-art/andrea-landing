@@ -106,7 +106,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
             </div>
 
             {/* Right side - Project Description */}
-            <div className="max-w-[642px] max-lg:flex-1">
+            <div className="max-w-[642px] max-lg:max-w-full max-lg:flex-1">
               <h2 className="mb-4 text-2xl font-bold text-[#484848] max-md:text-[24px] dark:text-gray-300">
                 {projectIntroTitle}
               </h2>
