@@ -404,3 +404,5 @@ export default function CreateProjectPage() {
     </AuthLayout>
   );
 }
+
+CreateProjectPage.getLayout = (page: React.ReactElement) => <>{page}</>;

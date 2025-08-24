@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { GetServerSideProps } from 'next';
 import ProjectFormPage from '@/components/admin/ProjectFormPage';
 import ProjectPreviewContent from '@/components/admin/ProjectPreviewContent';
 import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 import AuthLayout from '@/components/auth/AuthLayout';
 import { type ProjectFormData } from '@/lib/validations/project';
 import { uploadProjectMedia } from '@/utils/project-media-upload';
-import { handleProjectMediaChanges } from '@/utils/project-edit-media-upload';
 import {
   useSessionCleanup,
   sessionCleanupConfigs,
@@ -54,21 +52,22 @@ const ProjectPreviewWrapper = ({
   return (
     <div className="relative min-h-screen">
       {/* Header */}
-      <div className="content-wrapper sticky top-0 z-40 border-b border-gray-200 bg-white py-4 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={onBack}
-              disabled={isLoading}
-              className="flex items-center space-x-2 rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50"
-            >
-              <ArrowLeftIcon className="h-4 w-4" />
-              <span>Quay lại chỉnh sửa</span>
-            </button>
-
-            <div className="flex items-center space-x-2">
-              <div className="h-2 w-2 rounded-full bg-green-500"></div>
-              <span className="text-sm text-gray-600">Preview Mode</span>
+      <div className="border-b border-gray-200 bg-white shadow-sm">
+        <div className="content-wrapper">
+          <div className="max-sd:h-[60px] flex h-[65px] items-center justify-between py-2">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={onBack}
+                className="flex items-center space-x-2 text-gray-600 transition-colors hover:text-gray-900"
+              >
+                <ArrowLeftIcon className="h-5 w-5" />
+                <span className="text-sm sm:inline">Quay lại chỉnh sửa</span>
+              </button>
+              <div className="hidden h-6 w-px bg-gray-300 sm:block" />
+              <div className="flex items-center space-x-2">
+                <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                <span className="text-sm text-gray-600">Chế độ xem trước</span>
+              </div>
             </div>
           </div>
         </div>
@@ -85,15 +84,7 @@ const ProjectPreviewWrapper = ({
   );
 };
 
-interface EditProjectPageProps {
-  project: any;
-  error?: string;
-}
-
-export default function EditProjectPage({
-  project,
-  error,
-}: EditProjectPageProps) {
+export default function EditProjectPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -105,7 +96,49 @@ export default function EditProjectPage({
     formData: null,
     showcaseSections: [],
   });
-  console.log('previewData', previewData);
+  // client-side project state & fetch status
+  const [project, setProject] = useState<any | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isFetchingProject, setIsFetchingProject] = useState<boolean>(true);
+
+  const { slug } = router.query;
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const fetchProject = async () => {
+      setIsFetchingProject(true);
+      setFetchError(null);
+
+      try {
+        const apiUrl = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/projects?filters[slug][$eq]=${slug}&populate=*&publicationState=live`;
+        const response = await fetch(apiUrl, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.data || data.data.length === 0) {
+          setFetchError('Dự án không tồn tại.');
+          setProject(null);
+        } else {
+          setProject(data.data[0]);
+        }
+      } catch (err) {
+        console.error('Error fetching project (client):', err);
+        setFetchError('Không thể tải thông tin dự án. Vui lòng thử lại sau.');
+        setProject(null);
+      } finally {
+        setIsFetchingProject(false);
+      }
+    };
+
+    fetchProject();
+  }, [slug]);
+
   // Transform project data to form data on mount
   const [initialFormData, setInitialFormData] =
     useState<Partial<ProjectFormData> | null>(null);
@@ -606,7 +639,8 @@ export default function EditProjectPage({
     router.push('/admin/projects');
   };
 
-  if (error) {
+  // use client-side fetch error
+  if (fetchError) {
     return (
       <AuthLayout
         title="Lỗi"
@@ -617,7 +651,7 @@ export default function EditProjectPage({
         <div className="flex h-64 items-center justify-center">
           <div className="text-center">
             <h1 className="mb-4 text-3xl font-bold text-gray-900">Lỗi</h1>
-            <p className="text-gray-600">{error}</p>
+            <p className="text-gray-600">{fetchError}</p>
           </div>
         </div>
       </AuthLayout>
@@ -633,7 +667,38 @@ export default function EditProjectPage({
         backText="Quay lại danh sách dự án"
       >
         <div className="flex h-64 items-center justify-center">
-          <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-blue-600" />
+          {/* show client fetching spinner while project is loading */}
+          {isFetchingProject ? (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
+              <svg
+                className="text-brand-orange mb-4 h-10 w-10 animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
+              <div className="text-brand-orange text-lg font-semibold">
+                Đang tải, vui lòng chờ...
+              </div>
+            </div>
+          ) : fetchError ? (
+            <div className="text-center text-gray-600">{fetchError}</div>
+          ) : (
+            <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-blue-600" />
+          )}
         </div>
       </AuthLayout>
     );
@@ -705,55 +770,4 @@ export default function EditProjectPage({
   );
 }
 
-export const getServerSideProps: GetServerSideProps<
-  EditProjectPageProps
-> = async ({ params }) => {
-  const slug = params?.slug as string;
-
-  if (!slug) {
-    return {
-      notFound: true,
-    };
-  }
-
-  try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/projects?filters[slug][$eq]=${slug}&populate=*&publicationState=live`;
-
-    const response = await fetch(apiUrl, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      return {
-        props: {
-          project: null,
-          error: 'Không thể tải thông tin dự án. Vui lòng thử lại sau.',
-        },
-      };
-    }
-
-    const data = await response.json();
-
-    if (!data.data || data.data.length === 0) {
-      return {
-        notFound: true,
-      };
-    }
-
-    const project = data.data[0];
-    return {
-      props: {
-        project,
-      },
-    };
-  } catch (error) {
-    return {
-      props: {
-        project: null,
-        error: 'Không thể tải thông tin dự án. Vui lòng thử lại sau.',
-      },
-    };
-  }
-};
+EditProjectPage.getLayout = (page: React.ReactElement) => <>{page}</>;

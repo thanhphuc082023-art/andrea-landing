@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import {
   useSessionCleanup,
   sessionCleanupConfigs,
@@ -78,8 +78,8 @@ export default function AuthLayout({
     setCredentials({ email: '', password: '' });
   };
 
-  // Check if user is already logged in
-  useEffect(() => {
+  // Check if user is already logged in (useLayoutEffect to avoid UI flicker)
+  useLayoutEffect(() => {
     const token = localStorage.getItem('strapiToken');
     const user = localStorage.getItem('strapiUser');
     if (token && user) {
@@ -94,7 +94,7 @@ export default function AuthLayout({
           <title>{title}</title>
           <meta name="description" content={description} />
         </Head>
-        <div className="max-sd:mt-[60px] max-sd:h-[calc(100vh-60px)] mt-[65px] flex h-[calc(100vh-65px)] items-center justify-center bg-gray-100 py-10 max-md:px-2">
+        <div className="max-sd:h-[calc(100vh-60px)] flex h-[calc(100vh-65px)] items-center justify-center bg-gray-100 py-10 max-md:px-2">
           <div className="container mx-auto">
             <div className="mb-8 text-center">
               <h1 className="mb-2 text-3xl font-bold text-gray-900">{title}</h1>
@@ -255,7 +255,7 @@ export default function AuthLayout({
       </Head>
       <div className="min-h-screen">
         {/* Main content */}
-        <div className="max-sd:mt-[60px] mt-[65px]">{children}</div>
+        <div className="">{children}</div>
       </div>
     </>
   );

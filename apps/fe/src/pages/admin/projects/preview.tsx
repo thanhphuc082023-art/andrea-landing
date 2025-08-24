@@ -123,7 +123,7 @@ export default function ProjectPreviewPage() {
         {/* Header */}
         <div className="border-b border-gray-200 bg-white shadow-sm">
           <div className="content-wrapper">
-            <div className="flex min-h-16 items-center justify-between py-2">
+            <div className="max-sd:h-[60px] flex h-[65px] items-center justify-between py-2">
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => {
