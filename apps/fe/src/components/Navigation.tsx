@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { m, AnimatePresence } from 'framer-motion';
 import StrapiLogo from '@/components/StrapiLogo';
+import FlipWords from '@/components/ui/FlipWords';
 import type { NavigationItem, StrapiGlobal } from '@/types/strapi';
 
 interface NavbarProps {
@@ -15,6 +16,27 @@ interface NavbarProps {
 function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // flip items to show in navigation (example: Services -> E-Profile)
+  const servicesFlipItems = [
+    { label: 'Dịch vụ', url: '/#services' },
+    { label: 'E-Profile', url: '/e-profile' },
+  ];
+
+  const handleFlipClick = (e: React.MouseEvent) => {
+    const target = (e.target as HTMLElement).closest(
+      'a'
+    ) as HTMLAnchorElement | null;
+    if (!target) return;
+    const href = target.getAttribute('href') || '';
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const id = href.slice(1);
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      else router.push(href);
+    }
+  };
 
   const defaultNavigationItems = [
     { label: 'Về chúng tôi', url: '/about' },
@@ -30,8 +52,13 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
 
   // Helper function to check if an item is active
   const isItemActive = (item: NavigationItem) => {
-    const currentPath = router.asPath;
+    const rawPath = router.asPath || '';
+    // path without hash for most comparisons
+    const currentPath = rawPath.split('#')[0];
 
+    if (!item.url) return false;
+
+    // Exact match for homepage
     if (item.url === '/') return currentPath === '/';
 
     // Special case for E-Profile - also match /upload/e-profile
@@ -47,7 +74,16 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
       return currentPath === '/projects' || currentPath.startsWith('/project/');
     }
 
-    return currentPath.startsWith(item.url || '');
+    // Special case for Services - treat as active when on a /services route
+    // OR when the raw URL contains the #services anchor.
+    if (item.url === '/services') {
+      return (
+        currentPath.startsWith('/services') || rawPath.includes('#services')
+      );
+    }
+
+    // Default: compare path-only prefix matches
+    return currentPath.startsWith(item.url);
   };
 
   // Prefetch navigation routes for faster navigation (modern approach)
@@ -98,20 +134,48 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden items-center space-x-8 md:flex lg:space-x-[58px]">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.url || '/'}
-                className={clsx(
-                  'text-lg transition-colors duration-200',
-                  isItemActive(item)
-                    ? 'text-brand-orange hover:text-brand-orange-dark font-bold'
-                    : 'hover:text-brand-orange font-normal text-gray-700'
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navigationItems.map((item) => {
+              if (item.url === '/services') {
+                return (
+                  <div
+                    key={item.label}
+                    onClick={handleFlipClick}
+                    className="group"
+                  >
+                    <FlipWords
+                      words={servicesFlipItems}
+                      duration={4000}
+                      shimmer={true}
+                      activeClassName="!text-brand-orange !font-semibold ![--base-color:#EE4823]"
+                      className={clsx(
+                        'inline-block text-lg transition-colors duration-200'
+                      )}
+                    />
+                  </div>
+                );
+              }
+
+              const href = item.url || '/';
+              console.log(
+                'isItemActive(item) - item?.url',
+                isItemActive(item),
+                item?.url
+              );
+              return (
+                <Link
+                  key={item.label}
+                  href={href}
+                  className={clsx(
+                    'text-lg transition-colors duration-200',
+                    isItemActive(item)
+                      ? 'text-brand-orange hover:text-brand-orange-dark !font-semibold'
+                      : 'hover:text-brand-orange font-normal text-gray-700'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -172,32 +236,71 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
             id="mobile-navigation"
           >
             <nav className="flex h-full flex-col gap-6 px-6 py-8">
-              {navigationItems.map((item, index) => (
-                <m.div
-                  key={item.label}
-                  initial={{ x: -50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{
-                    delay: 0.1 + index * 0.1,
-                    duration: 0.5,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                  }}
-                >
-                  <Link
-                    href={item.url || '/'}
-                    className={clsx(
-                      'block border-b border-gray-200/50 py-4 text-xl transition-all duration-300',
-                      'hover:border-brand-orange/30 hover:translate-x-2',
-                      isItemActive(item)
-                        ? 'text-brand-orange translate-x-1 font-bold'
-                        : 'hover:text-brand-orange font-normal text-gray-700'
-                    )}
-                    onClick={() => handleMobileMenuClick(item.label)}
+              {navigationItems.map((item, index) => {
+                // Special case for Services on mobile: show FlipWords and close menu on click
+                if (item.url === '/services') {
+                  return (
+                    <m.div
+                      key={item.label}
+                      initial={{ x: -50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{
+                        delay: 0.1 + index * 0.1,
+                        duration: 0.5,
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                      }}
+                      onClick={(e) => {
+                        handleFlipClick(e);
+                        handleMobileMenuClick(item.label);
+                      }}
+                      className="[&>.flip-wrap]:!w-full"
+                    >
+                      <FlipWords
+                        words={servicesFlipItems}
+                        duration={4000}
+                        className={clsx(
+                          'w-full cursor-pointer border-b border-gray-200/50 py-4 text-xl transition-colors duration-300',
+                          'hover:border-brand-orange/30'
+                        )}
+                        activeClassName="text-brand-orange border-brand-orange/30 font-semibold ![--base-color:#EE4823]"
+                      />
+                    </m.div>
+                  );
+                }
+
+                const href = item.url || '/';
+                console.log(
+                  'isItemActive(item) - item?.url',
+                  isItemActive(item),
+                  item?.url
+                );
+                return (
+                  <m.div
+                    key={item.label}
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{
+                      delay: 0.1 + index * 0.1,
+                      duration: 0.5,
+                      ease: [0.25, 0.46, 0.45, 0.94],
+                    }}
                   >
-                    {item.label}
-                  </Link>
-                </m.div>
-              ))}
+                    <Link
+                      href={href}
+                      className={clsx(
+                        'block border-b border-gray-200/50 py-4 text-xl transition-colors duration-300',
+                        'hover:border-brand-orange/30',
+                        isItemActive(item)
+                          ? 'text-brand-orange border-brand-orange/30 translate-x-1 font-semibold'
+                          : 'hover:text-brand-orange font-normal text-gray-700'
+                      )}
+                      onClick={() => handleMobileMenuClick(item.label)}
+                    >
+                      {item.label}
+                    </Link>
+                  </m.div>
+                );
+              })}
             </nav>
           </m.div>
         )}

@@ -3,6 +3,8 @@ import React from 'react';
 
 import ServiceIcon from '@/assets/icons/ServiceIcon';
 import { getStrapiMediaUrl } from '@/utils/helper';
+import { useRouter } from 'next/router';
+import { FollowerPointerCard } from '@/components/ui/FollowingCard';
 
 interface Service {
   id?: number;
@@ -12,6 +14,7 @@ interface Service {
   slogan?: any[];
   icon?: any;
   iconActive?: any;
+  url?: string;
 }
 
 interface ServiceCardProps {
@@ -20,6 +23,7 @@ interface ServiceCardProps {
 }
 
 function ServiceCard({ service, active = false }: ServiceCardProps) {
+  const router = useRouter();
   if (!service) {
     return null;
   }
@@ -42,17 +46,32 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
   return (
     <div
       className={clsx(
-        'rounded-10 group relative h-full cursor-pointer transition-all duration-300 hover:shadow-lg',
-        'border-card-bg border-[2px] dark:bg-slate-800',
-        'hover:border-brand-orange hover:bg-transparent',
-        active ? 'border-brand-orange bg-transparent' : 'bg-card-bg'
+        'rounded-10 group relative h-full transition-all duration-300 hover:shadow-lg',
+        'dark:bg-slate-800',
+        'hover:bg-white',
+        active ? 'bg-white' : 'bg-card-bg'
       )}
     >
+      {/* <div className="absolute bottom-2 right-2 z-[20] translate-y-2 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="flex items-center justify-between">
+          <span className="relative inline-block shrink-0">
+            <button
+              onClick={() =>
+                service.url ? router.push(`/service/${service.url}`) : null
+              }
+              className="after:bg-brand-orange relative z-30 shrink-0 overflow-hidden rounded-md bg-black/10 px-2 py-1 text-sm font-semibold text-white after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700"
+            >
+              Xem thêm
+            </button>
+          </span>
+        </div>
+      </div> */}
+
       {/* Content Container */}
       <div
         className={clsx(
           'relative flex h-full flex-col',
-          'px-[25px] py-[35px] max-md:p-4'
+          'pointer-events-none px-[25px] py-[35px] max-md:p-4'
         )}
       >
         {/* Title with Number */}

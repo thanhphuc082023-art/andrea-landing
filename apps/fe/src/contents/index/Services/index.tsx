@@ -1,6 +1,10 @@
 import clsx from 'clsx';
+import { AnimatePresence, motion } from 'motion/react';
+import { useState } from 'react';
 
 import ServiceCard from './ServiceCard';
+import { FollowerPointerCard } from '@/components/ui/FollowingCard';
+import { useRouter } from 'next/router';
 
 interface Service {
   id?: number;
@@ -10,6 +14,7 @@ interface Service {
   slogan?: unknown[];
   icon?: unknown;
   iconActive?: unknown;
+  url?: string;
 }
 
 interface ServicesData {
@@ -22,7 +27,9 @@ interface ServicesProps {
 }
 
 function Services({ servicesData = {} }: ServicesProps) {
+  const router = useRouter();
   const services = servicesData?.items || servicesExample;
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Layout config cho 5 items đầu
   const layoutConfig = [
@@ -60,14 +67,57 @@ function Services({ servicesData = {} }: ServicesProps) {
     );
 
     return (
-      <div key={`service-${service.id || index}`} className={gridClass}>
-        <ServiceCard service={service} active={config.active} />
+      <div
+        key={`service-${service.id || index}`}
+        className={gridClass}
+        onMouseEnter={() => setHoveredIndex(index)}
+        onMouseLeave={() =>
+          setHoveredIndex((prev) => (prev === index ? null : prev))
+        }
+      >
+        <FollowerPointerCard
+          onClick={() =>
+            service.url ? router.push(`/service/${service.url}`) : null
+          }
+          title={
+            <>
+              {service.url ? (
+                <button className="bg-brand-orange relative z-30 shrink-0 overflow-hidden rounded-md px-2 py-1 text-sm font-semibold text-white backdrop-blur-sm after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700">
+                  Xem thêm
+                </button>
+              ) : (
+                <></>
+              )}
+            </>
+          }
+        >
+          <div className="group relative h-full w-full">
+            <AnimatePresence>
+              {hoveredIndex === index && (
+                <motion.span
+                  layoutId="hoverBackground"
+                  className="bg-brand-orange/70 absolute inset-0 h-full w-full rounded-[12px]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, transition: { duration: 0.15 } }}
+                  exit={{
+                    opacity: 0,
+                    transition: { duration: 0.15, delay: 0.2 },
+                  }}
+                />
+              )}
+            </AnimatePresence>
+
+            <div className="relative z-20 h-full w-full p-1">
+              <ServiceCard service={service} active={config.active} />
+            </div>
+          </div>
+        </FollowerPointerCard>
       </div>
     );
   };
 
   return (
-    <section>
+    <section id="services">
       <div className={clsx('content-wrapper mx-auto')}>
         {/* Section Title */}
         <div className={clsx('mb-6')}>
@@ -99,7 +149,7 @@ function Services({ servicesData = {} }: ServicesProps) {
 
           {/* Các item còn lại (từ item 6 trở đi) */}
           {services.slice(5).map((service, index) => {
-            const actualIndex = index + 6; // Vị trí thực tế trong mảng services
+            const actualIndex = index + 5; // zero-based actual index
             const remainingServices = services.slice(5);
             const isLastItem = index === remainingServices.length - 1;
 
@@ -114,14 +164,14 @@ function Services({ servicesData = {} }: ServicesProps) {
               'max-md:col-span-1 max-md:row-span-auto'
             );
 
-            if (isLastItem && actualIndex >= 6) {
+            if (isLastItem && actualIndex >= 5) {
               const pattern1 = Array.from(
                 { length: Math.ceil((services.length - 5) / 3) },
-                (_, i) => 6 + i * 3
+                (_, i) => 5 + i * 3
               );
               const pattern2 = Array.from(
                 { length: Math.ceil((services.length - 6) / 3) },
-                (_, i) => 7 + i * 3
+                (_, i) => 6 + i * 3
               );
 
               if (pattern1.includes(actualIndex)) {
@@ -153,8 +203,53 @@ function Services({ servicesData = {} }: ServicesProps) {
               <div
                 key={`service-${service.id || actualIndex}`}
                 className={gridClass}
+                onMouseEnter={() => setHoveredIndex(actualIndex)}
+                onMouseLeave={() =>
+                  setHoveredIndex((prev) =>
+                    prev === actualIndex ? null : prev
+                  )
+                }
               >
-                <ServiceCard service={service} />
+                <FollowerPointerCard
+                  onClick={() =>
+                    service.url ? router.push(`/service/${service.url}`) : null
+                  }
+                  title={
+                    <>
+                      {service.url ? (
+                        <button className="bg-brand-orange relative z-30 shrink-0 overflow-hidden rounded-md px-2 py-1 text-sm font-semibold text-white backdrop-blur-sm after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700">
+                          Xem thêm
+                        </button>
+                      ) : (
+                        <></>
+                      )}
+                    </>
+                  }
+                >
+                  <div className="group relative h-full w-full">
+                    <AnimatePresence>
+                      {hoveredIndex === actualIndex && (
+                        <motion.span
+                          layoutId="hoverBackground"
+                          className="bg-brand-orange/70 absolute inset-0 h-full w-full rounded-[12px]"
+                          initial={{ opacity: 0 }}
+                          animate={{
+                            opacity: 1,
+                            transition: { duration: 0.15 },
+                          }}
+                          exit={{
+                            opacity: 0,
+                            transition: { duration: 0.15, delay: 0.2 },
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    <div className="relative z-20 h-full w-full p-1">
+                      <ServiceCard service={service} />
+                    </div>
+                  </div>
+                </FollowerPointerCard>
               </div>
             );
           })}
@@ -232,7 +327,7 @@ const servicesExample = [
     position: 8,
     title: 'Quay phim, chụp hình',
     description:
-      "Lorem ipsum ullisae adipisci hul remonte al industrie de l'imprimerie au XVIe siècle. Un imprimeur inconnue à utilisé une version modifiée du livre philosophique de Cicéron.",
+      "Lorem ipsum ullisae adipisci hul remonte al industrie de l'imprimerie au XVIe siècle. Un imprimeur inconnue à utilisé một version modifiée du livre philosophique de Cicéron.",
     isLarge: false,
   },
 ];

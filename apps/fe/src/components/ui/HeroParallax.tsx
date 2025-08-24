@@ -452,7 +452,7 @@ export const ProductCard = ({
       <div className="absolute bottom-4 left-4 right-4 translate-y-4 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/product:translate-y-0 group-hover/product:opacity-100">
         <div className="flex items-center justify-between">
           <h2 className="truncate text-lg font-semibold">{product.title}</h2>
-          <span className="relative inline-block">
+          <span className="relative inline-block shrink-0">
             <button
               onClick={() => router.push(product.link)}
               className="after:bg-brand-orange relative z-30 shrink-0 overflow-hidden rounded-md bg-black/10 px-2 py-1 text-sm font-semibold text-white after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700"
