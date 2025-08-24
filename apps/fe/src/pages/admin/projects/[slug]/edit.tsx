@@ -105,7 +105,7 @@ export default function EditProjectPage({
     formData: null,
     showcaseSections: [],
   });
-
+  console.log('previewData', previewData);
   // Transform project data to form data on mount
   const [initialFormData, setInitialFormData] =
     useState<Partial<ProjectFormData> | null>(null);
@@ -117,10 +117,6 @@ export default function EditProjectPage({
 
       // Extract showcase sections from project data for preview
       const showcaseSections = project.showcaseSections || [];
-      console.log(
-        '🔄 Loading showcase sections from project:',
-        showcaseSections
-      );
 
       // Set initial preview data with showcase sections
       // Also include the formData so the preview component has full data to render
@@ -177,7 +173,6 @@ export default function EditProjectPage({
                 formData,
                 showcaseSections: processed,
               }));
-              console.log('✅ Processed showcase for preview:', processed);
             } else {
               console.warn('process-showcase failed on mount:', res.status);
             }
@@ -218,7 +213,6 @@ export default function EditProjectPage({
     data?: { formData: Partial<ProjectFormData>; showcaseSections: any[] }
   ) => {
     if (mode === 'preview' && data) {
-      console.log('data.showcaseSections', data.showcaseSections);
       setPreviewData((prev) => {
         const incomingSections =
           data.showcaseSections ?? (data.formData?.showcase as any) ?? [];
@@ -273,6 +267,41 @@ export default function EditProjectPage({
     handleSubmit(data);
   };
 
+  // Helper function to upload file to Strapi (client-side version)
+  const uploadFileToStrapi = async (
+    file: File,
+    originalName: string,
+    token: string,
+    strapiUrl: string,
+    category = 'projects'
+  ) => {
+    const form = new FormData();
+    // Client-side: directly use the File object
+    form.append('files', file, originalName);
+    form.append('path', category);
+
+    const res = await fetch(`${strapiUrl}/api/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: form,
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => null);
+      throw new Error(
+        `Upload to Strapi failed: ${res.status} ${res.statusText} ${text || ''}`
+      );
+    }
+
+    const data = await res.json().catch(() => null);
+    if (Array.isArray(data) && data.length > 0) return data[0].id;
+    if (data && Array.isArray(data.data) && data.data[0])
+      return data.data[0].id;
+    return null;
+  };
+
   const handleSubmit = async (data: ProjectFormData) => {
     setIsLoading(true);
     setSubmitError('');
@@ -299,6 +328,81 @@ export default function EditProjectPage({
         return;
       }
 
+      const STRAPI_URL =
+        process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+
+      // Upload media files to Strapi first and collect IDs
+      const uploadedIds: Record<string, number | null> = {
+        thumbnail: null,
+        heroBanner: null,
+        heroVideo: null,
+        featuredImage: null,
+      };
+
+      // Upload thumbnail
+      if (data.thumbnail?.file) {
+        try {
+          const id = await uploadFileToStrapi(
+            data.thumbnail.file,
+            data.thumbnail.file.name,
+            token,
+            STRAPI_URL
+          );
+          uploadedIds.thumbnail = id;
+        } catch (e) {
+          console.error('Thumbnail upload error', e);
+          throw new Error('Lỗi khi tải lên thumbnail');
+        }
+      }
+
+      // Upload heroBanner
+      if (data.heroBanner?.file) {
+        try {
+          const id = await uploadFileToStrapi(
+            data.heroBanner.file,
+            data.heroBanner.file.name,
+            token,
+            STRAPI_URL
+          );
+          uploadedIds.heroBanner = id;
+        } catch (e) {
+          console.error('Hero banner upload error', e);
+          throw new Error('Lỗi khi tải lên heroBanner');
+        }
+      }
+
+      // Upload heroVideo
+      if (data.heroVideo?.file) {
+        try {
+          const id = await uploadFileToStrapi(
+            data.heroVideo.file,
+            data.heroVideo.file.name,
+            token,
+            STRAPI_URL
+          );
+          uploadedIds.heroVideo = id;
+        } catch (e) {
+          console.error('Hero video upload error', e);
+          throw new Error('Lỗi khi tải lên heroVideo');
+        }
+      }
+
+      // Upload featuredImage
+      if (data.featuredImage?.file) {
+        try {
+          const id = await uploadFileToStrapi(
+            data.featuredImage.file,
+            data.featuredImage.file.name,
+            token,
+            STRAPI_URL
+          );
+          uploadedIds.featuredImage = id;
+        } catch (e) {
+          console.error('Featured image upload error', e);
+          throw new Error('Lỗi khi tải lên featuredImage');
+        }
+      }
+
       // Tách riêng xử lý showcase
       const showcaseMediaFiles = {
         showcase: data.showcase || [],
@@ -322,9 +426,6 @@ export default function EditProjectPage({
             // Upload progress feedback can be added here
           }
         );
-        console.log('showcaseMediaFiles', showcaseMediaFiles);
-        console.log('uploadResults', uploadResults);
-
         // Get upload IDs and original names for processing on the server
         if (
           uploadResults.showcaseUploadIds &&
@@ -348,272 +449,147 @@ export default function EditProjectPage({
         }
       }
 
-      // Handle media changes cho các loại media còn lại - only processes files that have been changed
-      const uploadResults = await handleProjectMediaChanges(
-        data,
-        (progress) => {
-          // Upload progress feedback can be added here
-        }
-      );
-
-      // Extract the ID from the thumbnail directly if available
-      const thumbnailId = data.thumbnail?.id || data.thumbnail?.uploadId;
-
-      // Prepare data for API call
+      // Prepare data for API call (include uploaded media IDs)
       const projectData = {
         ...data,
         id: project.id,
         documentId: project.id,
-        heroVideoUploadId: uploadResults.heroVideoUploadId,
-        heroBannerUploadId: uploadResults.heroBannerUploadId,
-        thumbnailUploadId: uploadResults.thumbnailUploadId || thumbnailId,
-        featuredImageUploadId: uploadResults.featuredImageUploadId,
-        galleryUploadIds: uploadResults.galleryUploadIds,
-        // Include showcase data for processing on the server
         showcase: data.showcase || [],
         showcaseUploadIds: showcaseUploadIds,
         showcaseOriginalNames: showcaseOriginalNames,
-        // Pass existing URLs if no new upload happened (and they're not blob URLs)
-        existingHeroVideoUrl:
-          !uploadResults.heroVideoUploadId &&
-          data.heroVideo?.url &&
-          !data.heroVideo.url.startsWith('blob:')
-            ? data.heroVideo.url
-            : undefined,
-        existingHeroBannerUrl:
-          !uploadResults.heroBannerUploadId &&
-          data.heroBanner?.url &&
-          !data.heroBanner.url.startsWith('blob:')
-            ? data.heroBanner.url
-            : undefined,
-        existingThumbnailUrl:
-          !uploadResults.thumbnailUploadId &&
-          data.thumbnail?.url &&
-          !data.thumbnail.url.startsWith('blob:')
-            ? data.thumbnail.url
-            : undefined,
-        existingFeaturedImageUrl:
-          !uploadResults.featuredImageUploadId &&
-          data.featuredImage?.url &&
-          !data.featuredImage.url.startsWith('blob:')
-            ? data.featuredImage.url
-            : undefined,
-        // Include original file names for new uploads
-        ...(uploadResults.originalHeroVideoName && {
-          originalHeroVideoName: uploadResults.originalHeroVideoName,
-        }),
-        ...(uploadResults.originalHeroBannerName && {
-          originalHeroBannerName: uploadResults.originalHeroBannerName,
-        }),
-        ...(uploadResults.originalThumbnailName && {
-          originalThumbnailName: uploadResults.originalThumbnailName,
-        }),
-        ...(uploadResults.originalFeaturedImageName && {
-          originalFeaturedImageName: uploadResults.originalFeaturedImageName,
-        }),
+        // Include uploaded media IDs (prefer newly uploaded, fallback to existing)
+        thumbnailUploadId: uploadedIds.thumbnail || data.thumbnail?.uploadId,
+        heroBannerUploadId: uploadedIds.heroBanner || data.heroBanner?.uploadId,
+        heroVideoUploadId: uploadedIds.heroVideo || data.heroVideo?.uploadId,
+        featuredImageUploadId:
+          uploadedIds.featuredImage || data.featuredImage?.uploadId,
         // Pass all thumbnail related information for better debugging and reliability
         _originalThumbnail: {
           ...(data.thumbnail || {}),
           rawData: data.thumbnail?.raw,
-          strapi_id: data.thumbnail?.id || data.thumbnail?.uploadId,
+          strapi_id:
+            data.thumbnail?.id ||
+            data.thumbnail?.uploadId ||
+            uploadedIds.thumbnail,
           initialId: project.thumbnail?.id,
           initialData: project.thumbnail,
         },
-        _dataFormat: 'enhanced_v2',
+        _dataFormat: 'enhanced_v3_client_upload',
       };
 
-      // Use a mutable copy for final payload modifications
-      let finalProjectData: any = { ...projectData };
+      // If there are showcase upload IDs, finalize/process them on the server
+      let finalProjectData: any = projectData;
 
-      console.log('DEBUG - Client sending to API:', projectData);
+      if (
+        showcaseUploadIds &&
+        Array.isArray(showcaseUploadIds) &&
+        showcaseUploadIds.length > 0
+      ) {
+        try {
+          const procRes = await fetch('/api/admin/projects/process-showcase', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              showcaseSections: data.showcase || [],
+              showcaseUploadIds,
+              showcaseOriginalNames,
+            }),
+          });
 
-      // Determine if we need to use the chunked upload endpoint
-      const useChunkedEndpoint =
-        showcaseHasFiles || // Sử dụng chunked endpoint nếu có showcase files
-        !!uploadResults.heroVideoUploadId ||
-        !!uploadResults.heroBannerUploadId ||
-        !!uploadResults.thumbnailUploadId ||
-        !!uploadResults.featuredImageUploadId;
+          if (!procRes.ok) {
+            const errBody = await procRes.json().catch(() => null);
+            console.warn('Failed to process showcase on server:', errBody);
+            throw new Error(errBody?.message || 'Failed to process showcase');
+          }
 
-      let result;
+          const procJson = await procRes.json();
+          // server returns processedShowcase (array of sections with src/url fields)
+          const processedShowcase =
+            procJson.processedShowcase || data.showcase || [];
 
-      // Check if we need to use the chunked endpoint for large media files
-      if (!useChunkedEndpoint) {
-        // Use the improved v2 endpoint for better thumbnail handling
-        const apiUrl = `/api/admin/projects/${project.documentId}/update-from-chunks`;
+          // Merge processed showcase into previewData so preview shows resolved src/url immediately
+          setPreviewData((prev) => ({
+            ...prev,
+            showcaseSections:
+              Array.isArray(processedShowcase) && processedShowcase.length > 0
+                ? processedShowcase
+                : prev?.showcaseSections || processedShowcase,
+          }));
 
-        // Ensure server receives 'showcaseSections' key for consistent updates
-        const payloadForJson = {
-          ...projectData,
-          showcaseSections: projectData.showcase || [],
+          // Build finalProjectData with processed showcase
+          finalProjectData = {
+            ...projectData,
+            showcaseSections:
+              Array.isArray(processedShowcase) && processedShowcase.length > 0
+                ? processedShowcase
+                : projectData.showcase || [],
+          };
+          // Remove transient client-only fields from the final payload
+          delete (finalProjectData as any).showcase;
+          delete (finalProjectData as any).showcaseUploadIds;
+          delete (finalProjectData as any).showcaseOriginalNames;
+        } catch (err) {
+          console.warn('Showcase processing error, aborting update:', err);
+          throw err;
+        }
+      }
+
+      // Remove file objects from data since they're already uploaded
+      const dataForAPI = { ...finalProjectData };
+      if (dataForAPI.thumbnail?.file) {
+        dataForAPI.thumbnail = {
+          ...dataForAPI.thumbnail,
+          file: undefined,
         };
-
-        // Create a JSON representation for the API
-        const jsonString = JSON.stringify(payloadForJson);
-        console.log(
-          'DEBUG - Client sending to API:',
-          jsonString.substring(0, 1000) + '...'
-        );
-
-        const response = await fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: jsonString,
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-
-          if (response.status === 401) {
-            localStorage.removeItem('strapiToken');
-            localStorage.removeItem('strapiUser');
-            router.push('/admin/projects');
-            return;
-          }
-
-          throw new Error(errorData.message || 'Lỗi khi cập nhật dự án');
-        }
-
-        result = await response.json();
-      } else {
-        // Send media files and project data to server-side update endpoint
-        const thumbnailFile = data.thumbnail?.file || null;
-        const heroBannerFile = data.heroBanner?.file || null;
-        const heroVideoFile = data.heroVideo?.file || null;
-        console.log('showcaseObject', {
-          showcaseSections: data.showcase || [],
-          showcaseUploadIds,
-          showcaseOriginalNames,
-        });
-        // If there are showcase upload IDs, finalize/process them on the server
-        // so we can include processed showcaseSections (with Strapi URLs) in the
-        // update payload. This separates showcase processing from the other
-        // large-media multipart uploads (thumbnail/heroBanner/heroVideo).
-        if (
-          showcaseUploadIds &&
-          Array.isArray(showcaseUploadIds) &&
-          showcaseUploadIds.length > 0
-        ) {
-          try {
-            const procRes = await fetch(
-              '/api/admin/projects/process-showcase',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  showcaseSections: data.showcase || [],
-                  showcaseUploadIds,
-                  showcaseOriginalNames,
-                }),
-              }
-            );
-
-            if (!procRes.ok) {
-              const errBody = await procRes.json().catch(() => null);
-              console.warn('Failed to process showcase on server:', errBody);
-              throw new Error(errBody?.message || 'Failed to process showcase');
-            }
-
-            const procJson = await procRes.json();
-            // server returns processedShowcase (array of sections with src/url fields)
-            const processedShowcase =
-              procJson.processedShowcase || data.showcase || [];
-
-            // Merge processed showcase into previewData so preview shows resolved src/url immediately
-            setPreviewData((prev) => ({
-              ...prev,
-              showcaseSections:
-                Array.isArray(processedShowcase) && processedShowcase.length > 0
-                  ? processedShowcase
-                  : prev?.showcaseSections || processedShowcase,
-            }));
-
-            // Build a finalProjectData object (use any to avoid strict typing issues)
-            // Ensure showcaseSections is set even if processedShowcase is empty
-            finalProjectData = {
-              ...projectData,
-              showcaseSections:
-                Array.isArray(processedShowcase) && processedShowcase.length > 0
-                  ? processedShowcase
-                  : projectData.showcase || [],
-            };
-            console.log('processedShowcase', processedShowcase);
-            // Remove transient client-only fields from the final payload if present
-            // by creating a clean copy rather than using delete on typed object.
-            delete (finalProjectData as any).showcase;
-            delete (finalProjectData as any).showcaseUploadIds;
-            delete (finalProjectData as any).showcaseOriginalNames;
-
-            // Use finalProjectData below when building the multipart form
-            // (do not reassign the original 'projectData' const)
-          } catch (err) {
-            console.warn('Showcase processing error, aborting update:', err);
-            throw err;
-          }
-        }
-
-        // Use multipart branch: build form from either finalProjectData (if modified) or original projectData
-        const dataForForm =
-          typeof finalProjectData !== 'undefined' && finalProjectData
-            ? finalProjectData
-            : projectData;
-
-        const form = new FormData();
-        form.append('data', JSON.stringify(dataForForm));
-        if (thumbnailFile) form.append('thumbnail', thumbnailFile as Blob);
-        if (heroBannerFile) form.append('heroBanner', heroBannerFile as Blob);
-        if (heroVideoFile) form.append('heroVideo', heroVideoFile as Blob);
-
-        // Also include featuredImage if present
-        const featuredImageFile = data.featuredImage?.file || null;
-        if (featuredImageFile)
-          form.append('featuredImage', featuredImageFile as Blob);
-
-        // Send multipart/form-data to the server API that now handles uploads
-        const apiUrl = `/api/admin/projects/${project.documentId}/update`;
-
-        const response = await fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: form,
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-
-          if (response.status === 401) {
-            localStorage.removeItem('strapiToken');
-            localStorage.removeItem('strapiUser');
-            router.push('/admin/projects');
-            return;
-          }
-
-          throw new Error(errorData?.message || 'Lỗi khi cập nhật dự án');
-        }
-
-        result = await response.json();
       }
-      console.log('DEBUG - API response:', result);
-
-      // Kiểm tra debug data nếu có
-      if (result.debug) {
-        console.log(
-          'DEBUG - Thumbnail processing details:',
-          result.debug.processing || 'No processing info available'
-        );
-        console.log(
-          'DEBUG - Strapi response:',
-          result.debug.strapiResponse || 'No Strapi response info available'
-        );
+      if (dataForAPI.heroBanner?.file) {
+        dataForAPI.heroBanner = {
+          ...dataForAPI.heroBanner,
+          file: undefined,
+        };
       }
+      if (dataForAPI.heroVideo?.file) {
+        dataForAPI.heroVideo = {
+          ...dataForAPI.heroVideo,
+          file: undefined,
+        };
+      }
+      if (dataForAPI.featuredImage?.file) {
+        dataForAPI.featuredImage = {
+          ...dataForAPI.featuredImage,
+          file: undefined,
+        };
+      }
+
+      // Send JSON data to the server API (files already uploaded)
+      const apiUrl = `/api/admin/projects/${project.documentId}/update`;
+
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dataForAPI),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+
+        if (response.status === 401) {
+          localStorage.removeItem('strapiToken');
+          localStorage.removeItem('strapiUser');
+          router.push('/admin/projects');
+          return;
+        }
+
+        throw new Error(errorData?.message || 'Lỗi khi cập nhật dự án');
+      }
+
+      const result = await response.json();
 
       alert('Cập nhật dự án thành công!');
       router.push('/admin/projects');
@@ -742,7 +718,6 @@ export const getServerSideProps: GetServerSideProps<
 
   try {
     const apiUrl = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/projects?filters[slug][$eq]=${slug}&populate=*&publicationState=live`;
-    console.log('DEBUG - Fetching project data from:', apiUrl);
 
     const response = await fetch(apiUrl, {
       headers: {
@@ -768,7 +743,6 @@ export const getServerSideProps: GetServerSideProps<
     }
 
     const project = data.data[0];
-    console.log('DEBUG - Thumbnail in project data:', project.thumbnail);
     return {
       props: {
         project,

@@ -12,14 +12,9 @@ interface ProjectHeroProps {
 
 function ProjectHero({ project = null }: ProjectHeroProps) {
   const projectTitle = project?.title || 'Dự án';
-  const projectCategory = project?.category?.name || 'Thiết kế';
   const projectDescription = project?.description || '';
   const projectMetaInfo = project?.projectMetaInfo || [];
   const projectIntroTitle = project?.projectIntroTitle || 'Giới thiệu dự án:';
-  const projectYear = project
-    ? new Date(project.createdAt).getFullYear()
-    : new Date().getFullYear();
-  const projectUrl = project?.projectUrl || '';
   const router = useRouter();
 
   const mode = router.query.mode;

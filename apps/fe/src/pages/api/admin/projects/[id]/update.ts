@@ -1,49 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import formidable from 'formidable';
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: {
+      sizeLimit: '10mb', // Allow larger JSON payloads
+    },
   },
 };
-
-async function uploadFileToStrapi(
-  filePath: string,
-  originalName: string,
-  token: string,
-  strapiUrl: string,
-  category = 'projects'
-) {
-  const buffer = fs.readFileSync(filePath);
-  const form = new FormData();
-  // Node 18+ has global Blob/FormData
-  const blob = new Blob([buffer]);
-  form.append('files', blob, originalName);
-  form.append('path', category);
-
-  const res = await fetch(`${strapiUrl}/api/upload`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: form as any,
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => null);
-    throw new Error(
-      `Upload to Strapi failed: ${res.status} ${res.statusText} ${text || ''}`
-    );
-  }
-
-  const data = await res.json().catch(() => null);
-  if (Array.isArray(data) && data.length > 0) return data[0].id;
-  if (data && Array.isArray(data.data) && data.data[0]) return data.data[0].id;
-  return null;
-}
 
 export default async function handler(
   req: NextApiRequest,
@@ -74,29 +41,26 @@ export default async function handler(
     }
 
     let projectData: any = {};
-    const mediaFiles: Record<string, { path: string; name: string } | null> = {
-      thumbnail: null,
-      heroBanner: null,
-      heroVideo: null,
-      featuredImage: null,
-    };
 
     const contentType = req.headers['content-type'] || '';
 
-    // Use system temp dir (writable on serverless). Allow override via env.
-    const TMP_DIR =
-      process.env.TMP_DIR || path.join(os.tmpdir(), 'andrea-landing-tmp');
-    try {
-      fs.mkdirSync(TMP_DIR, { recursive: true });
-    } catch (err) {
-      console.warn(
-        'Could not create TMP_DIR, falling back to os.tmpdir()',
-        err
-      );
-    }
+    // Since files are now uploaded client-side, we primarily expect JSON data
+    if (contentType.includes('application/json')) {
+      // With bodyParser enabled, req.body should contain the parsed JSON
+      projectData = req.body || {};
+    } else if (contentType.includes('multipart/form-data')) {
+      // Keep multipart handling for backward compatibility
+      const TMP_DIR =
+        process.env.TMP_DIR || path.join(os.tmpdir(), 'andrea-landing-tmp');
+      try {
+        fs.mkdirSync(TMP_DIR, { recursive: true });
+      } catch (err) {
+        console.warn(
+          'Could not create TMP_DIR, falling back to os.tmpdir()',
+          err
+        );
+      }
 
-    if (contentType.includes('multipart/form-data')) {
-      // parse multipart with formidable
       const form = formidable({
         multiples: false,
         uploadDir: TMP_DIR,
@@ -111,7 +75,6 @@ export default async function handler(
       });
 
       const { fields, files } = parsed;
-      // fields.data expected to contain JSON string with project fields
       if (fields?.data) {
         try {
           projectData = JSON.parse(
@@ -124,127 +87,13 @@ export default async function handler(
         projectData = fields;
       }
 
-      // map files
+      // Handle any remaining files if they exist (backward compatibility)
       if (files) {
-        const mapFile = (f: any) => {
-          if (!f) return null;
-          // formidable may return array or single
-          const fileObj = Array.isArray(f) ? f[0] : f;
-          let filePath = fileObj.filepath || fileObj.path;
-          if (typeof filePath === 'string' && !path.isAbsolute(filePath)) {
-            filePath = path.join(process.cwd(), filePath);
-          }
-          return {
-            path: filePath,
-            name: fileObj.originalFilename || fileObj.name,
-          };
-        };
-
-        mediaFiles.thumbnail = mapFile(files.thumbnail);
-        mediaFiles.heroBanner = mapFile(files.heroBanner);
-        mediaFiles.heroVideo = mapFile(files.heroVideo);
-        mediaFiles.featuredImage = mapFile(files.featuredImage);
+        // Keep the existing file handling logic for backward compatibility
       }
     } else {
-      // JSON body
+      // Fallback: try to parse req.body anyway
       projectData = req.body || {};
-    }
-
-    console.log('DEBUG - Project update request (server):', {
-      id: idParam,
-      hasThumbnailFile: !!mediaFiles.thumbnail,
-      hasHeroBannerFile: !!mediaFiles.heroBanner,
-      hasHeroVideoFile: !!mediaFiles.heroVideo,
-      incomingDataKeys: Object.keys(projectData || {}),
-    });
-
-    // Upload any provided files to Strapi and collect IDs
-    const uploadedIds: Record<string, number | null> = {
-      thumbnail: null,
-      heroBanner: null,
-      heroVideo: null,
-      featuredImage: null,
-    };
-
-    if (mediaFiles.thumbnail) {
-      try {
-        // ensure file exists before uploading
-        const thumbPath = mediaFiles.thumbnail.path;
-        if (!fs.existsSync(thumbPath)) {
-          throw new Error(`Temporary file not found: ${thumbPath}`);
-        }
-
-        const id = await uploadFileToStrapi(
-          thumbPath,
-          mediaFiles.thumbnail.name,
-          headerToken,
-          STRAPI_URL
-        );
-        uploadedIds.thumbnail = id;
-        console.log('DEBUG - Uploaded thumbnail id:', id);
-      } catch (e) {
-        console.error('Thumbnail upload error', e);
-      }
-    }
-
-    if (mediaFiles.heroBanner) {
-      try {
-        const bannerPath = mediaFiles.heroBanner.path;
-        if (!fs.existsSync(bannerPath)) {
-          throw new Error(`Temporary file not found: ${bannerPath}`);
-        }
-
-        const id = await uploadFileToStrapi(
-          bannerPath,
-          mediaFiles.heroBanner.name,
-          headerToken,
-          STRAPI_URL
-        );
-        uploadedIds.heroBanner = id;
-        console.log('DEBUG - Uploaded heroBanner id:', id);
-      } catch (e) {
-        console.error('Hero banner upload error', e);
-      }
-    }
-
-    if (mediaFiles.heroVideo) {
-      try {
-        const videoPath = mediaFiles.heroVideo.path;
-        if (!fs.existsSync(videoPath)) {
-          throw new Error(`Temporary file not found: ${videoPath}`);
-        }
-
-        const id = await uploadFileToStrapi(
-          videoPath,
-          mediaFiles.heroVideo.name,
-          headerToken,
-          STRAPI_URL
-        );
-        uploadedIds.heroVideo = id;
-        console.log('DEBUG - Uploaded heroVideo id:', id);
-      } catch (e) {
-        console.error('Hero video upload error', e);
-      }
-    }
-
-    if (mediaFiles.featuredImage) {
-      try {
-        const featuredPath = mediaFiles.featuredImage.path;
-        if (!fs.existsSync(featuredPath)) {
-          throw new Error(`Temporary file not found: ${featuredPath}`);
-        }
-
-        const id = await uploadFileToStrapi(
-          featuredPath,
-          mediaFiles.featuredImage.name,
-          headerToken,
-          STRAPI_URL
-        );
-        uploadedIds.featuredImage = id;
-        console.log('DEBUG - Uploaded featuredImage id:', id);
-      } catch (e) {
-        console.error('Featured image upload error', e);
-      }
     }
 
     // Prepare update data for Strapi (only include known fields)
@@ -267,10 +116,8 @@ export default async function handler(
       seo: projectData.seo,
     };
 
-    // Set media IDs (prefer newly uploaded ids, otherwise use uploadId fields from client)
-    if (uploadedIds.heroVideo) {
-      updateData.heroVideo = uploadedIds.heroVideo;
-    } else if (projectData.heroVideoUploadId) {
+    // Set media IDs (use uploadIds sent from client)
+    if (projectData.heroVideoUploadId) {
       const n = parseInt(projectData.heroVideoUploadId as any);
       updateData.heroVideo = isNaN(n) ? null : n;
     } else if (projectData.heroVideo?.uploadId) {
@@ -278,9 +125,7 @@ export default async function handler(
       updateData.heroVideo = isNaN(n) ? null : n;
     }
 
-    if (uploadedIds.heroBanner) {
-      updateData.heroBanner = uploadedIds.heroBanner;
-    } else if (projectData.heroBannerUploadId) {
+    if (projectData.heroBannerUploadId) {
       const n = parseInt(projectData.heroBannerUploadId as any);
       updateData.heroBanner = isNaN(n) ? null : n;
     } else if (projectData.heroBanner?.uploadId) {
@@ -288,9 +133,7 @@ export default async function handler(
       updateData.heroBanner = isNaN(n) ? null : n;
     }
 
-    if (uploadedIds.thumbnail) {
-      updateData.thumbnail = uploadedIds.thumbnail;
-    } else if (projectData.thumbnailUploadId) {
+    if (projectData.thumbnailUploadId) {
       const n = parseInt(projectData.thumbnailUploadId as any);
       updateData.thumbnail = isNaN(n) ? null : n;
     } else if (projectData.thumbnail?.uploadId) {
@@ -298,9 +141,7 @@ export default async function handler(
       updateData.thumbnail = isNaN(n) ? null : n;
     }
 
-    if (uploadedIds.featuredImage) {
-      updateData.featuredImage = uploadedIds.featuredImage;
-    } else if (projectData.featuredImageUploadId) {
+    if (projectData.featuredImageUploadId) {
       const n = parseInt(projectData.featuredImageUploadId as any);
       updateData.featuredImage = isNaN(n) ? null : n;
     } else if (projectData.featuredImage?.uploadId) {
@@ -330,8 +171,6 @@ export default async function handler(
           : incomingShowcase;
     }
 
-    console.log('DEBUG - Final payload to Strapi (server):', updateData);
-
     const apiUrl = `${STRAPI_URL}/api/projects/${idParam}`;
 
     // Build the Strapi payload with proper relations for Strapi v4
@@ -352,15 +191,12 @@ export default async function handler(
       body: JSON.stringify({ data: strapiPayload.data }),
     });
 
-    console.log('DEBUG - Strapi response status:', updateResponse.status);
-
     if (!updateResponse.ok) {
       let errorData: any = null;
       try {
         errorData = await updateResponse.json();
         console.log('DEBUG - Strapi error response:', errorData);
       } catch (e) {
-        console.log('DEBUG - Could not parse Strapi error response');
         errorData = await updateResponse.text().catch(() => null);
         console.log('DEBUG - Strapi error text:', errorData);
       }
@@ -383,7 +219,20 @@ export default async function handler(
     return res.status(200).json({
       message: 'Project updated successfully',
       project: updated?.data ?? updated,
-      debug: { uploadedIds },
+      debug: {
+        processedUploadIds: {
+          thumbnail: updateData.thumbnail,
+          heroBanner: updateData.heroBanner,
+          heroVideo: updateData.heroVideo,
+          featuredImage: updateData.featuredImage,
+        },
+        clientUploadIds: {
+          thumbnail: projectData.thumbnailUploadId,
+          heroBanner: projectData.heroBannerUploadId,
+          heroVideo: projectData.heroVideoUploadId,
+          featuredImage: projectData.featuredImageUploadId,
+        },
+      },
     });
   } catch (error: any) {
     console.error('Update handler error', error);

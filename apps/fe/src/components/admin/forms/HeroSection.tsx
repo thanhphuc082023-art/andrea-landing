@@ -219,7 +219,7 @@ export default function HeroSection({
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                         }}
-                        className="h-8 w-8 shrink-0 rounded border border-gray-200"
+                        className="h-8 w-12 shrink-0 rounded border border-gray-200"
                         title={`Preview: ${thumbnail.name || 'thumbnail'}`}
                       />
                     ) : (
@@ -230,6 +230,8 @@ export default function HeroSection({
                     <span className="block max-w-[12rem] flex-1 truncate text-sm text-gray-700">
                       {thumbnail.name || thumbnail.fileName}
                     </span>
+                  </div>
+                  <div className="flex space-x-2">
                     {thumbnail.uploadId ? (
                       <span className="inline-flex shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                         ✓ Đã tải lên
@@ -243,14 +245,14 @@ export default function HeroSection({
                         Đã có
                       </span>
                     ) : null}
+                    <button
+                      type="button"
+                      onClick={removeThumbnail}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={removeThumbnail}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <XMarkIcon className="h-4 w-4" />
-                  </button>
                 </div>
               </div>
             ) : (
@@ -296,6 +298,8 @@ export default function HeroSection({
                     <span className="block max-w-[12rem] truncate text-sm text-gray-700">
                       {heroVideo.name || heroVideo.fileName}
                     </span>
+                  </div>
+                  <div className="flex space-x-2">
                     {heroVideo.uploadId ? (
                       <span className="inline-flex shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                         ✓ Đã tải lên
@@ -309,14 +313,14 @@ export default function HeroSection({
                         Đã có
                       </span>
                     ) : null}
+                    <button
+                      type="button"
+                      onClick={removeHeroVideo}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={removeHeroVideo}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <XMarkIcon className="h-4 w-4" />
-                  </button>
                 </div>
               </div>
             ) : (
@@ -368,6 +372,8 @@ export default function HeroSection({
                     <span className="block max-w-[12rem] truncate text-sm text-gray-700">
                       {heroBanner.name || heroBanner.fileName}
                     </span>
+                  </div>
+                  <div className="flex space-x-2">
                     {heroBanner.uploadId ? (
                       <span className="inline-flex shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                         ✓ Đã tải lên
@@ -381,14 +387,14 @@ export default function HeroSection({
                         Đã có
                       </span>
                     ) : null}
+                    <button
+                      type="button"
+                      onClick={removeHeroBanner}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={removeHeroBanner}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <XMarkIcon className="h-4 w-4" />
-                  </button>
                 </div>
               </div>
             ) : (

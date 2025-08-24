@@ -95,9 +95,7 @@ export default function ProjectFormPage({
   const heroVideo = watch('heroVideo');
   const heroBanner = watch('heroBanner');
   const thumbnail = watch('thumbnail');
-  const title = watch('title') || '';
-  const description = watch('description') || '';
-  console.log('errors', errors);
+
   const handleCancel = () => {
     cleanup();
     formCleanup();
@@ -175,8 +173,6 @@ export default function ProjectFormPage({
   // Enhanced form submission
   const handleEnhancedFormSubmit = async (data: ProjectFormData) => {
     setIsUploading(true);
-    console.log('clicked');
-    console.log('showcaseSections', showcaseSections);
     try {
       // Submit form data directly
       await onSubmit({ ...data, showcase: showcaseSections });

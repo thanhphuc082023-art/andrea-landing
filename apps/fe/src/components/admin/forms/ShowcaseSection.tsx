@@ -781,7 +781,7 @@ const SortableSection = ({
                       <div className="flex items-center space-x-2">
                         {item.uploadId ? (
                           <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                            ✓ Uploaded
+                            ✓ Đã tải lên
                           </span>
                         ) : item.file ? (
                           <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
