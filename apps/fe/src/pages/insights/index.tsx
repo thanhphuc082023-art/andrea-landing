@@ -1,205 +1,181 @@
-import Blog from '@/contents/index/Blog';
-import ContactForm from '@/contents/index/ContactForm';
+import Blog, { BlogCard } from '@/contents/index/Blog';
 import clsx from 'clsx';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { getStaticPropsWithGlobalAndData } from '@/lib/page-helpers';
-import { getStrapiMediaUrl } from '@/utils/helper';
+import SubmitButton from '@/components/SubmitButton';
 import StrapiHead from '@/components/meta/StrapiHead';
+import { useRouter } from 'next/router';
+import ContactForm from '@/contents/index/ContactForm';
 
-export default function InsightsPage({ article, currentGlobal }: any) {
-  const sections = article?.sections || [];
+export default function InsightsPage() {
+  const router = useRouter();
+  const items = insightsPageItems;
 
-  // Merge article SEO with global defaults
-  const defaultSeo = currentGlobal?.defaultSeo || {};
-  const articleSeo = {
-    metaTitle: article?.title || defaultSeo?.metaTitle,
-    metaDescription: article?.excerpt || defaultSeo?.metaDescription,
-    shareImage: article?.hero?.mobile,
-  };
-  const seo = { ...defaultSeo, ...articleSeo };
+  // heroTop: first hero in the list
+  const heroTopIndex = items.findIndex((i) => i.type === 'hero');
+  const heroTop = heroTopIndex >= 0 ? (items[heroTopIndex] as any) : undefined;
+
+  // next 6 items after heroTop (only posts)
+  const mainSixStart = Math.max(0, heroTopIndex + 1);
+  const mainSix = items
+    .slice(mainSixStart, mainSixStart + 6)
+    .filter((v) => v.type === 'post') as any[];
+
+  // heroMid: prefer the original item at index heroTopIndex + 7 (i.e., item thứ 8),
+  // otherwise fallback to the next hero found after heroTop
+  const candidateIndex = heroTopIndex + 7;
+  const heroMid =
+    items[candidateIndex] && items[candidateIndex].type === 'hero'
+      ? (items[candidateIndex] as any)
+      : (items.find((v, idx) => idx > heroTopIndex && v.type === 'hero') as
+          | any
+          | undefined);
+
+  // last three posts after heroMid (or after mainSix if heroMid not present)
+  const afterHeroMidStart = heroMid
+    ? items.findIndex((i) => i === heroMid) + 1
+    : mainSixStart + mainSix.length;
+  const lastThree = items
+    .slice(afterHeroMidStart)
+    .filter((v) => v.type === 'post')
+    .slice(0, 3) as any[];
+
+  // posts to render in the main grid = the 6 posts after heroTop
+  const posts = mainSix;
 
   return (
-    <div className="max-sd:mt-[60px] mt-[65px]">
+    <div className="max-sd:mt-[60px] max-sd:pt-[60px] mt-[65px] min-h-screen bg-white pt-[65px]">
       <StrapiHead
-        ogImage={article?.hero?.mobile}
-        global={currentGlobal}
-        seo={seo}
+        title="Góc nhìn"
+        description="Bài viết và câu chuyện về thương hiệu từ ANDREA."
+        ogImage={heroTop?.image || '/assets/images/insights/coffee/coffee1.png'}
+        overrideTitle
       />
 
-      {/* Hero Section */}
-      <div className="w-full">
-        <div className="relative aspect-[430/342] w-full overflow-hidden md:aspect-[1440/401]">
-          <picture>
-            <source
-              media="(max-width: 767px)"
-              srcSet={
-                getStrapiMediaUrl(article?.hero?.mobile) ||
-                '/assets/images/insights/coffee/coffee-insight-mobile.png'
-              }
-            />
-            <source
-              media="(min-width: 768px)"
-              srcSet={
-                getStrapiMediaUrl(article?.hero?.desktop) ||
-                '/assets/images/insights/coffee/coffee-insight.png'
-              }
-            />
-            <Image
-              src={
-                getStrapiMediaUrl(article?.hero?.desktop) ||
-                '/assets/images/insights/coffee/coffee-insight.png'
-              }
-              alt={article?.title || 'Insight'}
-              fill
-              sizes="(min-width: 768px) 1440px, 430px"
-              className="object-cover"
-            />
-          </picture>
-        </div>
-      </div>
-
-      {/* Breadcrumb */}
-      <div className="content-wrapper my-[56px] max-md:my-[29px]">
-        <nav className="flex items-center space-x-2 overflow-hidden text-[17px] text-[#979797]">
-          {/** Collection / Index link (e.g. Góc nhìn của Andrea) */}
-          <Link
-            href={article?.collectionHref || '/insights'}
-            className="min-w-0 max-w-[220px] truncate font-[300] hover:text-gray-900"
+      {/* Top hero (item 1) */}
+      {heroTop && (
+        <div className="content-wrapper">
+          <div
+            onClick={() => heroTop.link && router.push(heroTop.link)}
+            className="group grid cursor-pointer grid-cols-1 items-center gap-8 lg:grid-cols-3"
           >
-            {article?.collectionName || 'Góc nhìn của Andrea'}
-          </Link>
-          <span
-            className="inline-block h-6 w-px bg-[#D9D9D9]"
-            aria-hidden="true"
-          />
-
-          {/** Category (optional) */}
-          <Link
-            href={
-              article?.category
-                ? `/insights?category=${encodeURIComponent(article.category)}`
-                : '#'
-            }
-            className="min-w-0 max-w-[140px] truncate font-[300] text-[#979797] hover:text-gray-900"
-            onClick={(e) => {
-              if (!article?.category) e.preventDefault();
-            }}
-          >
-            {article?.category || 'Danh mục'}
-          </Link>
-
-          <span
-            className="inline-block h-6 w-px bg-[#D9D9D9]"
-            aria-hidden="true"
-          />
-
-          {/** Current article title */}
-          <span className="min-w-0 max-w-[120px] truncate font-[300] text-[#979797]">
-            {article?.title}
-          </span>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="content-wrapper">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-          {/* Table of Contents */}
-          <div className="lg:col-span-1">
-            <h1 className="mb-8 hidden text-[28px] font-bold leading-tight text-gray-900 max-md:block lg:text-[50px]">
-              {article?.title}
-            </h1>
-
-            <div className="sticky top-24">
-              <h3 className="mb-4 text-[28px] font-bold max-md:text-[20px]">
-                Mục lục
-              </h3>
-              {/* TOC entries will scroll to section ids and highlight active */}
-              <TOC sections={sections} />
-            </div>
-          </div>
-
-          {/* Article Content */}
-          <div className="lg:col-span-3">
-            <h1 className="mb-8 text-[28px] font-bold leading-tight text-gray-900 max-md:hidden lg:text-[50px]">
-              {article?.title}
-            </h1>
-
-            {/* Main Image */}
-            <div className="mb-8">
-              <Image
-                src={'/assets/images/insights/coffee/coffee1.png'}
-                alt={article?.title || 'Insight'}
-                width={970}
-                height={550}
-                className="h-auto w-full"
-              />
+            <div className="lg:col-span-2">
+              <div className="rounded-15 relative aspect-video w-full overflow-hidden">
+                <Image
+                  src={heroTop.image}
+                  alt={heroTop.title}
+                  fill
+                  className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
             </div>
 
-            {/* Content Sections (dynamic) */}
-            {sections.map((sec: any, idx: number) => (
-              <section
-                id={sec.id || `section-${idx + 1}`}
-                key={sec.id || idx}
-                className="mb-8"
-              >
-                <h2 className="mb-6 text-[25px] font-bold text-gray-900 lg:text-[37px]">
-                  {sec.title}
-                </h2>
-                {sec.paragraphs &&
-                  sec.paragraphs.map((p: string, pi: number) => (
-                    <p
-                      key={pi}
-                      className="mb-8 text-[17px] leading-relaxed text-gray-700"
-                    >
-                      {p}
-                    </p>
-                  ))}
-
-                {sec.images && (
-                  <div
-                    className={
-                      sec.images.length === 1
-                        ? 'mb-6 grid grid-cols-1'
-                        : 'mb-6 grid grid-cols-1 gap-4 md:grid-cols-2'
-                    }
-                  >
-                    {sec.images.map((img: any, i: number) => (
-                      <Image
-                        key={i}
-                        src={img.src}
-                        alt={img.alt || ''}
-                        width={img.width || 600}
-                        height={img.height || 300}
-                        className="h-auto w-full"
-                      />
-                    ))}
+            <div className="space-y-6 lg:col-span-1">
+              <div>
+                {heroTop.date && (
+                  <div className="text-[14px] text-black/50">
+                    {heroTop.date}
                   </div>
                 )}
-              </section>
-            ))}
-          </div>
-        </div>
-      </div>
-      {article?.author?.name && (
-        <div className="content-wrapper mt-8 flex items-end justify-between gap-4">
-          <div className="mb-1 h-[1px] flex-1 bg-black/20" />
-          <div className="shrink-0 text-right">
-            <p className="text-brand-orange text-[17px]">
-              {article?.author?.name || 'Theo Mộng Nghi'}
-            </p>
-            {article?.author?.role && (
-              <p className="text-brand-orange text-[17px]">
-                {article?.author?.role}
-              </p>
-            )}
+                <h1 className="text-[24px] font-semibold leading-tight max-md:text-[20px]">
+                  {heroTop.title}
+                </h1>
+              </div>
+
+              {heroTop.excerpt && (
+                <p className="text-[17px] leading-relaxed">{heroTop.excerpt}</p>
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      <div className={clsx('py-[50px]')}>
-        <Blog title="Bài viết liên quan" />
+      {/* Main grid of posts */}
+      <div className={clsx('py-[100px] max-md:py-[50px]')}>
+        <section>
+          <div className={clsx('content-wrapper mx-auto')}>
+            <div
+              className={clsx(
+                'grid grid-cols-1 gap-8 md:grid-cols-3',
+                'max-md:gap-4'
+              )}
+            >
+              {posts.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Middle hero (item 8) */}
+      {heroMid && (
+        <div className="content-wrapper">
+          <div
+            onClick={() => heroMid.link && router.push(heroMid.link)}
+            className="group grid cursor-pointer grid-cols-1 items-center gap-8 lg:grid-cols-3"
+          >
+            <div className="lg:col-span-2">
+              <div className="rounded-15 relative aspect-video w-full overflow-hidden">
+                <Image
+                  src={heroMid.image}
+                  alt={heroMid.title}
+                  fill
+                  className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-6 lg:col-span-1">
+              <div>
+                {heroMid.date && (
+                  <div className="text-[14px] text-black/50">
+                    {heroMid.date}
+                  </div>
+                )}
+                <h2 className="text-[24px] font-semibold leading-tight max-md:text-[20px]">
+                  {heroMid.title}
+                </h2>
+              </div>
+
+              {heroMid.excerpt && (
+                <p className="text-[17px] leading-relaxed">{heroMid.excerpt}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CTA / preview slice */}
+      <div className={clsx('py-[100px] max-md:py-[50px]')}>
+        <section>
+          <div className={clsx('content-wrapper mx-auto')}>
+            <div
+              className={clsx(
+                'grid grid-cols-1 gap-8 md:grid-cols-3',
+                'max-md:gap-4'
+              )}
+            >
+              {posts.slice(0, 3).map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
+
+            <div className={clsx('mt-6 text-center')}>
+              <SubmitButton
+                textColor="text-brand-orange"
+                borderColor="border-brand-orange"
+                beforeBgColor="before:bg-brand-orange"
+                hoverBgColor="hover:bg-brand-orange"
+                hoverTextColor="hover:text-white"
+                focusRingColor="focus:ring-brand-orange"
+                focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
+                onClick={() => router.push('/insights?page=2')}
+              >
+                Xem thêm
+              </SubmitButton>
+            </div>
+          </div>
+        </section>
       </div>
 
       <div>
@@ -209,117 +185,124 @@ export default function InsightsPage({ article, currentGlobal }: any) {
   );
 }
 
-export const getStaticProps = async () =>
-  getStaticPropsWithGlobalAndData(async () => {
-    // Example article data — replace with CMS fetch later
-    const article = {
-      title: 'Tạo tính riêng trong thiết kế bao bì qua giá trị văn hóa',
-      hero: {
-        desktop: '/assets/images/insights/coffee/coffee-insight.png',
-        mobile: '/assets/images/insights/coffee/coffee-insight-mobile.png',
-      },
-      author: {
-        name: 'Theo Mộng Nghi',
-        role: 'Brand Designer',
-      },
-      sections: [
-        {
-          id: 'section-1',
-          title: 'Truyền tải thông điệp qua bao bì',
-          paragraphs: [
-            'Thiết kế bao bì luôn khiến chúng ta đam mê bởi tính đa dạng và phong phú trong truyền tải thông điệp văn hóa, giá trị thương hiệu. Nó quan tâm ra sự khác biệt, thú hút sự chú ý của khách hàng và nâng cao giá trị sản phẩm. Thiết kế bao bì vận hóa thành công có thể tạo ra sự kết nối cảm xúc với người tiêu dùng, thúc đẩy sự trung thành và góp phần vào sự phát triển bền vững của doanh nghiệp.',
-          ],
-          images: [
-            {
-              src: '/assets/images/insights/coffee/coffee2.png',
-              alt: 'img1',
-              width: 480,
-              height: 480,
-            },
-            {
-              src: '/assets/images/insights/coffee/coffee3.png',
-              alt: 'img2',
-              width: 480,
-              height: 480,
-            },
-          ],
-        },
-        {
-          id: 'section-2',
-          title: 'Khai thác giá trị văn hóa',
-          paragraphs: [
-            'Thiết kế bao bì vận hóa thông qua đơn thuần là làm đẹp sản phẩm mà còn là một phương tiện truyền tải thông điệp văn hóa, giá trị thương hiệu. Nó quan tâm ra sự khác biệt, thú hút sự chú ý của khách hàng và nâng cao giá trị sản phẩm. Thiết kế bao bì vận hóa thành công có thể tạo ra sự kết nối cảm xúc với người tiêu dùng, thúc đẩy sự trung thành và góp phần vào sự phát triển bền vững của doanh nghiệp.',
-            'Thiết kế bao bì vận hóa thông qua đơn thuần là làm đẹp sản phẩm mà còn là một phương tiện truyền tải thông điệp văn hóa, giá trị thương hiệu.',
-          ],
-          images: [
-            {
-              src: '/assets/images/insights/coffee/coffee4.png',
-              alt: 'img3',
-              width: 970,
-              height: 536,
-            },
-          ],
-        },
-        {
-          id: 'section-3',
-          title: 'Văn hóa đã ảnh hưởng tới thiết kế bao bì như thế nào?',
-          paragraphs: [
-            'Thiết kế bao bì vận hóa thông qua đơn thuần là làm đẹp sản phẩm mà còn là một phương tiện truyền tải thông điệp văn hóa, giá trị thương hiệu. Nó quan tâm ra sự khác biệt, thú hút sự chú ý của khách hàng và nâng cao giá trị sản phẩm. Thiết kế bao bì vận hóa thành công có thể tạo ra sự kết nối cảm xúc với người tiêu dùng, thúc đẩy sự trung thành và góp phần vào sự phát triển bền vững của doanh nghiệp.',
-          ],
-        },
-      ],
+export type InsightsItem =
+  | {
+      id: string | number;
+      type: 'hero';
+      date?: string;
+      title: string;
+      excerpt?: string;
+      image: string;
+      link?: string;
+    }
+  | {
+      id: string | number;
+      type: 'post';
+      date?: string;
+      title: string;
+      image: string;
+      slug?: string;
+      excerpt?: string;
     };
 
-    return { article };
-  });
+export const insightsPageItems: InsightsItem[] = [
+  // item 1 (Large Top Hero)
+  {
+    id: 'hero-1',
+    type: 'hero',
+    date: '01/08/2025',
+    title: 'Đã đến lúc phải kể câu chuyện về thương hiệu của chính mình',
+    excerpt:
+      'Cốt lõi của câu chuyện thương hiệu vốn đã được hình thành từ trước khi khởi nghiệp và vẫn luôn tiếp tục trải dài theo từng năm tháng phát triển của thương hiệu.',
+    image: '/assets/images/insights/coffee/coffee1.png',
+    link: '/insight/bao-bi',
+  },
 
-// Table of Contents component with scrollspy
-function TOC({ sections }: { sections: any[] }) {
-  const items = sections.map((sec) => ({ id: sec.id, label: sec.title }));
+  // regular posts
+  {
+    id: 1,
+    type: 'post',
+    date: '01/08/2025',
+    title: 'Tạo tính riêng trong thiết kế bao bì qua giá trị văn hóa',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'thiet-ke-bao-bi-gia-tri-van-hoa',
+  },
+  {
+    id: 2,
+    type: 'post',
+    date: '28/07/2025',
+    title: 'Kể câu chuyện thương hiệu: Bắt đầu từ đâu?',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'ke-cau-chuyen-thuong-hieu',
+  },
+  {
+    id: 3,
+    type: 'post',
+    date: '20/07/2025',
+    title: 'Thiết kế bao bì và giá trị cảm xúc',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'thiet-ke-bao-bi-cam-xuc',
+  },
+  {
+    id: 4,
+    type: 'post',
+    date: '12/07/2025',
+    title: 'Nghệ thuật kể chuyện trên nhãn hàng',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'nghe-thuat-ke-chuyen-nhan-hang',
+  },
+  {
+    id: 5,
+    type: 'post',
+    date: '02/07/2025',
+    title: 'Phong cách thị giác cho thương hiệu Việt',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'phong-cach-thi-giac-thuong-hieu-viet',
+  },
+  {
+    id: 6,
+    type: 'post',
+    date: '20/06/2025',
+    title: 'Case study: Bao bì kể chuyện văn hoá',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'case-study-bao-bi-van-hoa',
+  },
 
-  const [activeId, setActiveId] = useState<string | null>(items[0].id);
+  // item 8 (Large Middle Hero at index 7)
+  {
+    id: 'hero-2',
+    type: 'hero',
+    date: '15/06/2025',
+    title: 'Tập trung vào trải nghiệm khách hàng qua bao bì',
+    excerpt:
+      'Cốt lõi của câu chuyện thương hiệu vốn đã được hình thành từ trước khi khởi nghiệp và vẫn luôn tiếp tục trải dài theo từng năm tháng phát triển của thương hiệu.',
+    image: '/assets/images/insights/coffee/coffee1.png',
+    link: '/insight/bao-bi',
+  },
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
-        });
-      },
-      { root: null, rootMargin: '-30% 0px -50% 0px', threshold: 0.1 }
-    );
-
-    items.forEach((it) => {
-      const el = document.getElementById(it.id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <ul className="space-y-3 text-sm">
-      {items.map((it, index) => (
-        <li key={it.id}>
-          <a
-            href={`#${it.id}`}
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById(it.id)?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-            className={`block hover:text-gray-900 ${
-              activeId === it.id
-                ? 'text-brand-orange font-semibold'
-                : 'text-[#6B6B6B]'
-            }`}
-          >
-            {index + 1}. {it.label}
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
-}
+  // additional posts (optional)
+  {
+    id: 7,
+    type: 'post',
+    date: '01/06/2025',
+    title: 'Thiết kế tối giản cho bao bì hiện đại',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'thiet-ke-toi-gian-bao-bi',
+  },
+  {
+    id: 8,
+    type: 'post',
+    date: '28/05/2025',
+    title: 'Xu hướng màu sắc cho bao bì 2025',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'xu-huong-mau-sac-bao-bi-2025',
+  },
+  {
+    id: 9,
+    type: 'post',
+    date: '15/05/2025',
+    title: 'Tối ưu trải nghiệm unboxing cho thương hiệu nhỏ',
+    image: '/assets/images/blog/blog-1.png',
+    slug: 'toi-uu-unboxing-thuong-hieu-nho',
+  },
+];

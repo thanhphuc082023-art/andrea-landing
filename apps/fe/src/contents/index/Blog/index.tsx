@@ -30,7 +30,17 @@ const blogPosts = [
   },
 ];
 
-function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
+export function BlogCard({
+  post,
+}: {
+  post: {
+    id: number;
+    date: string;
+    title: string;
+    image: string;
+    excerpt?: string;
+  };
+}) {
   return (
     <div className={clsx('group cursor-pointer')}>
       {/* Desktop/Tablet Layout */}
@@ -46,7 +56,7 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
             alt={post.title}
             fill
             className={clsx(
-              'object-cover',
+              'object-cover object-center',
               'transition-transform duration-300 group-hover:scale-105'
             )}
             sizes="(max-width: 768px) 100vw, 33vw"
@@ -59,20 +69,22 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
           <p className={clsx('mb-2 text-sm text-gray-600')}>{post.date}</p>
           <h3
             className={clsx(
-              'mb-3 text-lg font-semibold text-gray-900',
+              'text-lg font-semibold text-gray-900',
               'line-clamp-2 leading-tight'
             )}
           >
             {post.title}
           </h3>
-          <p
-            className={clsx(
-              'text-sm leading-relaxed text-gray-600',
-              'line-clamp-3'
-            )}
-          >
-            {post.excerpt}
-          </p>
+          {post.excerpt && (
+            <p
+              className={clsx(
+                'mt-3 text-sm leading-relaxed text-gray-600',
+                'line-clamp-3'
+              )}
+            >
+              {post.excerpt}
+            </p>
+          )}
         </div>
       </div>
 
@@ -89,7 +101,7 @@ function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
             alt={post.title}
             fill
             className={clsx(
-              'object-cover',
+              'object-cover object-center',
               'transition-transform duration-300 group-hover:scale-105'
             )}
             sizes="177px"
