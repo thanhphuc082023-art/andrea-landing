@@ -94,7 +94,7 @@ export default function AuthLayout({
           <title>{title}</title>
           <meta name="description" content={description} />
         </Head>
-        <div className="max-sd:h-[calc(100vh-60px)] flex h-[calc(100vh-65px)] items-center justify-center bg-gray-100 py-10 max-md:px-2">
+        <div className="flex h-screen items-center justify-center bg-gray-100 py-10 max-md:px-2">
           <div className="container mx-auto">
             <div className="mb-8 text-center">
               <h1 className="mb-2 text-3xl font-bold text-gray-900">{title}</h1>
