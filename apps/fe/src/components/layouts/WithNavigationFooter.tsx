@@ -26,7 +26,7 @@ function WithNavigationFooter({
       <Navigation menuItems={menuItems} serverGlobal={serverGlobal} />
       <main>{children}</main>
       <Toaster />
-      <Footer footerData={footerData} />
+      {footerData && <Footer footerData={footerData} />}
     </>
   );
 }

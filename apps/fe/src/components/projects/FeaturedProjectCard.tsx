@@ -5,7 +5,6 @@ import type { ProjectCardProps } from '@/types/project';
 import { getStrapiMediaUrl } from '@/utils/helper';
 
 function FeaturedProjectCard({ project, className }: ProjectCardProps) {
-  console.log('project?.thumbnail', project?.thumbnail);
   if (project?.isLarge) {
     return (
       <div className={clsx('lg:col-span-8', className)}>

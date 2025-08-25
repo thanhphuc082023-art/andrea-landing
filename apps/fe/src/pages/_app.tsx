@@ -19,6 +19,7 @@ import '@/styles/datepicker.css';
 
 type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, pageProps?: any) => ReactNode;
+  getLayoutNoFooter?: (page: ReactElement, pageProps?: any) => ReactNode;
 };
 
 type AppPropsWithLayout = AppProps & {
@@ -45,6 +46,17 @@ function getDefaultLayout(page: ReactElement, pageProps?: any): ReactNode {
   );
 }
 
+function getLayoutNoFooter(page: ReactElement, pageProps?: any): ReactNode {
+  return (
+    <WithNavigationFooter
+      serverGlobal={pageProps?.serverGlobal}
+      menuItems={pageProps?.menuItems}
+    >
+      {page}
+    </WithNavigationFooter>
+  );
+}
+
 function App({ Component, pageProps, router }: AppPropsWithLayout) {
   let getLayout;
 
@@ -52,6 +64,8 @@ function App({ Component, pageProps, router }: AppPropsWithLayout) {
     getLayout = (page: ReactElement) => <main>{page}</main>;
   } else if (Component.getLayout) {
     getLayout = (page: ReactElement) => Component.getLayout!(page, pageProps);
+  } else if (Component.getLayoutNoFooter) {
+    getLayout = (page: ReactElement) => getLayoutNoFooter(page, pageProps);
   } else {
     getLayout = (page: ReactElement) => getDefaultLayout(page, pageProps);
   }

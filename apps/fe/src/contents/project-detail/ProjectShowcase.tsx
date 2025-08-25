@@ -385,13 +385,6 @@ const ShowcaseSection = memo(
         >
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
-            console.log(
-              'transformedItem',
-              transformedItem?.title === 'hdcs-test.png'
-                ? transformedItem
-                : null
-            );
-
             // For half-half layout, divide width by 2 for proper aspect ratio
             const adjustedWidth = items[0].width / 2;
             return (
@@ -437,6 +430,44 @@ const ShowcaseSection = memo(
                 key={itemIndex}
                 className={`group ${itemIndex === 1 ? 'col-span-2' : ''}`}
               >
+                <div
+                  className="relative w-full overflow-hidden bg-white"
+                  style={{
+                    aspectRatio:
+                      transformedItem.type !== 'text'
+                        ? `${adjustedWidth} / ${transformedItem.height}`
+                        : undefined,
+                  }}
+                >
+                  <ShowcaseItem
+                    item={transformedItem}
+                    priority={index === 0 && itemIndex === 0}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // Handle one-third-equal layout (33% - 33% - 33%)
+    if (section.layout === 'one-third-equal') {
+      const items = Array.isArray(section.items)
+        ? section.items
+        : [section.items];
+
+      return (
+        <div key={section.id} className="grid grid-cols-3">
+          {items.map((item: any, itemIndex: number) => {
+            const transformedItem = transformItem(item, itemIndex);
+            // Use one third of the first item's width for aspect ratio calculations
+            const adjustedWidth = items[0]?.width
+              ? items[0].width / 3
+              : 1300 / 3;
+
+            return (
+              <div key={itemIndex} className="group">
                 <div
                   className="relative w-full overflow-hidden bg-white"
                   style={{
@@ -538,7 +569,6 @@ ShowcaseSection.displayName = 'ShowcaseSection';
 
 function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
   const sections = project?.showcaseSections || legacyShowcaseData;
-  console.log('sections', sections);
   return (
     <section className="content-wrapper max-md:px-0">
       <div>

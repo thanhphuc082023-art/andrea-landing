@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { EmailIcon, PhoneIcon, WebsiteIcon } from '@/assets/icons';
 import StrapiHead from '@/components/meta/StrapiHead';
 import { getStrapiMediaUrl } from '@/utils/helper';
+import { ReactElement } from 'react';
 
 export default function ContactSection({
   brandSectionData,
@@ -253,6 +254,10 @@ export default function ContactSection({
     </div>
   );
 }
+
+ContactSection.getLayoutNoFooter = (page: ReactElement) => {
+  return page;
+};
 
 export const getStaticProps = async () =>
   getStaticPropsWithGlobalAndData(async () => {

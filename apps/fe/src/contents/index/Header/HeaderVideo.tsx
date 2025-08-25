@@ -30,14 +30,14 @@ function HeaderVideo({
     }
 
     // Strapi v4 shape: { data: { attributes: { url: '...' } } }
-      if (videoData.data?.attributes?.url) {
-        const u = videoData.data.attributes.url;
-        return typeof u === 'string'
-          ? u.startsWith('/')
-            ? (getStrapiMediaUrl(u) ?? null)
-            : u
-          : null;
-      }
+    if (videoData.data?.attributes?.url) {
+      const u = videoData.data.attributes.url;
+      return typeof u === 'string'
+        ? u.startsWith('/')
+          ? (getStrapiMediaUrl(u) ?? null)
+          : u
+        : null;
+    }
 
     return null;
   };
@@ -132,7 +132,7 @@ function HeaderVideo({
       <div
         ref={skeletonRef}
         className={clsx(
-          'skeleton-video pointer-events-none absolute inset-0 z-10'
+          'skeleton-video pointer-events-none absolute inset-0 z-10 h-[calc(100vh-65px)]'
         )}
         aria-hidden="true"
         style={{

@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 import React from 'react';
+import Link from 'next/link';
 
 import ServiceIcon from '@/assets/icons/ServiceIcon';
 import { getStrapiMediaUrl } from '@/utils/helper';
 import { useRouter } from 'next/router';
-import { FollowerPointerCard } from '@/components/ui/FollowingCard';
 
 interface Service {
   id?: number;
@@ -71,7 +71,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
       <div
         className={clsx(
           'relative flex h-full flex-col',
-          'pointer-events-none px-[25px] py-[35px] max-md:p-4'
+          'px-[25px] py-[35px] max-md:p-4'
         )}
       >
         {/* Title with Number */}
@@ -189,7 +189,15 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                     'text-base max-lg:text-sm max-md:text-sm'
                   )}
                 >
-                  {getText(item)}
+                  {typeof item === 'string' ? (
+                    item
+                  ) : item?.subtitle ? (
+                    <Link href={String(item.subtitle)} className='cursor-none'>
+                      {item.title || String(item.subtitle)}
+                    </Link>
+                  ) : (
+                    getText(item)
+                  )}
                 </li>
               ))}
             </ul>

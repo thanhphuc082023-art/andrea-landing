@@ -5,6 +5,7 @@ import SubmitButton from '@/components/SubmitButton';
 import StrapiHead from '@/components/meta/StrapiHead';
 import { useRouter } from 'next/router';
 import ContactForm from '@/contents/index/ContactForm';
+import { getStaticPropsWithGlobalAndData } from '@/lib/page-helpers';
 
 export default function InsightsPage() {
   const router = useRouter();
@@ -306,3 +307,8 @@ export const insightsPageItems: InsightsItem[] = [
     slug: 'toi-uu-unboxing-thuong-hieu-nho',
   },
 ];
+
+export const getStaticProps = async () =>
+  getStaticPropsWithGlobalAndData(async () => {
+    return { props: {} };
+  });
