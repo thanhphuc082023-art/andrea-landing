@@ -175,43 +175,52 @@ async function processShowcaseSections(
   showcaseOriginalNames: string[],
   token: string
 ): Promise<any[]> {
-  const uploadedFiles: Array<{ id: number; url: string }> = [];
+  // Build a mapping of temporary uploadId -> uploaded Strapi file result (id/url)
+  const uploadedByUploadId: Map<
+    string,
+    { id: number; url: string; name?: string }
+  > = new Map();
 
-  for (let i = 0; i < showcaseUploadIds.length; i++) {
+  for (let i = 0; i < (showcaseUploadIds || []).length; i++) {
     const uploadId = showcaseUploadIds[i];
-    const originalName = showcaseOriginalNames[i] || `showcase-${i}`;
+    const originalName = showcaseOriginalNames?.[i] || `showcase-${i}`;
 
     const fileInfo = findUploadedFile(uploadId);
-    if (fileInfo) {
-      const uploadResult = await uploadToStrapi(
-        fileInfo.filePath,
-        originalName,
-        token,
-        'showcase'
-      );
-      if (uploadResult) {
-        uploadedFiles.push({ id: uploadResult.id, url: uploadResult.url });
-      }
+    if (!fileInfo) {
+      console.warn(`Uploaded temp file not found for uploadId=${uploadId}`);
+      continue;
+    }
+
+    const uploadResult = await uploadToStrapi(
+      fileInfo.filePath,
+      originalName,
+      token,
+      'showcase'
+    );
+
+    if (uploadResult) {
+      uploadedByUploadId.set(uploadId, {
+        id: uploadResult.id,
+        url: uploadResult.url,
+        name: uploadResult.name,
+      });
     }
   }
 
-  // Map uploaded files to showcase items
-  let fileIndex = 0;
+  // Now map uploaded files back into sections/items using uploadId references
   const processedSections = showcaseSections.map((section, sectionIndex) => {
-    if (!section.items || section.items.length === 0) {
-      return section;
-    }
+    const items = Array.isArray(section.items)
+      ? section.items
+      : [section.items];
 
-    const processedItems = section.items.map((item: any, itemIndex: number) => {
-      // Check if this item needs an uploaded file
-      if (fileIndex < uploadedFiles.length) {
-        const uploadedFile = uploadedFiles[fileIndex];
-        fileIndex++;
-
+    const processedItems = (items || []).map((item: any, itemIndex: number) => {
+      // If item has an uploadId (temporary), map to uploaded file
+      if (item && item.uploadId && uploadedByUploadId.has(item.uploadId)) {
+        const uploaded = uploadedByUploadId.get(item.uploadId)!;
         return {
           ...item,
           id: item.id || `item-${sectionIndex}-${itemIndex}`,
-          src: uploadedFile.url,
+          src: uploaded.url,
           type: item.type || 'image',
           title: item.title || `Item ${itemIndex + 1}`,
           alt: item.alt || item.title || `Item ${itemIndex + 1}`,
@@ -221,19 +230,40 @@ async function processShowcaseSections(
         };
       }
 
-      // Return item without file upload
+      // No uploadId mapping - return item preserving any existing src/url
       return {
         ...item,
         id: item.id || `item-${sectionIndex}-${itemIndex}`,
         type: item.type || 'image',
         title: item.title || `Item ${itemIndex + 1}`,
         alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+        src: item.src || item.url || '',
         width: item.width || 1300,
         height: item.height || 800,
         order: item.order !== undefined ? item.order : itemIndex,
       };
     });
 
+    // Handle section-level background and image uploads (if present)
+    let background = section.background || null;
+    if (
+      section.backgroundUploadId &&
+      uploadedByUploadId.has(section.backgroundUploadId)
+    ) {
+      const up = uploadedByUploadId.get(section.backgroundUploadId)!;
+      background = { id: up.id, url: up.url, name: up.name };
+    }
+
+    let image = section.image || null;
+    if (
+      section.imageUploadId &&
+      uploadedByUploadId.has(section.imageUploadId)
+    ) {
+      const up = uploadedByUploadId.get(section.imageUploadId)!;
+      image = { id: up.id, url: up.url, name: up.name };
+    }
+
+    // Ensure the processed section shape is consistent
     return {
       ...section,
       id: section.id || `section-${sectionIndex}`,
@@ -241,13 +271,17 @@ async function processShowcaseSections(
       type: section.type || 'image',
       layout: section.layout || 'single',
       items: processedItems,
+      // include background/image objects when available for later rendering
+      ...(background ? { background } : {}),
+      ...(image ? { image } : {}),
       order: section.order !== undefined ? section.order : sectionIndex,
     };
   });
 
   console.log(
-    `Processed showcase sections: ${processedSections.length} sections, ${uploadedFiles.length} files uploaded`
+    `Processed showcase sections: ${processedSections.length} sections, ${uploadedByUploadId.size} files uploaded (by uploadId)`
   );
+
   return processedSections;
 }
 

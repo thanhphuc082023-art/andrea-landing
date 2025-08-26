@@ -95,7 +95,7 @@ export default function ProjectFormPage({
   const heroVideo = watch('heroVideo');
   const heroBanner = watch('heroBanner');
   const thumbnail = watch('thumbnail');
-
+  console.log('showcaseSections', showcaseSections);
   const handleCancel = () => {
     cleanup();
     formCleanup();

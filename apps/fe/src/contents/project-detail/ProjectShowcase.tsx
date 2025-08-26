@@ -241,7 +241,7 @@ const ShowcaseItem = memo(
             : '(max-width: 1024px) 100vw, 50vw'
         }
         priority={priority}
-        style={{ objectFit: 'cover' }}
+        style={{ objectFit: 'contain' }}
       />
     );
   }
@@ -332,6 +332,203 @@ const ShowcaseSection = memo(
       };
     };
 
+    // New: render image-text section type
+    if (section.type === 'image-text') {
+      const resolveSrcTop = (raw?: string) => {
+        if (!raw) return '';
+        if (
+          raw.startsWith('http') ||
+          raw.startsWith('data:') ||
+          raw.startsWith('blob:')
+        )
+          return raw;
+        if (raw.startsWith('/')) {
+          const base = process.env.NEXT_PUBLIC_STRAPI_URL || '';
+          return base ? `${base.replace(/\/+$/, '')}${raw}` : raw;
+        }
+        return raw;
+      };
+
+      const bgSrc = resolveSrcTop(
+        section.backgroundSrc ||
+          section.background?.url ||
+          section.background ||
+          ''
+      );
+      // content image may be stored as section.imageSrc or as the first image item
+      let contentSrc = '';
+      let contentAlt = '';
+      // Prefer explicit section.image (server object with url), then imageSrc (client blob), then first image item
+      if (
+        section.image &&
+        (section.image.url || typeof section.image === 'string')
+      ) {
+        const raw = section.image.url || section.image;
+        contentSrc = resolveSrcTop(raw);
+        contentAlt = section.imageAlt || section.image.name || '';
+      } else if (section.imageSrc) {
+        contentSrc = resolveSrcTop(section.imageSrc);
+        contentAlt = section.imageAlt || '';
+      } else if (Array.isArray(section.items) && section.items.length > 0) {
+        const imgItem =
+          section.items.find(
+            (it: any) => (it.type || '').toLowerCase() === 'image'
+          ) || section.items[0];
+        if (imgItem) {
+          contentSrc = resolveSrcTop(imgItem.src || imgItem.url || '');
+          contentAlt = imgItem.alt || imgItem.title || '';
+        }
+      }
+
+      const title = section.title || '';
+      const subtitle = section.subtitle || '';
+      const description = section.description || '';
+      const position =
+        section.contentImagePosition === 'right' ? 'right' : 'left';
+
+      // Use section.width and section.height (if present) to control aspect ratio of the image area
+      const secWidth = section.width ? Number(section.width) : null;
+      const secHeight = section.height ? Number(section.height) : null;
+      // Instead of using aspect-ratio, apply an explicit height (px) to the whole section when provided
+      const secHeightStyle = secHeight
+        ? { height: `${secHeight}px`, maxWidth: `${secWidth}px` }
+        : undefined;
+
+      // Content image specific dimensions (from admin editor)
+      const imgWidth = section.imageWidth ? Number(section.imageWidth) : null;
+      const imgHeight = section.imageHeight
+        ? Number(section.imageHeight)
+        : null;
+      const imageStyle =
+        imgWidth && imgHeight
+          ? {
+              aspectRatio: `${imgWidth} / ${imgHeight}`,
+              width: `${imgWidth}px`,
+              height: `${imgHeight}`,
+            }
+          : imgHeight
+            ? { height: `${imgHeight}px` }
+            : undefined;
+
+      return (
+        <div key={section.id} className="w-full overflow-hidden">
+          <div
+            className="mx-auto w-full max-lg:!h-auto max-lg:!w-full lg:bg-[image:var(--bg-url)]"
+            style={{
+              ['--bg-url' as any]: `url('${bgSrc || ''}')`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              ...secHeightStyle,
+            }}
+          >
+            <div className="flex h-full flex-col items-stretch p-8 max-lg:p-0 lg:flex-row">
+              {position === 'right' ? (
+                <div className="flex h-full w-full items-center justify-center gap-9 max-lg:flex-col">
+                  <div className="flex h-full max-w-[548px] items-center justify-end max-lg:w-full max-lg:max-w-full max-lg:justify-center max-md:px-[25px]">
+                    <div className="max-w-full">
+                      {title ? (
+                        <h3 className="font-playfair text-center text-2xl font-semibold text-gray-900">
+                          {title}
+                        </h3>
+                      ) : null}
+                      {subtitle ? (
+                        <h4 className="mt-2 text-center text-sm text-gray-700">
+                          {subtitle}
+                        </h4>
+                      ) : null}
+                      {description ? (
+                        <p className="mt-9 text-sm text-gray-600">
+                          {description}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Content image: small screens use fixed h-64, md+ use configured image size when provided */}
+                  <div
+                    className={`relative py-[65px] max-lg:flex max-lg:w-full max-lg:items-center max-lg:justify-center max-lg:bg-[image:var(--bg-url)]`}
+                    style={{
+                      ['--bg-url' as any]: `url('${bgSrc || ''}')`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'left',
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  >
+                    <div
+                      className={`relative max-md:!w-1/2`}
+                      style={{
+                        ...imageStyle,
+                      }}
+                    >
+                      {contentSrc ? (
+                        <Image
+                          src={contentSrc}
+                          alt={contentAlt || title}
+                          fill
+                          style={{ objectFit: 'contain' }}
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center gap-9 max-lg:flex-col">
+                  <div
+                    className={`relative py-[65px] max-lg:flex max-lg:w-full max-lg:items-center max-lg:justify-center max-lg:bg-[image:var(--bg-url)]`}
+                    style={{
+                      ['--bg-url' as any]: `url('${bgSrc || ''}')`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'left',
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  >
+                    <div
+                      className={`relative max-md:!w-1/2`}
+                      style={{
+                        ...imageStyle,
+                      }}
+                    >
+                      {contentSrc ? (
+                        <Image
+                          src={contentSrc}
+                          alt={contentAlt || title}
+                          fill
+                          style={{ objectFit: 'contain' }}
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="flex h-full max-w-[548px] items-center justify-start max-lg:justify-center max-md:px-[25px]">
+                    <div className="max-w-full">
+                      <div className="flex flex-col items-center justify-center">
+                        {title ? (
+                          <h3 className="font-playfair text-center text-[50px] font-semibold text-[#003974]">
+                            {title}
+                          </h3>
+                        ) : null}
+                        {subtitle ? (
+                          <h4 className="mt-2 text-center text-[24px] text-[#003974] max-lg:text-[20px]">
+                            {subtitle}
+                          </h4>
+                        ) : null}
+                      </div>
+                      {description ? (
+                        <p className="mt-9 text-[16px] leading-[24px] text-[#7D7D7D] max-lg:mt-6">
+                          {description}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (section.layout === 'single') {
       // Handle both admin structure (items array) and legacy structure
       const items = Array.isArray(section.items)
@@ -417,7 +614,7 @@ const ShowcaseSection = memo(
         : [section.items];
 
       return (
-        <div key={section.id} className="grid grid-cols-3">
+        <div key={section.id} className="grid grid-cols-3 max-md:grid-cols-1">
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
             // For one-third layout: first item gets 1/3 width, second item gets 2/3 width
@@ -458,7 +655,7 @@ const ShowcaseSection = memo(
         : [section.items];
 
       return (
-        <div key={section.id} className="grid grid-cols-3">
+        <div key={section.id} className="grid grid-cols-3 max-md:grid-cols-1">
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
             // Use one third of the first item's width for aspect ratio calculations

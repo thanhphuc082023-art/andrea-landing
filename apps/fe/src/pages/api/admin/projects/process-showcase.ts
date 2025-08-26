@@ -173,77 +173,105 @@ export default async function handler(
       showcaseOriginalNames = [],
     } = req.body || {};
 
-    // Upload files referenced by upload IDs and map them back
-    const uploadedFiles: Array<{ id: number; url: string; name: string }> = [];
+    // Upload files referenced by upload IDs and map them back by uploadId
+    const uploadedByUploadId: Map<
+      string,
+      { id: number; url: string; name?: string }
+    > = new Map();
     const strapiBaseUrl =
       process.env.NEXT_PUBLIC_STRAPI_URL ||
       'https://tremendous-delight-4e1d7b6669.strapiapp.com';
 
-    for (let i = 0; i < showcaseUploadIds.length; i++) {
+    for (let i = 0; i < (showcaseUploadIds || []).length; i++) {
       const uploadId = showcaseUploadIds[i];
-      const originalName =
-        `${showcaseOriginalNames[i]}-${uploadId}` || `showcase-${i}`;
+      const originalName = showcaseOriginalNames[i] || `showcase-${i}`;
 
       const fileInfo = findUploadedFile(uploadId);
+      if (!fileInfo) {
+        console.warn(`Uploaded temp file not found for uploadId=${uploadId}`);
+        continue;
+      }
 
-      if (fileInfo) {
-        const uploadResult = await uploadToStrapi(
-          fileInfo.filePath,
-          originalName,
-          token,
-          'showcase'
-        );
+      const uploadResult = await uploadToStrapi(
+        fileInfo.filePath,
+        originalName,
+        token,
+        'showcase'
+      );
 
-        if (uploadResult) {
-          // Ensure URL is absolute so client preview uses a full URL
-          const url =
-            uploadResult.url && uploadResult.url.startsWith('http')
-              ? uploadResult.url
-              : `${strapiBaseUrl}${uploadResult.url}`;
-          uploadedFiles.push({
-            id: uploadResult.id,
-            url,
-            name: uploadResult?.name,
-          });
-        }
+      if (uploadResult) {
+        const url =
+          uploadResult.url && uploadResult.url.startsWith('http')
+            ? uploadResult.url
+            : `${strapiBaseUrl}${uploadResult.url}`;
+        uploadedByUploadId.set(uploadId, {
+          id: uploadResult.id,
+          url,
+          name: uploadResult.name,
+        });
       }
     }
 
-    // Map uploaded files back into showcaseSections
+    // Map uploaded files back into showcaseSections using uploadId references
     const processedSections = (showcaseSections || []).map(
       (section: any, sectionIndex: number) => {
-        if (!section.items || section.items.length === 0) return section;
+        const items = Array.isArray(section.items)
+          ? section.items
+          : [section.items];
 
-        const processedItems = section.items.map(
+        const processedItems = (items || []).map(
           (item: any, itemIndex: number) => {
-            const uploadedFile = uploadedFiles.find(
-              (file) => file.name === `${item?.name}-${item?.uploadId}`
-            );
+            if (
+              item &&
+              item.uploadId &&
+              uploadedByUploadId.has(item.uploadId)
+            ) {
+              const up = uploadedByUploadId.get(item.uploadId)!;
+              return {
+                ...item,
+                id: item.id || `item-${sectionIndex}-${itemIndex}`,
+                src: up.url,
+                type: item.type || 'image',
+                title: item.title || `Item ${itemIndex + 1}`,
+                alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+                width: item.width || 1300,
+                height: item.height || 800,
+                order: item.order !== undefined ? item.order : itemIndex,
+              };
+            }
 
             return {
               ...item,
               id: item.id || `item-${sectionIndex}-${itemIndex}`,
-              src: uploadedFile?.url || item?.url,
               type: item.type || 'image',
               title: item.title || `Item ${itemIndex + 1}`,
               alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+              src: item.src || item.url || '',
               width: item.width || 1300,
               height: item.height || 800,
               order: item.order !== undefined ? item.order : itemIndex,
             };
-
-            // return {
-            //   ...item,
-            //   id: item.id || `item-${sectionIndex}-${itemIndex}`,
-            //   type: item.type || 'image',
-            //   title: item.title || `Item ${itemIndex + 1}`,
-            //   alt: item.alt || item.title || `Item ${itemIndex + 1}`,
-            //   width: item.width || 1300,
-            //   height: item.height || 800,
-            //   order: item.order !== undefined ? item.order : itemIndex,
-            // };
           }
         );
+
+        // Section-level background/image
+        let background = section.background || null;
+        if (
+          section.backgroundUploadId &&
+          uploadedByUploadId.has(section.backgroundUploadId)
+        ) {
+          const up = uploadedByUploadId.get(section.backgroundUploadId)!;
+          background = { id: up.id, url: up.url, name: up.name };
+        }
+
+        let image = section.image || null;
+        if (
+          section.imageUploadId &&
+          uploadedByUploadId.has(section.imageUploadId)
+        ) {
+          const up = uploadedByUploadId.get(section.imageUploadId)!;
+          image = { id: up.id, url: up.url, name: up.name };
+        }
 
         return {
           ...section,
@@ -252,6 +280,8 @@ export default async function handler(
           type: section.type || 'image',
           layout: section.layout || 'single',
           items: processedItems,
+          ...(background ? { background } : {}),
+          ...(image ? { image } : {}),
           order: section.order !== undefined ? section.order : sectionIndex,
         };
       }

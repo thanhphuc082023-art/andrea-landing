@@ -102,7 +102,7 @@ export default function EditProjectPage() {
   const [isFetchingProject, setIsFetchingProject] = useState<boolean>(true);
 
   const { slug } = router.query;
-
+  console.log('previewData', previewData);
   useEffect(() => {
     if (!slug) return;
 
@@ -142,7 +142,7 @@ export default function EditProjectPage() {
   // Transform project data to form data on mount
   const [initialFormData, setInitialFormData] =
     useState<Partial<ProjectFormData> | null>(null);
-
+  console.log('initialFormData', initialFormData);
   useEffect(() => {
     if (project) {
       const formData = transformStrapiProjectToFormData(project);
@@ -441,9 +441,12 @@ export default function EditProjectPage() {
         showcase: data.showcase || [],
       };
 
-      // Check if showcase has actual files
-      const showcaseHasFiles = showcaseMediaFiles.showcase?.some((section) =>
-        section.items?.some((item) => item.file)
+      // Check if showcase has actual files (including section-level files)
+      const showcaseHasFiles = showcaseMediaFiles.showcase?.some(
+        (section) =>
+          section.items?.some((item) => item.file) ||
+          section.backgroundFile ||
+          section.imageFile
       );
 
       // Process showcase data for API
@@ -466,19 +469,37 @@ export default function EditProjectPage() {
         ) {
           showcaseUploadIds = uploadResults.showcaseUploadIds;
 
-          // Extract original names from showcase sections
-          showcaseOriginalNames =
-            data.showcase?.flatMap(
-              (section) =>
-                section.items
-                  ?.filter((item) => item.file)
-                  .map(
-                    (item) =>
-                      item.file?.name ||
+          // Build showcaseOriginalNames aligned with uploadProjectMedia order:
+          // for each section: items (in order), then backgroundFile (if any), then imageFile (if any)
+          if (data.showcase && Array.isArray(data.showcase)) {
+            data.showcase.forEach((section: any) => {
+              // items
+              (section.items || []).forEach((item: any) => {
+                if (item.file) {
+                  showcaseOriginalNames.push(
+                    item.file?.name ||
                       item.title ||
                       `showcase-item-${Date.now()}`
-                  ) || []
-            ) || [];
+                  );
+                }
+              });
+
+              // section-level backgroundFile
+              if (section.backgroundFile) {
+                showcaseOriginalNames.push(
+                  section.backgroundFile?.name ||
+                    `${section.title || 'background'}`
+                );
+              }
+
+              // section-level imageFile
+              if (section.imageFile) {
+                showcaseOriginalNames.push(
+                  section.imageFile?.name || `${section.title || 'image'}`
+                );
+              }
+            });
+          }
         }
       }
 

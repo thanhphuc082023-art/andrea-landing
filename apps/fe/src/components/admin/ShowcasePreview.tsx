@@ -3,10 +3,9 @@ import {
   VideoCameraIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
-import { type ShowcaseSection } from '@/types/project';
 
 interface ShowcasePreviewProps {
-  sections: ShowcaseSection[];
+  sections: any[];
 }
 
 export default function ShowcasePreview({ sections }: ShowcasePreviewProps) {
@@ -28,6 +27,8 @@ export default function ShowcasePreview({ sections }: ShowcasePreviewProps) {
         return <DocumentTextIcon className="h-5 w-5 text-green-500" />;
       case 'text':
         return <DocumentTextIcon className="h-5 w-5 text-purple-500" />;
+      case 'image-text':
+        return <PhotoIcon className="h-5 w-5 text-indigo-600" />;
       default:
         return <DocumentTextIcon className="h-5 w-5 text-gray-500" />;
     }
@@ -43,6 +44,8 @@ export default function ShowcasePreview({ sections }: ShowcasePreviewProps) {
         return 'border-green-200 bg-green-50';
       case 'text':
         return 'border-purple-200 bg-purple-50';
+      case 'image-text':
+        return 'border-indigo-200 bg-indigo-50';
       default:
         return 'border-gray-200 bg-gray-50';
     }
@@ -50,7 +53,7 @@ export default function ShowcasePreview({ sections }: ShowcasePreviewProps) {
 
   return (
     <div className="space-y-4">
-      {sections.map((section, index) => (
+      {sections.map((section: any, index: number) => (
         <div
           key={section.id}
           className={`rounded-lg border-2 p-4 shadow-sm ${getTypeColor(section.type)}`}
@@ -67,7 +70,77 @@ export default function ShowcasePreview({ sections }: ShowcasePreviewProps) {
             </div>
           </div>
 
-          {section.items.length > 0 && section.items[0].src ? (
+          {section.type === 'image-text' ? (
+            // Image + Text layout preview
+            <div className="rounded bg-white p-3 shadow-sm">
+              <div
+                className="w-full overflow-hidden rounded-md border shadow-sm"
+                style={{
+                  backgroundImage: section.backgroundSrc
+                    ? `url(${section.backgroundSrc})`
+                    : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              >
+                <div className="bg-white/80">
+                  <div className="flex h-40">
+                    {section.contentImagePosition === 'right' ? (
+                      <>
+                        <div className="flex flex-1 items-center p-4">
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-900">
+                              {section.title || 'Tiêu đề'}
+                            </h5>
+                            {section.subtitle && (
+                              <p className="text-xs text-gray-600">
+                                {section.subtitle}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="w-1/2">
+                          <img
+                            src={section.imageSrc || section.items?.[0]?.src}
+                            alt={
+                              section.imageAlt || section.items?.[0]?.alt || ''
+                            }
+                            className="h-40 w-full object-cover"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-1/2">
+                          <img
+                            src={section.imageSrc || section.items?.[0]?.src}
+                            alt={
+                              section.imageAlt || section.items?.[0]?.alt || ''
+                            }
+                            className="h-40 w-full object-cover"
+                          />
+                        </div>
+
+                        <div className="flex flex-1 items-center p-4">
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-900">
+                              {section.title || 'Tiêu đề'}
+                            </h5>
+                            {section.subtitle && (
+                              <p className="text-xs text-gray-600">
+                                {section.subtitle}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : section.items.length > 0 && section.items[0].src ? (
             <div className="rounded bg-white p-3 shadow-sm">
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-2 rounded-full bg-green-500"></div>

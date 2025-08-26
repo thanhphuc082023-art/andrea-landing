@@ -13,7 +13,7 @@ const styles: Record<string, CSSProperties> = {
     backgroundColor: '#ffffff',
     backgroundRepeat: 'no-repeat',
     backgroundSize: '1200px 600px',
-    backgroundPosition: 'top left',
+    contentImagePosition: 'top left',
     color: '#0f172a',
     display: 'flex',
     flexDirection: 'column',

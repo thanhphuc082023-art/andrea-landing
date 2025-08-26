@@ -135,6 +135,7 @@ export const uploadProjectMedia = async (
   featuredImageUploadId?: string;
   galleryUploadIds: string[];
   showcaseUploadIds: string[];
+  showcaseOriginalNames: string[];
 }> => {
   const results: {
     heroVideoUploadId?: string;
@@ -143,9 +144,11 @@ export const uploadProjectMedia = async (
     featuredImageUploadId?: string;
     galleryUploadIds: string[];
     showcaseUploadIds: string[];
+    showcaseOriginalNames: string[];
   } = {
     galleryUploadIds: [],
     showcaseUploadIds: [],
+    showcaseOriginalNames: [],
   };
 
   let totalFiles = 0;
@@ -179,6 +182,29 @@ export const uploadProjectMedia = async (
           }
         });
       }
+
+      // Also count section-level files (e.g., image-text background or content images)
+      if (section.backgroundFile) {
+        if (
+          section.backgroundFile instanceof File ||
+          isUploadableString(section.backgroundFile) ||
+          (typeof section.backgroundFile === 'string' &&
+            section.backgroundFile.startsWith('upload_'))
+        ) {
+          totalFiles++;
+        }
+      }
+
+      if (section.imageFile) {
+        if (
+          section.imageFile instanceof File ||
+          isUploadableString(section.imageFile) ||
+          (typeof section.imageFile === 'string' &&
+            section.imageFile.startsWith('upload_'))
+        ) {
+          totalFiles++;
+        }
+      }
     });
   }
 
@@ -194,10 +220,10 @@ export const uploadProjectMedia = async (
   const uploadMaybeFile = async (
     maybeFile: File | string,
     displayName?: string
-  ) => {
+  ): Promise<{ uploadId?: string; originalFileName?: string } | undefined> => {
     // If already an uploadId string, return it
     if (typeof maybeFile === 'string' && !isUploadableString(maybeFile)) {
-      return maybeFile; // treat as existing temp uploadId
+      return { uploadId: maybeFile, originalFileName: maybeFile };
     }
 
     let fileObj: File;
@@ -211,62 +237,63 @@ export const uploadProjectMedia = async (
       return undefined;
     }
 
+    const originalName = fileObj.name || displayName || 'file';
     const tempUploadId = generateUploadId();
     await uploadFileInChunks(fileObj, tempUploadId, (progress) => {
       safeOnProgress((uploadedFiles * 90 + progress) / Math.max(1, totalFiles));
     });
     uploadedFiles++;
-    return tempUploadId;
+    return { uploadId: tempUploadId, originalFileName: originalName };
   };
 
   // Upload hero video
   if (mediaFiles.heroVideo) {
     const maybe = mediaFiles.heroVideo;
-    const maybeUploadId = await uploadMaybeFile(
+    const maybeRes = await uploadMaybeFile(
       maybe,
       (maybe as any)?.name || 'heroVideo'
     );
-    if (maybeUploadId) results.heroVideoUploadId = maybeUploadId;
+    if (maybeRes?.uploadId) results.heroVideoUploadId = maybeRes.uploadId;
   }
 
   // Upload hero banner
   if (mediaFiles.heroBanner) {
     const maybe = mediaFiles.heroBanner;
-    const maybeUploadId = await uploadMaybeFile(
+    const maybeRes = await uploadMaybeFile(
       maybe,
       (maybe as any)?.name || 'heroBanner'
     );
-    if (maybeUploadId) results.heroBannerUploadId = maybeUploadId;
+    if (maybeRes?.uploadId) results.heroBannerUploadId = maybeRes.uploadId;
   }
 
   // Upload thumbnail
   if (mediaFiles.thumbnail) {
     const maybe = mediaFiles.thumbnail;
-    const maybeUploadId = await uploadMaybeFile(
+    const maybeRes = await uploadMaybeFile(
       maybe,
       (maybe as any)?.name || 'thumbnail'
     );
-    if (maybeUploadId) results.thumbnailUploadId = maybeUploadId;
+    if (maybeRes?.uploadId) results.thumbnailUploadId = maybeRes.uploadId;
   }
 
   // Upload featured image
   if (mediaFiles.featuredImage) {
     const maybe = mediaFiles.featuredImage;
-    const maybeUploadId = await uploadMaybeFile(
+    const maybeRes = await uploadMaybeFile(
       maybe,
       (maybe as any)?.name || 'featuredImage'
     );
-    if (maybeUploadId) results.featuredImageUploadId = maybeUploadId;
+    if (maybeRes?.uploadId) results.featuredImageUploadId = maybeRes.uploadId;
   }
 
   // Upload gallery images
   if (mediaFiles.gallery && mediaFiles.gallery.length > 0) {
     for (const maybe of mediaFiles.gallery) {
-      const maybeUploadId = await uploadMaybeFile(
+      const maybeRes = await uploadMaybeFile(
         maybe,
         (maybe as any)?.name || 'gallery'
       );
-      if (maybeUploadId) results.galleryUploadIds.push(maybeUploadId);
+      if (maybeRes?.uploadId) results.galleryUploadIds.push(maybeRes.uploadId);
     }
   }
 
@@ -282,7 +309,6 @@ export const uploadProjectMedia = async (
               typeof item.uploadId === 'string' &&
               item.uploadId.startsWith('upload_')
             ) {
-              // strip any transient blob/data src so payload doesn't include it
               if (
                 typeof item.src === 'string' &&
                 (item.src.startsWith('blob:') || item.src.startsWith('data:'))
@@ -290,8 +316,10 @@ export const uploadProjectMedia = async (
                 delete item.src;
               }
 
-              // ensure we return this uploadId so calling code can map it back
               results.showcaseUploadIds.push(item.uploadId);
+              results.showcaseOriginalNames.push(
+                item.title || item.name || item.alt || 'showcase'
+              );
             }
 
             continue;
@@ -307,16 +335,17 @@ export const uploadProjectMedia = async (
             continue;
           }
 
-          const uploadId = await uploadMaybeFile(
+          const maybeRes = await uploadMaybeFile(
             item.file,
             item.title || item.name || 'showcase'
           );
-          if (uploadId) {
-            // attach uploadId back to the item and clear transient fields so later
-            // when the payload is sent there is no blob:data url present
-            results.showcaseUploadIds.push(uploadId);
+          if (maybeRes?.uploadId) {
+            results.showcaseUploadIds.push(maybeRes.uploadId);
+            results.showcaseOriginalNames.push(
+              maybeRes.originalFileName || item.title || item.name || 'showcase'
+            );
             try {
-              item.uploadId = uploadId;
+              item.uploadId = maybeRes.uploadId;
             } catch (e) {
               // ignore if item is frozen or can't be mutated
             }
@@ -334,6 +363,77 @@ export const uploadProjectMedia = async (
               } catch (e) {
                 // ignore
               }
+            }
+          }
+        }
+      }
+
+      // Now handle section-level files (backgroundFile / imageFile)
+      if (section.backgroundFile) {
+        const maybe = section.backgroundFile;
+        const maybeRes = await uploadMaybeFile(
+          maybe,
+          (maybe as any)?.name || `${section.title || 'background'}`
+        );
+        if (maybeRes?.uploadId) {
+          results.showcaseUploadIds.push(maybeRes.uploadId);
+          results.showcaseOriginalNames.push(
+            maybeRes.originalFileName || `${section.title || 'background'}`
+          );
+          try {
+            section.backgroundUploadId = maybeRes.uploadId;
+          } catch (e) {
+            // ignore
+          }
+          try {
+            section.backgroundFile = null;
+          } catch (e) {
+            // ignore
+          }
+          if (
+            typeof section.backgroundSrc === 'string' &&
+            (section.backgroundSrc.startsWith('blob:') ||
+              section.backgroundSrc.startsWith('data:'))
+          ) {
+            try {
+              delete section.backgroundSrc;
+            } catch (e) {
+              // ignore
+            }
+          }
+        }
+      }
+
+      if (section.imageFile) {
+        const maybe = section.imageFile;
+        const maybeRes = await uploadMaybeFile(
+          maybe,
+          (maybe as any)?.name || `${section.title || 'image'}`
+        );
+        if (maybeRes?.uploadId) {
+          results.showcaseUploadIds.push(maybeRes.uploadId);
+          results.showcaseOriginalNames.push(
+            maybeRes.originalFileName || `${section.title || 'image'}`
+          );
+          try {
+            section.imageUploadId = maybeRes.uploadId;
+          } catch (e) {
+            // ignore
+          }
+          try {
+            section.imageFile = null;
+          } catch (e) {
+            // ignore
+          }
+          if (
+            typeof section.imageSrc === 'string' &&
+            (section.imageSrc.startsWith('blob:') ||
+              section.imageSrc.startsWith('data:'))
+          ) {
+            try {
+              delete section.imageSrc;
+            } catch (e) {
+              // ignore
             }
           }
         }

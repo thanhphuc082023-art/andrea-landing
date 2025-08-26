@@ -71,7 +71,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
           'relative z-10 flex min-h-[511px] items-center py-[50px] max-md:py-[40px]'
         )}
       >
-        <div className={clsx('content-wrapper')}>
+        <div className={clsx('content-wrapper w-full')}>
           <div
             className={clsx(
               'flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-[120px]',
@@ -102,7 +102,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
 
             {/* Right side - Project Description */}
             <div className="max-w-[642px] max-lg:max-w-full max-lg:flex-1">
-              <h2 className="mb-4 text-2xl font-bold text-[#484848] max-md:text-[24px] dark:text-gray-300">
+              <h2 className="mb-4 whitespace-normal break-words text-2xl font-bold text-[#484848] max-md:text-[24px] dark:text-gray-300">
                 {projectIntroTitle}
               </h2>
               <div

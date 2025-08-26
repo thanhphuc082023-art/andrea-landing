@@ -98,21 +98,20 @@ export function transformStrapiProjectToFormData(
         order: section.order || sectionIndex,
         gridCols:
           section.gridCols || (section.layout === 'grid' ? 2 : undefined),
+        // For 'text' and 'image-text' layouts treat items as text blocks
         items:
-          // Special handling for text sections: map title/description and ensure defaults
-          section.type === 'text'
+          section.type === 'text' || section.type === 'image-text'
             ? section.items && section.items.length > 0
               ? section.items.map((item: any, itemIndex: number) => ({
                   id: item.id || `item-${sectionIndex}-${itemIndex}`,
-                  title: item.title || '',
+                  title: item.title || item.alt || '',
                   description: item.description || '',
                   type: 'text',
                   order: item.order || itemIndex,
-                  // keep width/height for layout preview compatibility if present
                   width: item.width || 1300,
                   height: item.height || 800,
                 }))
-              : // No items in source: create default items depending on layout
+              : // No items in source: create default depending on layout
                 section.layout && section.layout !== 'single'
                 ? [
                     {
@@ -172,6 +171,37 @@ export function transformStrapiProjectToFormData(
                       }
                     : undefined),
               })) || [],
+        // For image-text sections, also expose section-level image/background data for the admin form
+        ...(section.type === 'image-text'
+          ? {
+              title: section.title || '',
+              subtitle: section.subtitle || '',
+              description: section.description || '',
+              imageWidth: section.imageWidth,
+              imageHeight: section.imageHeight,
+              width: section.width,
+              height: section.height,
+              // Keep original objects if present (used by server)
+              image: section.image || undefined,
+              background: section.background || undefined,
+              // Convenience URLs for previews (client-side)
+              imageSrc:
+                (section.image && getStrapiMediaUrl(section.image)) ||
+                section.imageSrc ||
+                undefined,
+              backgroundSrc:
+                (section.background && getStrapiMediaUrl(section.background)) ||
+                section.backgroundSrc ||
+                undefined,
+              backgroundAlt: section.backgroundAlt || undefined,
+              imageAlt: section.imageAlt || undefined,
+              contentImagePosition: section.contentImagePosition || 'left',
+              imageFile: undefined,
+              backgroundFile: undefined,
+              imageUploadId: section.imageUploadId || undefined,
+              backgroundUploadId: section.backgroundUploadId || undefined,
+            }
+          : {}),
       })) || [],
 
     // Arrays

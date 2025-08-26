@@ -80,6 +80,8 @@ const SortableSection = ({
         return <DocumentTextIcon className="h-5 w-5 text-green-500" />;
       case 'text':
         return <DocumentTextIcon className="h-5 w-5 text-purple-500" />;
+      case 'image-text':
+        return <PhotoIcon className="h-5 w-5 text-indigo-600" />;
       default:
         return <DocumentTextIcon className="h-5 w-5 text-gray-500" />;
     }
@@ -95,6 +97,8 @@ const SortableSection = ({
         return 'from-green-50 to-green-100 border-green-200';
       case 'text':
         return 'from-purple-50 to-purple-100 border-purple-200';
+      case 'image-text':
+        return 'from-indigo-50 to-indigo-100 border-indigo-200';
       default:
         return 'from-gray-50 to-gray-100 border-gray-200';
     }
@@ -656,10 +660,8 @@ const SortableSection = ({
                                                 title:
                                                   s.items?.[0]?.title || '',
                                                 description: v,
-                                                width:
-                                                  s.items?.[0]?.width || 1300,
-                                                height:
-                                                  s.items?.[0]?.height || 800,
+                                                width: 1300,
+                                                height: 800,
                                                 order: 0,
                                               },
                                               {
@@ -669,10 +671,8 @@ const SortableSection = ({
                                                 type: 'text',
                                                 title: '',
                                                 description: '',
-                                                width:
-                                                  s.items?.[1]?.width || 1300,
-                                                height:
-                                                  s.items?.[1]?.height || 800,
+                                                width: 1300,
+                                                height: 800,
                                                 order: 1,
                                               },
                                             ]
@@ -687,10 +687,8 @@ const SortableSection = ({
                                                 description:
                                                   s.items?.[0]?.description ||
                                                   '',
-                                                width:
-                                                  s.items?.[0]?.width || 1300,
-                                                height:
-                                                  s.items?.[0]?.height || 800,
+                                                width: 1300,
+                                                height: 800,
                                                 order: 0,
                                               },
                                               {
@@ -701,10 +699,8 @@ const SortableSection = ({
                                                 title:
                                                   s.items?.[1]?.title || '',
                                                 description: v,
-                                                width:
-                                                  s.items?.[1]?.width || 1300,
-                                                height:
-                                                  s.items?.[1]?.height || 800,
+                                                width: 1300,
+                                                height: 800,
                                                 order: 1,
                                               },
                                             ],
@@ -1109,6 +1105,375 @@ const SortableSection = ({
           </div>
         )}
 
+        {/* Image + Text Section Editor */}
+        {section.type === 'image-text' && (
+          <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
+            <div className="space-y-3">
+              <label className="block text-xs font-medium text-gray-700">
+                Title
+              </label>
+              <input
+                type="text"
+                value={section.title || section.items?.[0]?.title || ''}
+                onChange={(e) =>
+                  setShowcaseSections((prev) =>
+                    prev.map((s) =>
+                      s.id === section.id ? { ...s, title: e.target.value } : s
+                    )
+                  )
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                placeholder="Tiêu đề..."
+              />
+
+              <label className="block text-xs font-medium text-gray-700">
+                Subtitle
+              </label>
+              <input
+                type="text"
+                value={section.subtitle || ''}
+                onChange={(e) =>
+                  setShowcaseSections((prev) =>
+                    prev.map((s) =>
+                      s.id === section.id
+                        ? { ...s, subtitle: e.target.value }
+                        : s
+                    )
+                  )
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                placeholder="Phụ đề..."
+              />
+
+              <label className="block text-xs font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                value={section.description || ''}
+                onChange={(e) =>
+                  setShowcaseSections((prev) =>
+                    prev.map((s) =>
+                      s.id === section.id
+                        ? { ...s, description: e.target.value }
+                        : s
+                    )
+                  )
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                placeholder="Mô tả..."
+                rows={4}
+              />
+
+              {/* Width/Height controls for Image + Text section */}
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Chiều ngang (px)
+                  </label>
+                  <input
+                    type="number"
+                    value={section.width || ''}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value) || 0;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id ? { ...s, width: v } : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                    placeholder="1300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Chiều cao (px)
+                  </label>
+                  <input
+                    type="number"
+                    value={section.height || ''}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value) || 0;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id ? { ...s, height: v } : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                    placeholder="800"
+                  />
+                </div>
+              </div>
+
+              {/* Content image width/height controls */}
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Chiều ngang ảnh nội dung (px)
+                  </label>
+                  <input
+                    type="number"
+                    value={section.imageWidth || ''}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value) || 0;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id ? { ...s, imageWidth: v } : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                    placeholder="650"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700">
+                    Chiều cao ảnh nội dung (px)
+                  </label>
+                  <input
+                    type="number"
+                    value={section.imageHeight || ''}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value) || 0;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id ? { ...s, imageHeight: v } : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                    placeholder="800"
+                  />
+                </div>
+              </div>
+
+              {/* Position control for content image */}
+              <div className="mt-2 flex items-center space-x-3">
+                <span className="text-xs font-medium text-gray-700">
+                  Vị trí ảnh nội dung:
+                </span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id
+                            ? { ...s, contentImagePosition: 'left' }
+                            : s
+                        )
+                      )
+                    }
+                    className={`rounded-md border px-2 py-1 text-xs ${section.contentImagePosition === 'left' ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                  >
+                    Trái
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id
+                            ? { ...s, contentImagePosition: 'right' }
+                            : s
+                        )
+                      )
+                    }
+                    className={`rounded-md border px-2 py-1 text-xs ${section.contentImagePosition === 'right' ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                  >
+                    Phải
+                  </button>
+                </div>
+              </div>
+
+              {/* Image-text media summary (background + content image) - show like media items */}
+              {(section.backgroundSrc ||
+                section.background?.url ||
+                section.imageSrc ||
+                section.image?.url) && (
+                <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
+                  <div className="space-y-3">
+                    {/* Background media row */}
+                    {(section.backgroundSrc || section.background?.url) && (
+                      <div className="flex items-center space-x-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                          <CheckIcon className="h-4 w-4 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            Ảnh nền
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {section.backgroundAlt ||
+                              section.backgroundFile?.name ||
+                              'Ảnh nền'}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {section.background?.id ||
+                          section.backgroundUploadId ? (
+                            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                              ✓ Đã tải lên
+                            </span>
+                          ) : section.backgroundFile ? (
+                            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                              Sẵn sàng
+                            </span>
+                          ) : null}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowcaseSections((prev) =>
+                                prev.map((s) =>
+                                  s.id === section.id
+                                    ? {
+                                        ...s,
+                                        backgroundFile: undefined,
+                                        backgroundSrc: undefined,
+                                        background: undefined,
+                                        backgroundUploadId: undefined,
+                                      }
+                                    : s
+                                )
+                              )
+                            }
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <XMarkIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Content image media row */}
+                    {(section.imageSrc || section.image?.url) && (
+                      <div className="flex items-center space-x-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                          <CheckIcon className="h-4 w-4 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            Ảnh nội dung
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {section.imageAlt ||
+                              section.imageFile?.name ||
+                              'Ảnh nội dung'}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {section.image?.id || section.imageUploadId ? (
+                            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                              ✓ Đã tải lên
+                            </span>
+                          ) : section.imageFile ? (
+                            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                              Sẵn sàng
+                            </span>
+                          ) : null}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowcaseSections((prev) =>
+                                prev.map((s) =>
+                                  s.id === section.id
+                                    ? {
+                                        ...s,
+                                        imageFile: undefined,
+                                        imageSrc: undefined,
+                                        image: undefined,
+                                        imageUploadId: undefined,
+                                        imageAlt: undefined,
+                                      }
+                                    : s
+                                )
+                              )
+                            }
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <XMarkIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className="relative">
+                <input
+                  type="file"
+                  id={`bg-input-${section.id}`}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setShowcaseSections((prevSections) =>
+                        prevSections.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                backgroundFile: file,
+                                backgroundSrc: URL.createObjectURL(file),
+                                backgroundAlt: file.name,
+                              }
+                            : s
+                        )
+                      );
+                    }
+                  }}
+                  accept="image/*"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                />
+
+                <label
+                  htmlFor={`bg-input-${section.id}`}
+                  className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700 transition-colors hover:border-blue-400 hover:bg-blue-100"
+                >
+                  <PlusIcon className="mr-2 h-4 w-4" /> Chọn ảnh nền
+                </label>
+              </div>
+
+              {/* Content image upload (separate from background) */}
+              <div className="relative mt-2">
+                <input
+                  type="file"
+                  id={`content-input-${section.id}`}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setShowcaseSections((prevSections) =>
+                        prevSections.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                imageFile: file,
+                                imageSrc: URL.createObjectURL(file),
+                                imageAlt: file.name,
+                              }
+                            : s
+                        )
+                      );
+                    }
+                  }}
+                  accept="image/*"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                />
+
+                <label
+                  htmlFor={`content-input-${section.id}`}
+                  className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-100"
+                >
+                  <PlusIcon className="mr-2 h-4 w-4" /> Chọn ảnh nội dung
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Media Preview */}
         {section.items.length > 0 &&
           section.items.some(
@@ -1394,7 +1759,7 @@ const SortableSection = ({
 
         {/* Upload Area - Show when no file uploaded or when layout needs more items */}
         {/* Hide file upload UI for text sections */}
-        {section.type !== 'text' && (
+        {section.type !== 'text' && section.type !== 'image-text' && (
           <div className="mt-4 space-y-3">
             {/* First Item Upload - Hide when already has file */}
             {!section.items.some((item) => item.order === 0 && item.file) && (
@@ -1449,7 +1814,7 @@ const SortableSection = ({
                         });
                       }
                     }}
-                    accept={
+                    accept={String(
                       section.type === 'image'
                         ? 'image/*'
                         : section.type === 'video'
@@ -1457,7 +1822,7 @@ const SortableSection = ({
                           : section.type === 'flipbook'
                             ? 'application/pdf'
                             : '*'
-                    }
+                    )}
                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                   />
                   <label
@@ -1542,7 +1907,7 @@ const SortableSection = ({
                           );
                         }
                       }}
-                      accept={
+                      accept={String(
                         section.type === 'image'
                           ? 'image/*'
                           : section.type === 'video'
@@ -1550,7 +1915,7 @@ const SortableSection = ({
                             : section.type === 'flipbook'
                               ? 'application/pdf'
                               : '*'
-                      }
+                      )}
                       className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     />
                     <label
@@ -1639,7 +2004,7 @@ const SortableSection = ({
                           );
                         }
                       }}
-                      accept={
+                      accept={String(
                         section.type === 'image'
                           ? 'image/*'
                           : section.type === 'video'
@@ -1647,7 +2012,7 @@ const SortableSection = ({
                             : section.type === 'flipbook'
                               ? 'application/pdf'
                               : '*'
-                      }
+                      )}
                       className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     />
                     <label
@@ -1687,7 +2052,7 @@ export default function ShowcaseSection({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
+  console.log('showcaseSections', showcaseSections);
   const handleDragEnd = (event: DragEndEvent) => {
     try {
       const { active, over } = event;
@@ -1714,6 +2079,9 @@ export default function ShowcaseSection({
       type,
       layout,
       title: `Section ${showcaseSections.length + 1}`,
+      contentImagePosition: type === 'image-text' ? 'left' : undefined,
+      backgroundSrc: undefined,
+      imageSrc: undefined,
       items: [
         {
           id: `item-${Date.now()}`,
@@ -1722,11 +2090,15 @@ export default function ShowcaseSection({
               ? 'flipbook'
               : type === 'video'
                 ? 'video'
-                : type === 'text'
+                : type === 'text' || type === 'image-text'
                   ? 'text'
                   : 'image',
-          title: type === 'text' ? '' : `Item ${showcaseSections.length + 1}`,
-          description: type === 'text' ? '' : undefined,
+          title:
+            type === 'text' || type === 'image-text'
+              ? ''
+              : `Item ${showcaseSections.length + 1}`,
+          description:
+            type === 'text' || type === 'image-text' ? '' : undefined,
           src: type === 'text' ? undefined : '',
           alt: type === 'text' ? undefined : '',
           size: 0,
@@ -1739,7 +2111,7 @@ export default function ShowcaseSection({
     };
 
     // If text type and layout requires 2 columns, add a second empty text item
-    if (type === 'text' && layout !== 'single') {
+    if ((type === 'text' || type === 'image-text') && layout !== 'single') {
       newSection.items.push({
         id: `item-${Date.now()}-2`,
         type: 'text',
@@ -1845,6 +2217,16 @@ export default function ShowcaseSection({
                 >
                   <DocumentTextIcon className="h-6 w-6 text-purple-500" />
                   <span className="mt-1 text-xs text-gray-600">Text</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => addQuickSection('image-text', 'single')}
+                  className="flex flex-col items-center rounded-lg border border-gray-200 p-3 transition-colors hover:border-purple-300 hover:bg-purple-50"
+                >
+                  <PhotoIcon className="h-6 w-6 text-indigo-500" />
+                  <span className="mt-1 text-xs text-gray-600">
+                    Hình + Text
+                  </span>
                 </button>
               </div>
             </div>

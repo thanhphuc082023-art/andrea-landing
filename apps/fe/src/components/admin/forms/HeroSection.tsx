@@ -217,7 +217,7 @@ export default function HeroSection({
                         style={{
                           backgroundImage: `url(${thumbnail.url})`,
                           backgroundSize: 'cover',
-                          backgroundPosition: 'center',
+                          contentImagePosition: 'center',
                         }}
                         className="h-8 w-12 shrink-0 rounded border border-gray-200"
                         title={`Preview: ${thumbnail.name || 'thumbnail'}`}
@@ -359,7 +359,7 @@ export default function HeroSection({
                         style={{
                           backgroundImage: `url(${heroBanner.url})`,
                           backgroundSize: 'cover',
-                          backgroundPosition: 'center',
+                          contentImagePosition: 'center',
                         }}
                         className="h-8 w-12 rounded border border-gray-200"
                         title={`Preview: ${heroBanner.name || 'hero banner'}`}

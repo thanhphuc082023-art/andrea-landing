@@ -202,9 +202,12 @@ export default function CreateProjectPage() {
         showcaseUploadIds: [],
       };
 
-      // Check if showcase has actual files
-      const showcaseHasFiles = mediaFiles.showcase?.some((section) =>
-        section.items?.some((item) => item.file)
+      // Check if showcase has actual files (including section-level files)
+      const showcaseHasFiles = mediaFiles.showcase?.some(
+        (section) =>
+          section.items?.some((item) => item.file) ||
+          section.backgroundFile ||
+          section.imageFile
       );
 
       const hasMediaFiles =
@@ -245,6 +248,41 @@ export default function CreateProjectPage() {
         uploadResults = await uploadProjectMedia(mediaFiles, (progress) => {
           // Upload progress - can add UI feedback here if needed
         });
+
+        // Build showcaseOriginalNames aligned with uploadProjectMedia order:
+        // for each section: items (in order), then backgroundFile (if any), then imageFile (if any)
+        const showcaseOriginalNames: string[] = [];
+        if (data.showcase && Array.isArray(data.showcase)) {
+          data.showcase.forEach((section: any) => {
+            // items
+            (section.items || []).forEach((item: any) => {
+              if (item.file) {
+                showcaseOriginalNames.push(
+                  item.file?.name || item.title || `showcase-item-${Date.now()}`
+                );
+              }
+            });
+            // section-level backgroundFile
+            if (section.backgroundFile) {
+              showcaseOriginalNames.push(
+                section.backgroundFile?.name ||
+                  `${section.title || 'background'}`
+              );
+            }
+            // section-level imageFile
+            if (section.imageFile) {
+              showcaseOriginalNames.push(
+                section.imageFile?.name || `${section.title || 'image'}`
+              );
+            }
+          });
+        }
+
+        // Attach to project payload so server can map uploadIds to original names
+        // (we'll include this field below when posting to create-from-chunks)
+        /** temporary container */ (
+          uploadResults as any
+        ).showcaseOriginalNames = showcaseOriginalNames;
       } else if (hasBlobUrlsWithoutFiles) {
         // Show error to user
         setError(
@@ -264,6 +302,10 @@ export default function CreateProjectPage() {
         featuredImageUploadId: uploadResults.featuredImageUploadId,
         galleryUploadIds: uploadResults.galleryUploadIds,
         showcaseUploadIds: uploadResults.showcaseUploadIds,
+        showcaseOriginalNames:
+          (uploadResults as any).showcaseOriginalNames || [],
+        // Ensure we send the (possibly mutated) showcase sections so section-level uploadIds are available
+        showcase: mediaFiles.showcase || data.showcase || [],
         // Pass existing URLs if no new upload happened (and they're not blob URLs)
         existingHeroVideoUrl:
           !uploadResults.heroVideoUploadId &&
@@ -298,6 +340,31 @@ export default function CreateProjectPage() {
           ?.map((item) => item.name)
           .filter(Boolean),
       };
+
+      // DEBUG: log payload to help diagnose missing section fields (remove in production)
+      try {
+        // Use a shallow clone for safe logging
+        const safePayload = {
+          ...projectData,
+          showcase: (projectData.showcase || []).map((s: any) => ({
+            id: s.id,
+            type: s.type,
+            title: s.title,
+            backgroundUploadId: s.backgroundUploadId,
+            imageUploadId: s.imageUploadId,
+            items: (s.items || []).map((it: any) => ({
+              id: it.id,
+              title: it.title,
+              uploadId: it.uploadId,
+              src: it.src,
+            })),
+          })),
+        };
+        console.debug('CREATE_PROJECT_PAYLOAD', safePayload);
+      } catch (e) {
+        console.debug('Failed to log project payload', e);
+      }
+
       const response = await fetch('/api/admin/projects/create-from-chunks', {
         method: 'POST',
         headers: {
