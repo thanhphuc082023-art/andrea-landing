@@ -34,6 +34,7 @@ export default function HeroSection({
   removeMetaInfo,
   onLogout,
 }: HeroSectionProps) {
+  const videoLink = watch('videoLink');
   const heroVideo = watch('heroVideo');
   const heroBanner = watch('heroBanner');
   const thumbnail = watch('thumbnail');
@@ -217,7 +218,7 @@ export default function HeroSection({
                         style={{
                           backgroundImage: `url(${thumbnail.url})`,
                           backgroundSize: 'cover',
-                          contentImagePosition: 'center',
+                          backgroundPosition: 'center',
                         }}
                         className="h-8 w-12 shrink-0 rounded border border-gray-200"
                         title={`Preview: ${thumbnail.name || 'thumbnail'}`}
@@ -284,13 +285,13 @@ export default function HeroSection({
             Video Hero (Background)
           </label>
           <div className="mt-1">
-            {heroVideo ? (
+            {heroVideo?.file || heroVideo?.url ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-3 py-2">
                   <div className="flex items-center space-x-2">
-                    {heroVideo.url && (
+                    {heroVideo?.url && (
                       <video
-                        src={heroVideo.url}
+                        src={heroVideo?.url}
                         className="h-8 w-12 rounded object-cover"
                         muted
                       />
@@ -308,7 +309,7 @@ export default function HeroSection({
                       <span className="inline-flex shrink-0 items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
                         Sẵn sàng
                       </span>
-                    ) : heroVideo.url ? (
+                    ) : heroVideo?.url ? (
                       <span className="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
                         Đã có
                       </span>
@@ -327,6 +328,7 @@ export default function HeroSection({
               <SimpleFileUploader
                 onFileSelect={(file) => {
                   setValue('heroVideo', {
+                    ...(heroVideo || {}),
                     file,
                     url: URL.createObjectURL(file),
                     name: file.name,
@@ -342,6 +344,19 @@ export default function HeroSection({
                 // Remove onUploadComplete to disable immediate upload
               />
             )}
+            {/* Input đường dẫn video hero */}
+            <div className="mt-1">
+              <input
+                type="text"
+                value={videoLink || ''}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setValue('videoLink', v);
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                placeholder="https://..."
+              />
+            </div>
           </div>
         </div>
 
@@ -359,7 +374,7 @@ export default function HeroSection({
                         style={{
                           backgroundImage: `url(${heroBanner.url})`,
                           backgroundSize: 'cover',
-                          contentImagePosition: 'center',
+                          backgroundPosition: 'center',
                         }}
                         className="h-8 w-12 rounded border border-gray-200"
                         title={`Preview: ${heroBanner.name || 'hero banner'}`}

@@ -41,7 +41,9 @@ export default function ProjectPreviewContent({
             formData.heroVideo.url ||
             (formData.heroVideo.file
               ? URL.createObjectURL(formData.heroVideo.file)
-              : ''),
+              : formData.videoLink
+                ? formData.videoLink
+                : ''),
           name: 'Hero Video',
           mime: 'video/mp4',
           alt: 'Hero Video',

@@ -25,12 +25,16 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
       className={clsx('max-sd:mt-[60px] relative mt-[65px] overflow-hidden')}
     >
       {/* Background Video hoặc Banner */}
-      {project?.heroVideo?.url ? (
+      {project?.heroVideo?.url || project?.videoLink ? (
         <HeaderVideo
           mobileAspectRatio="9:16"
           heroData={{
-            desktopVideo: project.heroVideo,
-            mobileVideo: project.heroVideo,
+            desktopVideo: project?.videoLink
+              ? { url: project?.videoLink }
+              : project.heroVideo,
+            mobileVideo: project?.videoLink
+              ? { url: project?.videoLink }
+              : project.heroVideo,
           }}
         />
       ) : project?.heroBanner?.url ? (

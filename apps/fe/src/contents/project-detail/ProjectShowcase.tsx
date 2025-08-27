@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import Image from 'next/image';
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import MinimalFlipBook from '@/components/MinimalFlipBook';
 import {
   ProjectData,
@@ -23,12 +23,15 @@ interface ShowcaseItem {
   type?: 'image' | 'video' | 'flipbook' | 'text';
   title?: string;
   description?: string;
+  subtitle?: string;
+  largeTitle?: string;
   bookData?: {
     title?: string;
     websiteUrl?: string;
     phoneNumber?: string;
     downloadUrl?: string;
   };
+  videoLink?: string;
 }
 
 // Legacy data for backward compatibility
@@ -161,24 +164,99 @@ const ShowcaseItem = memo(
       'object-cover transition-transform duration-700 group-hover:scale-[1.02]';
     const html = item.description?.replace(/\n/g, '<br/>') || '';
 
+    // Refs and helpers for YouTube mounting (applies when item.type === 'video')
+    const ytContainerRef = useRef<HTMLDivElement | null>(null);
+    const ytPlayerRef = useRef<any>(null);
+    const skeletonRef = useRef<HTMLDivElement | null>(null);
+
+    const hideSkeleton = () => {
+      try {
+        skeletonRef.current?.classList.add('hidden');
+      } catch (e) {}
+    };
+
+    // Load YouTube IFrame API once
+    const loadYouTubeAPI = (() => {
+      let promise: Promise<void> | null = null;
+      return () => {
+        if (promise) return promise;
+        promise = new Promise<void>((resolve) => {
+          if ((window as any).YT && (window as any).YT.Player) return resolve();
+          const tag = document.createElement('script');
+          tag.src = 'https://www.youtube.com/iframe_api';
+          document.head.appendChild(tag);
+          (window as any).onYouTubeIframeAPIReady = () => resolve();
+        });
+        return promise;
+      };
+    })();
+
+    const createYouTubePlayer = async (
+      container: HTMLDivElement | null,
+      videoId: string | null
+    ) => {
+      if (!container || !videoId) return;
+      await loadYouTubeAPI();
+      if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
+        try {
+          ytPlayerRef.current.destroy();
+        } catch (e) {}
+      }
+      ytPlayerRef.current = new (window as any).YT.Player(container, {
+        videoId,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          loop: 1,
+          playlist: videoId, // required for loop
+          playsinline: 1,
+          disablekb: 1,
+          modestbranding: 1,
+          showInfo: 0,
+          rel: 0,
+          iv_load_policy: 3,
+        },
+        events: {
+          onReady: (e: any) => {
+            try {
+              e.target.mute();
+              e.target.playVideo();
+              hideSkeleton();
+            } catch (err) {}
+          },
+          onError: () => {
+            hideSkeleton();
+          },
+        },
+      });
+    };
+
     if (item.type === 'text') {
       return (
         <div
           className={clsx(
-            'pointer-events-none flex h-full w-full items-center justify-center bg-white p-6 max-lg:h-fit max-md:p-[28px]',
+            'pointer-events-none flex h-full w-full items-center justify-center bg-white max-lg:h-fit max-md:p-[28px]',
             !item?.description && !item?.title ? 'max-lg:hidden' : ''
           )}
           style={{ height: item?.height }}
         >
           <div className="max-w-full">
+            {item.subtitle ? (
+              <span className="text-[24px] text-black">{item.subtitle}</span>
+            ) : null}
             {item.title ? (
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">
+              <h3 className="mt-1 text-[24px] font-semibold text-black">
                 {item.title}
+              </h3>
+            ) : null}
+            {item.largeTitle ? (
+              <h3 className="text-[35px] font-semibold text-black">
+                {item.largeTitle}
               </h3>
             ) : null}
             {item.description ? (
               <div
-                className="whitespace-pre-wrap text-sm text-[#7D7D7D]"
+                className="mt-3 whitespace-pre-wrap text-sm text-[#7D7D7D]"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             ) : null}
@@ -186,17 +264,100 @@ const ShowcaseItem = memo(
         </div>
       );
     }
+
     if (item.type === 'video') {
+      const src = item.src || item.videoLink || '';
+
+      const isYouTubeUrl = (u?: string | null) =>
+        !!u && (u.includes('youtube.com') || u.includes('youtu.be'));
+
+      const getYouTubeId = (u: string) => {
+        const match =
+          u.match(/(?:v=|\/embed\/|\.be\/)([A-Za-z0-9_-]{11})/) ||
+          u.match(/([A-Za-z0-9_-]{11})/);
+        return match ? match[1] : null;
+      };
+
+      useEffect(() => {
+        if (!isYouTubeUrl(src)) return;
+        const id = getYouTubeId(src!);
+        createYouTubePlayer(ytContainerRef.current, id);
+        return () => {
+          if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
+            try {
+              ytPlayerRef.current.destroy();
+            } catch (e) {}
+          }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [src]);
+
+      if (isYouTubeUrl(src)) {
+        return (
+          <div className="video-responsive pointer-events-none relative">
+            {/* skeleton overlay */}
+            <div
+              ref={skeletonRef}
+              className="skeleton-video absolute inset-0 z-10"
+              aria-hidden="true"
+              style={{
+                background:
+                  'linear-gradient(90deg, #e0e0e0 10%, #f5f5f5 20%, #e0e0e0 30%, #e0e0e0 40%, #f5f5f5 50%, #e0e0e0 60%, #e0e0e0 70%, #f5f5f5 80%, #e0e0e0 90%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s infinite',
+              }}
+            />
+            <div
+              ref={ytContainerRef}
+              className={clsx('relative z-20 h-full w-full object-cover')}
+              style={{ width: '100%', height: '100%' }}
+              aria-hidden="true"
+            />
+            {/* visual overlays (can't inject into iframe) */}
+            <div className="video-overlay-top" aria-hidden="true" />
+            <div className="video-overlay-watermark" aria-hidden="true" />
+            <style>{`
+              @keyframes shimmer {
+                0% { background-position: -200% 0; }
+                100% { background-position: 200% 0; }
+              }
+            `}</style>
+          </div>
+        );
+      }
+
       return (
-        <video
-          src={item.src}
-          className="pointer-events-none h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-          controls
-          muted
-          loop
-          playsInline
-          autoPlay
-        />
+        <div className="relative h-full w-full">
+          <div
+            ref={skeletonRef}
+            className="skeleton-video absolute inset-0 z-10"
+            aria-hidden="true"
+            style={{
+              background:
+                'linear-gradient(90deg, #e0e0e0 10%, #f5f5f5 20%, #e0e0e0 30%, #e0e0e0 40%, #f5f5f5 50%, #e0e0e0 60%, #e0e0e0 70%, #f5f5f5 80%, #e0e0e0 90%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.5s infinite',
+            }}
+          />
+          <video
+            src={src}
+            className="pointer-events-none relative z-20 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+            controls
+            muted
+            loop
+            playsInline
+            autoPlay
+            preload="metadata"
+            onLoadedData={() => hideSkeleton()}
+            onError={() => hideSkeleton()}
+          />
+          <style>{`
+            @keyframes shimmer {
+              0% { background-position: -200% 0; }
+              100% { background-position: 200% 0; }
+            }
+          `}</style>
+        </div>
       );
     }
 
@@ -324,11 +485,14 @@ const ShowcaseSection = memo(
         alt: item.alt || item.title || '',
         title: item?.title || '',
         description: item?.description || '',
+        subtitle: item?.subtitle || '',
+        largeTitle: item?.largeTitle || '',
         width: item.width || 1300,
         height: item.height || 600, // Default height for better UX
         type: itemType,
         bookData: item.bookData || {},
         colSpan: item.colSpan || 1,
+        videoLink: item.videoLink || '',
       };
     };
 
@@ -541,16 +705,23 @@ const ShowcaseSection = memo(
       // Special handling for flipbook sections
       if (transformedItem.type === 'flipbook') {
         return (
-          <div key={section.id}>
+          <div
+            key={section.id}
+            style={{ maxWidth: section?.width, margin: '0 auto' }}
+          >
             <ShowcaseItem item={transformedItem} priority={index === 0} />
           </div>
         );
       }
 
       return (
-        <div key={section.id} className="group">
+        <div
+          style={{ maxWidth: section?.width, margin: '0 auto' }}
+          key={section.id}
+          className="group"
+        >
           <div
-            className="relative w-full overflow-hidden bg-white"
+            className="relative w-full bg-white"
             style={{
               aspectRatio:
                 transformedItem.type !== 'text'
@@ -574,20 +745,23 @@ const ShowcaseSection = memo(
 
       return (
         <div
+          style={{ maxWidth: section?.width, margin: '0 auto' }}
           key={section.id}
           className={clsx(
             'grid grid-cols-2',
-            section.type === 'text' ? 'max-lg:grid-cols-1' : ''
+            section.type === 'text' ? 'gap-6 max-lg:grid-cols-1' : ''
           )}
         >
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
             // For half-half layout, divide width by 2 for proper aspect ratio
-            const adjustedWidth = items[0].width / 2;
+            const adjustedWidth = section.width
+              ? section.width / 2
+              : items[0]?.width;
             return (
               <div key={itemIndex} className="group">
                 <div
-                  className="relative w-full overflow-hidden bg-white"
+                  className="relative w-full bg-white"
                   style={{
                     aspectRatio:
                       transformedItem.type !== 'text'
@@ -614,21 +788,29 @@ const ShowcaseSection = memo(
         : [section.items];
 
       return (
-        <div key={section.id} className="grid grid-cols-3 max-md:grid-cols-1">
+        <div
+          style={{ maxWidth: section?.width, margin: '0 auto' }}
+          key={section.id}
+          className="grid grid-cols-3 max-md:grid-cols-1"
+        >
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
             // For one-third layout: first item gets 1/3 width, second item gets 2/3 width
             const adjustedWidth =
               itemIndex === 0
-                ? items[0].width / 3 // First item: 33%
-                : (items[0].width * 2) / 3; // Second item: 67%
+                ? section?.width
+                  ? section?.width / 3
+                  : items[0]?.width // First item: 33%
+                : section?.width
+                  ? (section?.width / 3) * 2
+                  : items[0]?.width * 2; // Second item: 67%
             return (
               <div
                 key={itemIndex}
                 className={`group ${itemIndex === 1 ? 'col-span-2' : ''}`}
               >
                 <div
-                  className="relative w-full overflow-hidden bg-white"
+                  className="relative w-full bg-white"
                   style={{
                     aspectRatio:
                       transformedItem.type !== 'text'
@@ -655,18 +837,24 @@ const ShowcaseSection = memo(
         : [section.items];
 
       return (
-        <div key={section.id} className="grid grid-cols-3 max-md:grid-cols-1">
+        <div
+          style={{ maxWidth: section?.width, margin: '0 auto' }}
+          key={section.id}
+          className="grid grid-cols-3 max-md:grid-cols-1"
+        >
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
             // Use one third of the first item's width for aspect ratio calculations
-            const adjustedWidth = items[0]?.width
-              ? items[0].width / 3
-              : 1300 / 3;
+            const adjustedWidth = section?.width
+              ? section?.width / 3
+              : items[0]?.width
+                ? items[0]?.width
+                : 1300 / 3;
 
             return (
               <div key={itemIndex} className="group">
                 <div
-                  className="relative w-full overflow-hidden bg-white"
+                  className="relative w-full bg-white"
                   style={{
                     aspectRatio:
                       transformedItem.type !== 'text'
@@ -732,19 +920,25 @@ const ShowcaseSection = memo(
     };
 
     return (
-      <div key={section.id} className={`grid ${getGridClass(gridCols)}`}>
+      <div
+        style={{ maxWidth: section?.width, margin: '0 auto' }}
+        key={section.id}
+        className={`grid ${getGridClass(gridCols)}`}
+      >
         {items.map((item: any, itemIndex: number) => {
           const transformedItem = transformItem(item, itemIndex);
           // For grid layout, adjust width based on column span and total columns
           const effectiveColSpan = transformedItem.colSpan || 1;
-          const adjustedWidth = (items[0].width * effectiveColSpan) / gridCols;
+          const adjustedWidth = section?.width
+            ? (section?.width * effectiveColSpan) / gridCols
+            : items[0]?.width;
           return (
             <div
               key={itemIndex}
               className={`group ${transformedItem.colSpan ? getColSpanClass(transformedItem.colSpan) : ''}`}
             >
               <div
-                className="relative w-full overflow-hidden bg-white"
+                className="relative w-full bg-white"
                 style={{
                   aspectRatio:
                     transformedItem.type !== 'text'
@@ -766,6 +960,7 @@ ShowcaseSection.displayName = 'ShowcaseSection';
 
 function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
   const sections = project?.showcaseSections || legacyShowcaseData;
+  console.log('sections', sections);
   return (
     <section className="content-wrapper max-md:px-0">
       <div>

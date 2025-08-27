@@ -99,6 +99,7 @@ export default async function handler(
     // Prepare update data for Strapi (only include known fields)
     const updateData: any = {
       title: projectData.title,
+      videoLink: projectData.videoLink,
       description: projectData.description,
       slug: projectData.slug,
       projectIntroTitle: projectData.projectIntroTitle,

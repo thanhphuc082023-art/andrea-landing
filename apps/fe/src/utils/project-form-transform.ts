@@ -12,6 +12,7 @@ export function transformStrapiProjectToFormData(
   return {
     // Basic info
     title: project.title || '',
+    videoLink: project.videoLink || '',
     description: project.description || '',
     slug: project.slug || '',
     projectIntroTitle: project.projectIntroTitle || '',
@@ -106,6 +107,8 @@ export function transformStrapiProjectToFormData(
                   id: item.id || `item-${sectionIndex}-${itemIndex}`,
                   title: item.title || item.alt || '',
                   description: item.description || '',
+                  subtitle: item.subtitle || '',
+                  largeTitle: item.largeTitle || '',
                   type: 'text',
                   order: item.order || itemIndex,
                   width: item.width || 1300,
@@ -118,6 +121,9 @@ export function transformStrapiProjectToFormData(
                       id: `item-${sectionIndex}-0`,
                       title: '',
                       description: '',
+                      subtitle: '',
+                      largeTitle: '',
+
                       type: 'text',
                       order: 0,
                       width: 1300,
@@ -127,6 +133,8 @@ export function transformStrapiProjectToFormData(
                       id: `item-${sectionIndex}-1`,
                       title: '',
                       description: '',
+                      subtitle: '',
+                      largeTitle: '',
                       type: 'text',
                       order: 1,
                       width: 1300,
@@ -138,6 +146,8 @@ export function transformStrapiProjectToFormData(
                       id: `item-${sectionIndex}-0`,
                       title: '',
                       description: '',
+                      subtitle: '',
+                      largeTitle: '',
                       type: 'text',
                       order: 0,
                       width: 1300,
@@ -159,6 +169,7 @@ export function transformStrapiProjectToFormData(
                 colSpan: item.colSpan || 1,
                 file: undefined, // No file object for existing items
                 uploadId: item.uploadId || undefined,
+                videoLink: item.videoLink || '',
                 // FlipBook specific data
                 bookData:
                   item.bookData ||
@@ -177,6 +188,7 @@ export function transformStrapiProjectToFormData(
               title: section.title || '',
               subtitle: section.subtitle || '',
               description: section.description || '',
+              largeTitle: section.largeTitle || '',
               imageWidth: section.imageWidth,
               imageHeight: section.imageHeight,
               width: section.width,

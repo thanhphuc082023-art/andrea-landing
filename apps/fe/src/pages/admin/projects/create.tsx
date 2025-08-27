@@ -52,7 +52,7 @@ const ProjectPreviewWrapper = ({
   return (
     <div className="relative min-h-screen">
       {/* Header */}
-      <div className="content-wrapper sticky top-0 z-40 border-b border-gray-200 bg-white py-4 shadow-sm">
+      <div className="content-wrapper top-0 z-40 border-b border-gray-200 bg-white py-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button

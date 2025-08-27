@@ -92,10 +92,11 @@ export default function ProjectFormPage({
     saveDataForPreview,
     cleanup: formCleanup,
   } = useProjectForm({ initialData, onSubmit });
+  const videoLink = watch('videoLink');
   const heroVideo = watch('heroVideo');
   const heroBanner = watch('heroBanner');
   const thumbnail = watch('thumbnail');
-  console.log('showcaseSections', showcaseSections);
+
   const handleCancel = () => {
     cleanup();
     formCleanup();
@@ -116,6 +117,7 @@ export default function ProjectFormPage({
       const currentFormData = {
         ...baseFormData,
         // Merge với file objects từ state riêng
+        videoLink: videoLink,
         heroVideo: heroVideo
           ? {
               ...heroVideo,

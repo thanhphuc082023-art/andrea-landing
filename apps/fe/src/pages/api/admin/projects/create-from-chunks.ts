@@ -222,8 +222,8 @@ async function processShowcaseSections(
           id: item.id || `item-${sectionIndex}-${itemIndex}`,
           src: uploaded.url,
           type: item.type || 'image',
-          title: item.title || `Item ${itemIndex + 1}`,
-          alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+          title: item.title || ``,
+          alt: item.alt || item.title || ``,
           width: item.width || 1300,
           height: item.height || 800,
           order: item.order !== undefined ? item.order : itemIndex,
@@ -235,8 +235,8 @@ async function processShowcaseSections(
         ...item,
         id: item.id || `item-${sectionIndex}-${itemIndex}`,
         type: item.type || 'image',
-        title: item.title || `Item ${itemIndex + 1}`,
-        alt: item.alt || item.title || `Item ${itemIndex + 1}`,
+        title: item.title || ``,
+        alt: item.alt || item.title || ``,
         src: item.src || item.url || '',
         width: item.width || 1300,
         height: item.height || 800,
@@ -492,6 +492,7 @@ export default async function handler(
       data: {
         // Core required fields
         title: requestData.title,
+        videoLink: requestData.videoLink,
         slug:
           requestData.slug ||
           requestData.title.toLowerCase().replace(/\s+/g, '-'),

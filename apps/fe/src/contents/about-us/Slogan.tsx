@@ -264,7 +264,7 @@ function SloganSection({
           alt={altText}
           width={450}
           height={300}
-          className="rounded-8 pointer-events-none relative z-10 h-[250px] w-[400px] object-cover max-md:mx-auto max-md:h-[120px] max-md:w-[180px]"
+          className="rounded-8 pointer-events-none relative z-10 h-full w-full object-cover max-md:mx-auto"
         />
       );
 
@@ -307,7 +307,7 @@ function SloganSection({
           <DraggableCardBody
             key={`${item.id}`}
             isSelected={selected?.id === item.id}
-            className={`absolute min-h-[250px] w-[400px] max-md:mx-3 max-md:my-2 max-md:min-h-[120px] max-md:w-[180px] max-md:p-2`}
+            className={`absolute h-[250px] w-[400px] max-md:mx-3 max-md:my-2 max-md:h-[120px] max-md:w-[180px] max-md:p-2`}
             style={item.style}
             onClick={() => setSelected(item)}
           >
@@ -420,7 +420,7 @@ const SelectedCard = ({
         whileHover={{ scale: 1.02, zIndex: 999999 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="transform-3d rounded-10 relative z-[70] min-h-[250px] w-[400px] overflow-hidden bg-neutral-100 p-6 shadow-2xl max-md:min-h-[120px] max-md:w-[180px] max-md:p-2 dark:bg-neutral-900"
+        className="transform-3d rounded-10 relative z-[70] h-[60vh] w-[70vw] overflow-hidden bg-neutral-100 p-6 shadow-2xl max-md:h-[50vh] max-md:w-[90vw] max-md:p-2 dark:bg-neutral-900"
       >
         {selected?.content}
       </motion.div>

@@ -41,6 +41,23 @@ function HeaderVideo({
     return null;
   };
 
+  const isYouTubeUrl = (u?: string | null) =>
+    !!u && (u.includes('youtube.com') || u.includes('youtu.be'));
+
+  const getYouTubeId = (u: string) => {
+    const match =
+      u.match(/(?:v=|\/embed\/|\.be\/)([A-Za-z0-9_-]{11})/) ||
+      u.match(/([A-Za-z0-9_-]{11})/);
+    return match ? match[1] : null;
+  };
+
+  const getYouTubeEmbedUrl = (u: string) => {
+    const id = getYouTubeId(u);
+    if (!id) return null;
+    // autoplay, muted, loop (loop needs playlist=id)
+    return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playsinline=1&disablekb=1&modestbranding=1&rel=0`;
+  };
+
   const getMobileAspectRatioClasses = (ratio: string) => {
     switch (ratio) {
       case '16:9':
@@ -79,9 +96,100 @@ function HeaderVideo({
   const fallbackVideoRef = useRef<HTMLVideoElement | null>(null);
   const skeletonRef = useRef<HTMLDivElement | null>(null);
 
+  // YouTube mounts and player refs
+  const desktopYouTubeRef = useRef<HTMLDivElement | null>(null);
+  const mobileYouTubeRef = useRef<HTMLDivElement | null>(null);
+  const desktopYtPlayerRef = useRef<any>(null);
+  const mobileYtPlayerRef = useRef<any>(null);
+
   const hideSkeleton = () => {
     skeletonRef.current?.classList.add('hidden');
   };
+
+  // Load YouTube IFrame API once and return a promise that resolves when ready
+  const loadYouTubeAPI = (() => {
+    let promise: Promise<void> | null = null;
+    return () => {
+      if (promise) return promise;
+      promise = new Promise<void>((resolve) => {
+        if ((window as any).YT && (window as any).YT.Player) return resolve();
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+        (window as any).onYouTubeIframeAPIReady = () => resolve();
+      });
+      return promise;
+    };
+  })();
+
+  // create a player for a container ref and video id
+  const createYouTubePlayer = async (
+    container: HTMLDivElement | null,
+    videoId: string | null,
+    playerRef: React.MutableRefObject<any>
+  ) => {
+    if (!container || !videoId) return;
+    await loadYouTubeAPI();
+    // destroy existing if any
+    if (playerRef.current && playerRef.current.destroy) {
+      try {
+        playerRef.current.destroy();
+      } catch (e) {}
+    }
+
+    playerRef.current = new (window as any).YT.Player(container, {
+      videoId,
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        loop: 1,
+        playlist: videoId, // required for loop
+        playsinline: 1,
+        disablekb: 1,
+        modestbranding: 1,
+        showInfo: 0,
+        rel: 0,
+        iv_load_policy: 3,
+      },
+      events: {
+        onReady: (e: any) => {
+          try {
+            e.target.mute();
+            e.target.playVideo();
+          } catch (err) {}
+          hideSkeleton();
+        },
+        onError: hideSkeleton,
+      },
+    });
+  };
+
+  // Effects to mount desktop/mobile YouTube players when urls are YouTube links
+  useEffect(() => {
+    if (!isYouTubeUrl(desktopSrc)) return;
+    const id = getYouTubeId(desktopSrc!);
+    createYouTubePlayer(desktopYouTubeRef.current, id, desktopYtPlayerRef);
+    return () => {
+      if (desktopYtPlayerRef.current && desktopYtPlayerRef.current.destroy) {
+        try {
+          desktopYtPlayerRef.current.destroy();
+        } catch (e) {}
+      }
+    };
+  }, [desktopSrc]);
+
+  useEffect(() => {
+    if (!isYouTubeUrl(mobileSrc)) return;
+    const id = getYouTubeId(mobileSrc!);
+    createYouTubePlayer(mobileYouTubeRef.current, id, mobileYtPlayerRef);
+    return () => {
+      if (mobileYtPlayerRef.current && mobileYtPlayerRef.current.destroy) {
+        try {
+          mobileYtPlayerRef.current.destroy();
+        } catch (e) {}
+      }
+    };
+  }, [mobileSrc]);
 
   const loadAndPlay = (el: HTMLVideoElement | null, src: string | null) => {
     if (!el || !src) return;
@@ -142,39 +250,63 @@ function HeaderVideo({
         }}
       />
 
-      {/* Desktop video (visible on md+) */}
-      <video
-        ref={desktopVideoRef}
-        className={clsx(
-          'relative z-20 h-full w-full object-cover',
-          'hidden md:block'
-        )}
-        {...commonVideoProps}
-      >
-        <source src={desktopSrc ?? fallbackSrc} type="video/mp4" />
-        <track
-          src={desktopSrc ?? fallbackSrc}
-          kind="captions"
-          label="Vietnamese"
-        />
-      </video>
+      {/* Desktop: if YouTube -> iframe embed, else <video> */}
+      {isYouTubeUrl(desktopSrc) ? (
+        (() => {
+          // Mount YouTube IFrame API player into a container to ensure we can call mute/play reliably
+          const embed = getYouTubeEmbedUrl(desktopSrc!);
+          return embed ? (
+            <div className="video-responsive">
+              <div
+                ref={desktopYouTubeRef}
+                className={clsx(
+                  'relative z-20 h-full w-full object-cover',
+                  'pointer-events-none'
+                )}
+                style={{ width: '100%', height: '100%' }}
+                aria-hidden="true"
+              />
+            </div>
+          ) : null;
+        })()
+      ) : (
+        <video
+          ref={desktopVideoRef}
+          className={clsx(
+            'relative z-20 h-full w-full object-cover',
+            'hidden md:block'
+          )}
+          {...commonVideoProps}
+        >
+          <source src={desktopSrc ?? fallbackSrc} type="video/mp4" />
+          <track
+            src={desktopSrc ?? fallbackSrc}
+            kind="captions"
+            label="Vietnamese"
+          />
+        </video>
+      )}
 
-      {/* Mobile video (visible on <md) */}
-      <video
-        ref={mobileVideoRef}
-        className={clsx(
-          'relative z-20 h-full w-full object-cover',
-          'block md:hidden'
-        )}
-        {...commonVideoProps}
-      >
-        <source src={mobileSrc ?? fallbackSrc} type="video/mp4" />
-        <track
-          src={mobileSrc ?? fallbackSrc}
-          kind="captions"
-          label="Vietnamese"
-        />
-      </video>
+      {/* Mobile: if YouTube -> iframe (mounted via API), else <video> */}
+      {isYouTubeUrl(mobileSrc) ? (
+        <></>
+      ) : (
+        <video
+          ref={mobileVideoRef}
+          className={clsx(
+            'relative z-20 h-full w-full object-cover',
+            'block md:hidden'
+          )}
+          {...commonVideoProps}
+        >
+          <source src={mobileSrc ?? fallbackSrc} type="video/mp4" />
+          <track
+            src={mobileSrc ?? fallbackSrc}
+            kind="captions"
+            label="Vietnamese"
+          />
+        </video>
+      )}
 
       {/* Explicit fallback if neither desktop nor mobile provided */}
       {!desktopSrc && !mobileSrc && (

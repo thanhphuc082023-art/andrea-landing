@@ -161,34 +161,26 @@ const SortableSection = ({
                   <span className="inline-flex items-center rounded-full bg-white/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm">
                     {section.type}
                   </span>
-                  <select
-                    value={section.layout}
-                    onChange={(e) => {
-                      const newLayout = e.target.value as any;
-                      setShowcaseSections((prevSections) =>
-                        prevSections.map((s) =>
-                          s.id === section.id
-                            ? // If section is text, ensure items array matches layout (single vs two/three columns)
-                              {
-                                ...s,
-                                layout: newLayout,
-                                items:
-                                  s.type === 'text'
-                                    ? // For text: single -> keep only first item; for 2-col layouts ensure two items; for 3-col ensure three items
-                                      newLayout === 'single'
-                                      ? [
-                                          {
-                                            ...(s.items[0] || {}),
-                                            id:
-                                              s.items[0]?.id ||
-                                              `item-${Date.now()}`,
-                                            title: s.items[0]?.title || '',
-                                            description:
-                                              s.items[0]?.description || '',
-                                            order: 0,
-                                          },
-                                        ]
-                                      : newLayout === 'one-third-equal'
+                  {!section?.type.includes([
+                    'video',
+                    'image-text',
+                    'flipbook',
+                  ]) && (
+                    <select
+                      value={section.layout}
+                      onChange={(e) => {
+                        const newLayout = e.target.value as any;
+                        setShowcaseSections((prevSections) =>
+                          prevSections.map((s) =>
+                            s.id === section.id
+                              ? // If section is text, ensure items array matches layout (single vs two/three columns)
+                                {
+                                  ...s,
+                                  layout: newLayout,
+                                  items:
+                                    s.type === 'text'
+                                      ? // For text: single -> keep only first item; for 2-col layouts ensure two items; for 3-col ensure three items
+                                        newLayout === 'single'
                                         ? [
                                             {
                                               ...(s.items[0] || {}),
@@ -196,69 +188,118 @@ const SortableSection = ({
                                                 s.items[0]?.id ||
                                                 `item-${Date.now()}`,
                                               title: s.items[0]?.title || '',
+                                              subtitle:
+                                                s.items[0]?.subtitle || '',
+                                              largeTitle:
+                                                s.items[0]?.largeTitle || '',
                                               description:
                                                 s.items[0]?.description || '',
                                               order: 0,
-                                            },
-                                            {
-                                              ...(s.items[1] || {}),
-                                              id:
-                                                s.items[1]?.id ||
-                                                `item-${Date.now()}-2`,
-                                              title: s.items[1]?.title || '',
-                                              description:
-                                                s.items[1]?.description || '',
-                                              order: 1,
-                                            },
-                                            {
-                                              ...(s.items[2] || {}),
-                                              id:
-                                                s.items[2]?.id ||
-                                                `item-${Date.now()}-3`,
-                                              title: s.items[2]?.title || '',
-                                              description:
-                                                s.items[2]?.description || '',
-                                              order: 2,
+                                              type: s.items[0]?.type || s.type,
                                             },
                                           ]
-                                        : // half-half or one-third: ensure two items
-                                          [
-                                            {
-                                              ...(s.items[0] || {}),
-                                              id:
-                                                s.items[0]?.id ||
-                                                `item-${Date.now()}`,
-                                              title: s.items[0]?.title || '',
-                                              description:
-                                                s.items[0]?.description || '',
-                                              order: 0,
-                                            },
-                                            {
-                                              ...(s.items[1] || {}),
-                                              id:
-                                                s.items[1]?.id ||
-                                                `item-${Date.now()}-2`,
-                                              title: s.items[1]?.title || '',
-                                              description:
-                                                s.items[1]?.description || '',
-                                              order: 1,
-                                            },
-                                          ]
-                                    : s.items,
-                              }
-                            : s
-                        )
-                      );
-                    }}
-                    className="rounded-full border-none bg-white/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="single">Single</option>
-                    <option value="half-half">1/2 - 1/2</option>
-                    <option value="one-third">1/3 - 2/3</option>
-                    <option value="one-third-equal">1/3 - 1/3 - 1/3</option>
-                    {/* <option value="grid">Grid</option>
+                                        : newLayout === 'one-third-equal'
+                                          ? [
+                                              {
+                                                ...(s.items[0] || {}),
+                                                id:
+                                                  s.items[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                title: s.items[0]?.title || '',
+                                                subtitle:
+                                                  s.items[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items[0]?.largeTitle || '',
+                                                description:
+                                                  s.items[0]?.description || '',
+                                                order: 0,
+                                                type:
+                                                  s.items[0]?.type || s.type,
+                                              },
+                                              {
+                                                ...(s.items[1] || {}),
+                                                id:
+                                                  s.items[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                title: s.items[1]?.title || '',
+                                                subtitle:
+                                                  s.items[1]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items[1]?.largeTitle || '',
+                                                description:
+                                                  s.items[1]?.description || '',
+                                                order: 1,
+                                                type:
+                                                  s.items[1]?.type || s.type,
+                                              },
+                                              {
+                                                ...(s.items[2] || {}),
+                                                id:
+                                                  s.items[2]?.id ||
+                                                  `item-${Date.now()}-3`,
+                                                title: s.items[2]?.title || '',
+                                                subtitle:
+                                                  s.items[2]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items[2]?.largeTitle || '',
+                                                description:
+                                                  s.items[2]?.description || '',
+                                                order: 2,
+                                                type:
+                                                  s.items[2]?.type || s.type,
+                                              },
+                                            ]
+                                          : // half-half or one-third: ensure two items
+                                            [
+                                              {
+                                                ...(s.items[0] || {}),
+                                                id:
+                                                  s.items[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                title: s.items[0]?.title || '',
+                                                subtitle:
+                                                  s.items[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items[0]?.largeTitle || '',
+                                                description:
+                                                  s.items[0]?.description || '',
+                                                order: 0,
+                                                type:
+                                                  s.items[0]?.type || s.type,
+                                              },
+                                              {
+                                                ...(s.items[1] || {}),
+                                                id:
+                                                  s.items[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                title: s.items[1]?.title || '',
+                                                subtitle:
+                                                  s.items[1]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items[1]?.largeTitle || '',
+                                                description:
+                                                  s.items[1]?.description || '',
+                                                order: 1,
+                                                type:
+                                                  s.items[1]?.type || s.type,
+                                              },
+                                            ]
+                                      : s.items,
+                                }
+                              : s
+                          )
+                        );
+                      }}
+                      className="rounded-full border-none bg-white/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="single">Single</option>
+                      <option value="half-half">1/2 - 1/2</option>
+                      <option value="one-third">1/3 - 2/3</option>
+                      <option value="one-third-equal">1/3 - 1/3 - 1/3</option>
+                      {/* <option value="grid">Grid</option>
                     <option value="carousel">Carousel</option> */}
-                  </select>
+                    </select>
+                  )}
                 </div>
               </div>
             </div>
@@ -290,6 +331,45 @@ const SortableSection = ({
                 // Single text block
                 <div>
                   <label className="block text-xs font-medium text-gray-700">
+                    Phụ đề
+                  </label>
+                  <input
+                    type="text"
+                    value={section.items[0]?.subtitle || ''}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                items:
+                                  s.items && s.items.length
+                                    ? s.items.map((it, idx) =>
+                                        idx === 0 ? { ...it, subtitle: v } : it
+                                      )
+                                    : [
+                                        {
+                                          id: `item-${Date.now()}`,
+                                          type: 'text',
+                                          title: '',
+                                          subtitle: v,
+                                          largeTitle: '',
+                                          description: '',
+                                          width: 1300,
+                                          height: 800,
+                                          order: 0,
+                                        },
+                                      ],
+                              }
+                            : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                    placeholder="Tiêu đề phụ..."
+                  />
+                  <label className="mt-2block text-xs font-medium text-gray-700">
                     Tiêu đề
                   </label>
                   <input
@@ -325,6 +405,47 @@ const SortableSection = ({
                     }}
                     className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
                     placeholder="Tiêu đề..."
+                  />
+                  <label className="mt-2 block text-xs font-medium text-gray-700">
+                    Tiêu đề lớn
+                  </label>
+                  <input
+                    type="text"
+                    value={section.items[0]?.largeTitle || ''}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setShowcaseSections((prev) =>
+                        prev.map((s) =>
+                          s.id === section.id
+                            ? {
+                                ...s,
+                                items:
+                                  s.items && s.items.length
+                                    ? s.items.map((it, idx) =>
+                                        idx === 0
+                                          ? { ...it, largeTitle: v }
+                                          : it
+                                      )
+                                    : [
+                                        {
+                                          id: `item-${Date.now()}`,
+                                          type: 'text',
+                                          subtitle: '',
+                                          title: '',
+                                          largeTitle: v,
+                                          description: '',
+                                          width: 1300,
+                                          height: 800,
+                                          order: 0,
+                                        },
+                                      ],
+                              }
+                            : s
+                        )
+                      );
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                    placeholder="Tiêu đề lớn..."
                   />
                   <label className="mt-2 block text-xs font-medium text-gray-700">
                     Mô tả
@@ -542,6 +663,115 @@ const SortableSection = ({
                   {[0, 1].map((i) => (
                     <div key={i}>
                       <label className="block text-xs font-medium text-gray-700">
+                        {i === 0 ? 'Trái' : 'Phải'} - Phụ đề
+                      </label>
+                      <input
+                        type="text"
+                        value={section.items[i]?.subtitle || ''}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setShowcaseSections((prev) =>
+                            prev.map((s) =>
+                              s.id === section.id
+                                ? {
+                                    ...s,
+                                    items:
+                                      s.items && s.items.length >= 2
+                                        ? s.items.map((it, idx) =>
+                                            idx === i
+                                              ? { ...it, subtitle: v }
+                                              : it
+                                          )
+                                        : i === 0
+                                          ? [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                subtitle: v,
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title: '',
+                                                description: '',
+                                                subtitle: '',
+                                                largeTtile: '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ]
+                                          : [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                subtitle: v,
+                                                description:
+                                                  s.items?.[1]?.description ||
+                                                  '',
+                                                title:
+                                                  s.items?.[1]?.title || '',
+                                                largeTitle:
+                                                  s.items?.[1]?.description ||
+                                                  '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ],
+                                  }
+                                : s
+                            )
+                          );
+                        }}
+                        className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                        placeholder="Tiêu đề..."
+                      />
+                      <label className="mt-2 block text-xs font-medium text-gray-700">
                         {i === 0 ? 'Trái' : 'Phải'} - Tiêu đề
                       </label>
                       <input
@@ -570,6 +800,11 @@ const SortableSection = ({
                                                 description:
                                                   s.items?.[0]?.description ||
                                                   '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
                                                 width:
                                                   s.items?.[0]?.width || 1300,
                                                 height:
@@ -583,6 +818,8 @@ const SortableSection = ({
                                                 type: 'text',
                                                 title: '',
                                                 description: '',
+                                                subtitle: '',
+                                                largeTtile: '',
                                                 width:
                                                   s.items?.[1]?.width || 1300,
                                                 height:
@@ -601,6 +838,11 @@ const SortableSection = ({
                                                 description:
                                                   s.items?.[0]?.description ||
                                                   '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
                                                 width:
                                                   s.items?.[0]?.width || 1300,
                                                 height:
@@ -616,6 +858,11 @@ const SortableSection = ({
                                                 description:
                                                   s.items?.[1]?.description ||
                                                   '',
+                                                subtitle:
+                                                  s.items?.[1]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[1]?.largeTitle ||
+                                                  '',
                                                 width:
                                                   s.items?.[1]?.width || 1300,
                                                 height:
@@ -630,6 +877,113 @@ const SortableSection = ({
                         }}
                         className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
                         placeholder="Tiêu đề..."
+                      />
+                      <label className="mt-2 block text-xs font-medium text-gray-700">
+                        {i === 0 ? 'Trái' : 'Phải'} - Tiêu đề lớn
+                      </label>
+                      <input
+                        type="text"
+                        value={section.items[i]?.largeTitle || ''}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setShowcaseSections((prev) =>
+                            prev.map((s) =>
+                              s.id === section.id
+                                ? {
+                                    ...s,
+                                    items:
+                                      s.items && s.items.length >= 2
+                                        ? s.items.map((it, idx) =>
+                                            idx === i
+                                              ? { ...it, largeTitle: v }
+                                              : it
+                                          )
+                                        : i === 0
+                                          ? [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                largeTitle: v,
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title: '',
+                                                description: '',
+                                                subtitle: '',
+                                                largeTtile: '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ]
+                                          : [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                largeTitle: v,
+                                                description:
+                                                  s.items?.[1]?.description ||
+                                                  '',
+                                                subtitle:
+                                                  s.items?.[1]?.subtitle || '',
+                                                title:
+                                                  s.items?.[1]?.title || '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ],
+                                  }
+                                : s
+                            )
+                          );
+                        }}
+                        className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                        placeholder="Tiêu đề lớn..."
                       />
                       <label className="mt-2 block text-xs font-medium text-gray-700">
                         Mô tả
@@ -659,6 +1013,11 @@ const SortableSection = ({
                                                 type: 'text',
                                                 title:
                                                   s.items?.[0]?.title || '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
                                                 description: v,
                                                 width: 1300,
                                                 height: 800,
@@ -671,6 +1030,8 @@ const SortableSection = ({
                                                 type: 'text',
                                                 title: '',
                                                 description: '',
+                                                subtitle: '',
+                                                largeTitle: '',
                                                 width: 1300,
                                                 height: 800,
                                                 order: 1,
@@ -687,6 +1048,11 @@ const SortableSection = ({
                                                 description:
                                                   s.items?.[0]?.description ||
                                                   '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
                                                 width: 1300,
                                                 height: 800,
                                                 order: 0,
@@ -698,6 +1064,11 @@ const SortableSection = ({
                                                 type: 'text',
                                                 title:
                                                   s.items?.[1]?.title || '',
+                                                subtitle:
+                                                  s.items?.[0]?.subtitle || '',
+                                                largeTitle:
+                                                  s.items?.[0]?.largeTitle ||
+                                                  '',
                                                 description: v,
                                                 width: 1300,
                                                 height: 800,
@@ -809,7 +1180,7 @@ const SortableSection = ({
                     </label>
                     <input
                       type="number"
-                      value={section.items[0]?.width || ''}
+                      value={section?.width || ''}
                       onChange={(e) => {
                         const totalWidth = parseInt(e.target.value) || 0;
                         const w1 = Math.floor(totalWidth / 3);
@@ -820,6 +1191,7 @@ const SortableSection = ({
                             s.id === section.id
                               ? {
                                   ...s,
+                                  width: totalWidth,
                                   items:
                                     s.items && s.items.length >= 3
                                       ? s.items.map((it, idx) =>
@@ -964,7 +1336,7 @@ const SortableSection = ({
                       <div className="text-xs text-gray-600">
                         • Cột 1:{' '}
                         {Math.floor(
-                          (section.items[0]?.width || 1300) /
+                          (section?.width || 1300) /
                             (section.layout === 'half-half' ? 2 : 3)
                         )}
                         px × {section.items[0]?.height || 800}px
@@ -972,9 +1344,9 @@ const SortableSection = ({
                       {section.items[1] && (
                         <div className="text-xs text-gray-600">
                           • Cột 2:{' '}
-                          {(section.items[0]?.width || 1300) -
+                          {(section?.width || 1300) -
                             Math.floor(
-                              (section.items[0]?.width || 1300) /
+                              (section?.width || 1300) /
                                 (section.layout === 'half-half' ? 2 : 3)
                             )}
                           px ×{' '}
@@ -999,7 +1371,7 @@ const SortableSection = ({
                     </label>
                     <input
                       type="number"
-                      value={section.items[0]?.width || ''}
+                      value={section.width || ''}
                       onChange={(e) => {
                         const totalWidth = parseInt(e.target.value) || 0;
                         const firstItemWidth =
@@ -1013,6 +1385,7 @@ const SortableSection = ({
                             s.id === section.id
                               ? {
                                   ...s,
+                                  width: totalWidth,
                                   items:
                                     s.items && s.items.length >= 2
                                       ? s.items.map((it, idx) =>
@@ -1141,7 +1514,7 @@ const SortableSection = ({
                       <div className="text-xs text-gray-600">
                         • Cột 1:{' '}
                         {Math.floor(
-                          (section.items[0]?.width || 1300) /
+                          (section?.width || 1300) /
                             (section.layout === 'half-half' ? 2 : 3)
                         )}
                         px × {section.items[0]?.height || 800}px
@@ -1149,9 +1522,9 @@ const SortableSection = ({
                       {section.items[1] && (
                         <div className="text-xs text-gray-600">
                           • Cột 2:{' '}
-                          {(section.items[0]?.width || 1300) -
+                          {(section?.width || 1300) -
                             Math.floor(
-                              (section.items[0]?.width || 1300) /
+                              (section?.width || 1300) /
                                 (section.layout === 'half-half' ? 2 : 3)
                             )}
                           px ×{' '}
@@ -1174,7 +1547,7 @@ const SortableSection = ({
           <div className="mt-4 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
             <div className="space-y-3">
               <label className="block text-xs font-medium text-gray-700">
-                Title
+                Tiêu đề
               </label>
               <input
                 type="text"
@@ -1191,7 +1564,7 @@ const SortableSection = ({
               />
 
               <label className="block text-xs font-medium text-gray-700">
-                Subtitle
+                Phụ đề
               </label>
               <input
                 type="text"
@@ -1210,7 +1583,7 @@ const SortableSection = ({
               />
 
               <label className="block text-xs font-medium text-gray-700">
-                Description
+                Mô tả
               </label>
               <textarea
                 value={section.description || ''}
@@ -1550,62 +1923,67 @@ const SortableSection = ({
                     (item) => item.src || item.url || item.uploadId || item.file
                   ) // Only show items with source (existing uploads or new files)
                   .map((item, index) => (
-                    <div key={item.id} className="flex items-center space-x-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-                        <CheckIcon className="h-4 w-4 text-green-600" />
+                    <>
+                      <div
+                        key={item.id}
+                        className="flex items-center space-x-3"
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                          <CheckIcon className="h-4 w-4 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            {item.title || 'Uploaded file'}{' '}
+                            {section.items.length > 1 ? `(${index + 1})` : ''}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {item.size
+                              ? formatFileSize(item.size)
+                              : 'Unknown size'}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {item.uploadId ? (
+                            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                              ✓ Đã tải lên
+                            </span>
+                          ) : item.file ? (
+                            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                              Sẵn sàng
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+                              Có sẵn
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowcaseSections((prevSections) =>
+                                prevSections.map((s) =>
+                                  s.id === section.id
+                                    ? {
+                                        ...s,
+                                        items: s.items.filter(
+                                          (_, i) =>
+                                            i !==
+                                            section.items.findIndex(
+                                              (originalItem) =>
+                                                originalItem.id === item.id
+                                            )
+                                        ),
+                                      }
+                                    : s
+                                )
+                              );
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <XMarkIcon className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
-                          {item.title || 'Uploaded file'}{' '}
-                          {section.items.length > 1 ? `(${index + 1})` : ''}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {item.size
-                            ? formatFileSize(item.size)
-                            : 'Unknown size'}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {item.uploadId ? (
-                          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                            ✓ Đã tải lên
-                          </span>
-                        ) : item.file ? (
-                          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-                            Sẵn sàng
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
-                            Có sẵn
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowcaseSections((prevSections) =>
-                              prevSections.map((s) =>
-                                s.id === section.id
-                                  ? {
-                                      ...s,
-                                      items: s.items.filter(
-                                        (_, i) =>
-                                          i !==
-                                          section.items.findIndex(
-                                            (originalItem) =>
-                                              originalItem.id === item.id
-                                          )
-                                      ),
-                                    }
-                                  : s
-                              )
-                            );
-                          }}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <XMarkIcon className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
+                    </>
                   ))}
               </div>
 
@@ -1705,7 +2083,7 @@ const SortableSection = ({
                         </label>
                         <input
                           type="number"
-                          value={section.items[0].width || ''}
+                          value={section?.width || ''}
                           onChange={(e) => {
                             const totalWidth = parseInt(e.target.value) || 0;
                             const w1 = Math.floor(totalWidth / 3);
@@ -1717,6 +2095,7 @@ const SortableSection = ({
                                 s.id === section.id
                                   ? {
                                       ...s,
+                                      width: totalWidth,
                                       items: s.items.map((item, index) => ({
                                         ...item,
                                         width:
@@ -1808,7 +2187,7 @@ const SortableSection = ({
                         </label>
                         <input
                           type="number"
-                          value={section.items[0]?.width || ''}
+                          value={section?.width || ''}
                           onChange={(e) => {
                             const totalWidth = parseInt(e.target.value) || 0;
                             const firstItemWidth =
@@ -1822,6 +2201,7 @@ const SortableSection = ({
                                 s.id === section.id
                                   ? {
                                       ...s,
+                                      width: totalWidth,
                                       items:
                                         s.items && s.items.length >= 2
                                           ? s.items.map((it, idx) =>
@@ -1965,7 +2345,7 @@ const SortableSection = ({
                           <div className="text-xs text-gray-600">
                             • Cột 1:{' '}
                             {Math.floor(
-                              (section.items[0]?.width || 1300) /
+                              (section?.width || 1300) /
                                 (section.layout === 'half-half' ? 2 : 3)
                             )}
                             px × {section.items[0]?.height || 800}px
@@ -1973,9 +2353,9 @@ const SortableSection = ({
                           {section.items[1] && (
                             <div className="text-xs text-gray-600">
                               • Cột 2:{' '}
-                              {(section.items[0]?.width || 1300) -
+                              {(section?.width || 1300) -
                                 Math.floor(
-                                  (section.items[0]?.width || 1300) /
+                                  (section?.width || 1300) /
                                     (section.layout === 'half-half' ? 2 : 3)
                                 )}
                               px ×{' '}
@@ -2041,6 +2421,7 @@ const SortableSection = ({
                                       height: 800,
                                       order: 0,
                                       file: file, // Lưu file object để uploadProjectMedia có thể xử lý
+                                      videoLink: '',
                                     },
                                   ],
                                 }
@@ -2077,6 +2458,107 @@ const SortableSection = ({
                           : ''}
                   </label>
                 </div>
+
+                {/* Video link input (only for video items) */}
+                {section.type === 'video' && (
+                  <>
+                    <div className="mt-2">
+                      <label className="block text-xs font-medium text-gray-700">
+                        Đường dẫn
+                      </label>
+                      <input
+                        type="text"
+                        value={section?.items?.[0]?.videoLink || ''}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setShowcaseSections((prevSections) => {
+                            const updatedSections = prevSections.map((s) =>
+                              s.id === section.id
+                                ? {
+                                    ...s,
+                                    items: [
+                                      {
+                                        ...s.items?.[0],
+                                        videoLink: v,
+                                      },
+                                    ],
+                                  }
+                                : s
+                            );
+
+                            return updatedSections;
+                          });
+                        }}
+                        className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-sm shadow-sm"
+                        placeholder="https://..."
+                      />
+                    </div>{' '}
+                    <div className="mt-2 grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Chiều ngang (px)
+                        </label>
+                        <input
+                          type="number"
+                          value={section?.items?.[0]?.width || ''}
+                          onChange={(e) => {
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items: s.items.map((item, idx) =>
+                                        idx === 0
+                                          ? {
+                                              ...item,
+                                              width:
+                                                parseInt(e.target.value) || 0,
+                                            }
+                                          : item
+                                      ),
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="1300"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Chiều cao (px)
+                        </label>
+                        <input
+                          type="number"
+                          value={section?.items?.[0]?.height || ''}
+                          onChange={(e) => {
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items: s.items.map((item, idx) =>
+                                        idx === 0
+                                          ? {
+                                              ...item,
+                                              height:
+                                                parseInt(e.target.value) || 0,
+                                            }
+                                          : item
+                                      ),
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="800"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -2136,6 +2618,7 @@ const SortableSection = ({
                                         height: s.items[0]?.height || 800,
                                         order: 1,
                                         file: file, // Lưu file object để uploadProjectMedia có thể xử lý
+                                        videoLink: '',
                                       },
                                     ],
                                   }
@@ -2289,7 +2772,7 @@ export default function ShowcaseSection({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-  console.log('showcaseSections', showcaseSections);
+
   const handleDragEnd = (event: DragEndEvent) => {
     try {
       const { active, over } = event;
@@ -2333,7 +2816,7 @@ export default function ShowcaseSection({
           title:
             type === 'text' || type === 'image-text'
               ? ''
-              : `Item ${showcaseSections.length + 1}`,
+              : ``,
           description:
             type === 'text' || type === 'image-text' ? '' : undefined,
           src: type === 'text' ? undefined : '',
@@ -2342,6 +2825,7 @@ export default function ShowcaseSection({
           width: 1300,
           height: 800,
           order: 0,
+          videoLink: '',
         },
       ],
       order: showcaseSections.length,
@@ -2409,7 +2893,6 @@ export default function ShowcaseSection({
             </SortableContext>
           </DndContext>
         )}
-
         {/* Add New Section */}
         <div className="group relative">
           <button

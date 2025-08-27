@@ -36,6 +36,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
       title: initialData?.title || '',
+      videoLink: initialData?.videoLink || '',
       description: initialData?.description || '',
       slug: initialData?.slug || '',
       status: initialData?.status || 'draft',

@@ -53,6 +53,7 @@ export const projectFormSchema = z.object({
     projectManager: z.string().min(1, 'Credits là bắt buộc'),
   }),
   heroVideo: z.any().optional(),
+  videoLink: z.any().optional(),
   heroBanner: z.any().optional(),
   thumbnail: z.any().optional(),
   showcase: z.array(z.any()).optional(),

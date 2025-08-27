@@ -18,6 +18,7 @@ export interface ProjectShowcaseItem {
   // For file upload handling
   file?: File;
   uploadId?: string;
+  videoLink?: string;
   size?: number;
 }
 
@@ -91,6 +92,7 @@ export interface ProjectData {
   projectMetaInfo: string[];
 
   heroVideo?: MediaFile | null;
+  videoLink?: string;
   heroBanner?: MediaFile | null;
   thumbnail?: MediaFile | null;
   featuredImage?: MediaFile | null;
@@ -193,6 +195,7 @@ export interface ProjectFormData {
       order: number;
       file?: File;
       src?: string;
+      videoLink?: string;
       bookData?: {
         title?: string;
         websiteUrl?: string;

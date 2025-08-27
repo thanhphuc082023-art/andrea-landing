@@ -76,6 +76,8 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
                 type: 'text',
                 title: item.title || '',
                 description: item.description || '',
+                subtitle: item.subtitle || '',
+                largeTitle: item.largeTitle || '',
                 width: item.width || 1300,
                 height: item.height || 800,
                 order: item.order ?? idx,
@@ -88,6 +90,8 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
                     type: 'text',
                     title: '',
                     description: '',
+                    subtitle: '',
+                    largeTitle: '',
                     width: 1300,
                     height: 800,
                     order: 0,
@@ -97,17 +101,21 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
                     type: 'text',
                     title: '',
                     description: '',
+                    subtitle: '',
+                    largeTitle: '',
                     width: 1300,
                     height: 800,
                     order: 1,
                   },
                 ]
-              : [
+                : [
                   {
                     id: `item-${section.id || 's'}-0`,
                     type: 'text',
                     title: '',
                     description: '',
+                    subtitle: '',
+                    largeTitle: '',
                     width: 1300,
                     height: 800,
                     order: 0,
@@ -134,6 +142,7 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
   return {
     id: project.id,
     title: project.title || '',
+    videoLink: project.videoLink || '',
     slug: project.slug || '',
     description: project.description || '',
     projectIntroTitle: project.projectIntroTitle || '',
