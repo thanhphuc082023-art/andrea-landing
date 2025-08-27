@@ -954,8 +954,41 @@ const SortableSection = ({
                       placeholder="800"
                     />
                   </div>
+
+                  {/* Preview */}
+                  <div className="rounded-md bg-gray-50 p-2">
+                    <p className="mb-1 text-xs font-medium text-gray-700">
+                      Kích thước preview:
+                    </p>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-600">
+                        • Cột 1:{' '}
+                        {Math.floor(
+                          (section.items[0]?.width || 1300) /
+                            (section.layout === 'half-half' ? 2 : 3)
+                        )}
+                        px × {section.items[0]?.height || 800}px
+                      </div>
+                      {section.items[1] && (
+                        <div className="text-xs text-gray-600">
+                          • Cột 2:{' '}
+                          {(section.items[0]?.width || 1300) -
+                            Math.floor(
+                              (section.items[0]?.width || 1300) /
+                                (section.layout === 'half-half' ? 2 : 3)
+                            )}
+                          px ×{' '}
+                          {section.items[1]?.height ||
+                            section.items[0]?.height ||
+                            800}
+                          px
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ) : (
+                // Half-half and one-third layouts - shared dimensions
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700">
@@ -975,8 +1008,8 @@ const SortableSection = ({
                             : Math.floor(totalWidth / 3);
                         const secondItemWidth = totalWidth - firstItemWidth;
 
-                        setShowcaseSections((prev) =>
-                          prev.map((s) =>
+                        setShowcaseSections((prevSections) =>
+                          prevSections.map((s) =>
                             s.id === section.id
                               ? {
                                   ...s,
@@ -984,7 +1017,7 @@ const SortableSection = ({
                                     s.items && s.items.length >= 2
                                       ? s.items.map((it, idx) =>
                                           idx === 0
-                                            ? { ...it, width: totalWidth }
+                                            ? { ...it, width: firstItemWidth }
                                             : idx === 1
                                               ? {
                                                   ...it,
@@ -1001,7 +1034,7 @@ const SortableSection = ({
                                             title: s.items?.[0]?.title || '',
                                             description:
                                               s.items?.[0]?.description || '',
-                                            width: totalWidth,
+                                            width: firstItemWidth,
                                             height: s.items?.[0]?.height || 800,
                                             order: 0,
                                           },
@@ -1023,23 +1056,22 @@ const SortableSection = ({
                           )
                         );
                       }}
-                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       placeholder="1300"
                     />
                     <p className="mt-1 text-xs text-gray-500">
-                      {section.layout === 'half-half'
-                        ? `Sẽ chia: ${Math.floor(
-                            (section.items[0]?.width || 1300) / 2
-                          )}px + ${
-                            (section.items[0]?.width || 1300) -
-                            Math.floor((section.items[0]?.width || 1300) / 2)
-                          }px`
-                        : `Sẽ chia: ${Math.floor(
-                            (section.items[0]?.width || 1300) / 3
-                          )}px + ${
-                            (section.items[0]?.width || 1300) -
-                            Math.floor((section.items[0]?.width || 1300) / 3)
-                          }px`}
+                      Sẽ chia:{' '}
+                      {Math.floor(
+                        (section.items[0]?.width || 1300) /
+                          (section.layout === 'half-half' ? 2 : 3)
+                      )}
+                      px +{' '}
+                      {(section.items[0]?.width || 1300) -
+                        Math.floor(
+                          (section.items[0]?.width || 1300) /
+                            (section.layout === 'half-half' ? 2 : 3)
+                        )}
+                      px
                     </p>
                   </div>
 
@@ -1053,8 +1085,8 @@ const SortableSection = ({
                       onChange={(e) => {
                         const sharedHeight = parseInt(e.target.value) || 0;
 
-                        setShowcaseSections((prev) =>
-                          prev.map((s) =>
+                        setShowcaseSections((prevSections) =>
+                          prevSections.map((s) =>
                             s.id === section.id
                               ? {
                                   ...s,
@@ -1095,9 +1127,41 @@ const SortableSection = ({
                           )
                         );
                       }}
-                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm"
+                      className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       placeholder="800"
                     />
+                  </div>
+
+                  {/* Preview */}
+                  <div className="rounded-md bg-gray-50 p-2">
+                    <p className="mb-1 text-xs font-medium text-gray-700">
+                      Kích thước preview:
+                    </p>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-600">
+                        • Cột 1:{' '}
+                        {Math.floor(
+                          (section.items[0]?.width || 1300) /
+                            (section.layout === 'half-half' ? 2 : 3)
+                        )}
+                        px × {section.items[0]?.height || 800}px
+                      </div>
+                      {section.items[1] && (
+                        <div className="text-xs text-gray-600">
+                          • Cột 2:{' '}
+                          {(section.items[0]?.width || 1300) -
+                            Math.floor(
+                              (section.items[0]?.width || 1300) /
+                                (section.layout === 'half-half' ? 2 : 3)
+                            )}
+                          px ×{' '}
+                          {section.items[1]?.height ||
+                            section.items[0]?.height ||
+                            800}
+                          px
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1718,38 +1782,211 @@ const SortableSection = ({
                         </p>
                         <div className="space-y-1">
                           <div className="text-xs text-gray-600">
-                            • Item 1 (33%):{' '}
-                            {Math.floor((section.items[0].width || 1300) / 3)}px
+                            • Item 1 (50%):{' '}
+                            {Math.floor((section.items[0].width || 1300) / 2)}px
                             × {section.items[0].height || 800}px
                           </div>
                           {section.items[1] && (
                             <div className="text-xs text-gray-600">
-                              • Item 2 (33%):{' '}
-                              {Math.floor((section.items[1].width || 1300) / 3)}
+                              • Item 2 (50%):{' '}
+                              {Math.floor((section.items[1].width || 1300) / 2)}
                               px × {section.items[1].height || 800}px
-                            </div>
-                          )}
-                          {section.items[2] && (
-                            <div className="text-xs text-gray-600">
-                              • Item 3 (33%):{' '}
-                              {Math.max(
-                                0,
-                                (section.items[2].width || 1300) -
-                                  Math.floor(
-                                    (section.items[2].width || 1300) / 3
-                                  ) *
-                                    2
-                              )}
-                              px × {section.items[2].height || 800}px
                             </div>
                           )}
                         </div>
                       </div>
                     </div>
                   ) : (
-                    // Half-half and one-third layouts - shared dimensions (existing)
+                    // Half-half and one-third layouts - shared dimensions
                     <div className="space-y-3">
-                      {/* ...existing two-column shared controls... */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Tổng chiều ngang (px) -{' '}
+                          {section.layout === 'half-half'
+                            ? 'Chia 50% - 50%'
+                            : 'Chia 33% - 67%'}
+                        </label>
+                        <input
+                          type="number"
+                          value={section.items[0]?.width || ''}
+                          onChange={(e) => {
+                            const totalWidth = parseInt(e.target.value) || 0;
+                            const firstItemWidth =
+                              section.layout === 'half-half'
+                                ? Math.floor(totalWidth / 2)
+                                : Math.floor(totalWidth / 3);
+                            const secondItemWidth = totalWidth - firstItemWidth;
+
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items:
+                                        s.items && s.items.length >= 2
+                                          ? s.items.map((it, idx) =>
+                                              idx === 0
+                                                ? {
+                                                    ...it,
+                                                    width: firstItemWidth,
+                                                  }
+                                                : idx === 1
+                                                  ? {
+                                                      ...it,
+                                                      width: secondItemWidth,
+                                                    }
+                                                  : it
+                                            )
+                                          : [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                width: firstItemWidth,
+                                                height:
+                                                  s.items?.[0]?.height || 800,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[1]?.title || '',
+                                                description:
+                                                  s.items?.[1]?.description ||
+                                                  '',
+                                                width: secondItemWidth,
+                                                height:
+                                                  s.items?.[1]?.height || 800,
+                                                order: 1,
+                                              },
+                                            ],
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="1300"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                          Sẽ chia:{' '}
+                          {Math.floor(
+                            (section.items[0]?.width || 1300) /
+                              (section.layout === 'half-half' ? 2 : 3)
+                          )}
+                          px +{' '}
+                          {(section.items[0]?.width || 1300) -
+                            Math.floor(
+                              (section.items[0]?.width || 1300) /
+                                (section.layout === 'half-half' ? 2 : 3)
+                            )}
+                          px
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">
+                          Chiều cao chung (px) - Áp dụng cho cả 2
+                        </label>
+                        <input
+                          type="number"
+                          value={section.items[0]?.height || ''}
+                          onChange={(e) => {
+                            const sharedHeight = parseInt(e.target.value) || 0;
+
+                            setShowcaseSections((prevSections) =>
+                              prevSections.map((s) =>
+                                s.id === section.id
+                                  ? {
+                                      ...s,
+                                      items:
+                                        s.items && s.items.length >= 2
+                                          ? s.items.map((it) => ({
+                                              ...it,
+                                              height: sharedHeight,
+                                            }))
+                                          : [
+                                              {
+                                                id:
+                                                  s.items?.[0]?.id ||
+                                                  `item-${Date.now()}`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[0]?.title || '',
+                                                description:
+                                                  s.items?.[0]?.description ||
+                                                  '',
+                                                width:
+                                                  s.items?.[0]?.width || 1300,
+                                                height: sharedHeight,
+                                                order: 0,
+                                              },
+                                              {
+                                                id:
+                                                  s.items?.[1]?.id ||
+                                                  `item-${Date.now()}-2`,
+                                                type: 'text',
+                                                title:
+                                                  s.items?.[1]?.title || '',
+                                                description:
+                                                  s.items?.[1]?.description ||
+                                                  '',
+                                                width:
+                                                  s.items?.[1]?.width || 1300,
+                                                height: sharedHeight,
+                                                order: 1,
+                                              },
+                                            ],
+                                    }
+                                  : s
+                              )
+                            );
+                          }}
+                          className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="800"
+                        />
+                      </div>
+
+                      {/* Preview */}
+                      <div className="rounded-md bg-gray-50 p-2">
+                        <p className="mb-1 text-xs font-medium text-gray-700">
+                          Kích thước preview:
+                        </p>
+                        <div className="space-y-1">
+                          <div className="text-xs text-gray-600">
+                            • Cột 1:{' '}
+                            {Math.floor(
+                              (section.items[0]?.width || 1300) /
+                                (section.layout === 'half-half' ? 2 : 3)
+                            )}
+                            px × {section.items[0]?.height || 800}px
+                          </div>
+                          {section.items[1] && (
+                            <div className="text-xs text-gray-600">
+                              • Cột 2:{' '}
+                              {(section.items[0]?.width || 1300) -
+                                Math.floor(
+                                  (section.items[0]?.width || 1300) /
+                                    (section.layout === 'half-half' ? 2 : 3)
+                                )}
+                              px ×{' '}
+                              {section.items[1]?.height ||
+                                section.items[0]?.height ||
+                                800}
+                              px
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
