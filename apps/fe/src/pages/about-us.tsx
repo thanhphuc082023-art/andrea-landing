@@ -37,8 +37,8 @@ function AboutUsPage({
       <StrapiHead
         title={`Về chúng tôi - ${siteName}`}
         description={siteDescription}
-        ogImage={getStrapiMediaUrl(currentGlobal?.defaultSeo?.shareImage)}
-        seo={currentGlobal?.defaultSeo}
+        ogImage={'/assets/images/about-us/content.png'}
+        // seo={currentGlobal?.defaultSeo}
         global={currentGlobal}
         overrideTitle
       />
