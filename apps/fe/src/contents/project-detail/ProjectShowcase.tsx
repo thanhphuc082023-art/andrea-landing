@@ -161,7 +161,7 @@ const legacyShowcaseData: any[] = [
 const ShowcaseItem = memo(
   ({ item, priority = false }: { item: ShowcaseItem; priority?: boolean }) => {
     const commonClasses =
-      'object-cover transition-transform duration-700 group-hover:scale-[1.02]';
+      'object-cover transition-transform duration-700 group-hover:scale-[1.02] z-[10]';
     const html = item.description?.replace(/\n/g, '<br/>') || '';
 
     // Refs and helpers for YouTube mounting (applies when item.type === 'video')
@@ -235,7 +235,7 @@ const ShowcaseItem = memo(
       return (
         <div
           className={clsx(
-            'pointer-events-none flex h-full w-full items-center justify-center bg-white max-lg:h-fit max-md:p-[28px]',
+            'pointer-events-none flex h-full w-full items-center justify-center bg-white max-lg:h-fit max-md:!h-auto max-md:p-[28px]',
             !item?.description && !item?.title ? 'max-lg:hidden' : ''
           )}
           style={{ height: item?.height }}
@@ -250,7 +250,7 @@ const ShowcaseItem = memo(
               </h3>
             ) : null}
             {item.largeTitle ? (
-              <h3 className="text-[35px] font-semibold text-black">
+              <h3 className="text-[35px] font-semibold leading-[43px] text-black max-md:text-[28px] max-md:leading-[36px]">
                 {item.largeTitle}
               </h3>
             ) : null}
@@ -294,7 +294,7 @@ const ShowcaseItem = memo(
 
       if (isYouTubeUrl(src)) {
         return (
-          <div className="video-responsive pointer-events-none relative">
+          <div className="video-responsive pointer-events-none relative max-md:pointer-events-auto">
             {/* skeleton overlay */}
             <div
               ref={skeletonRef}
@@ -402,7 +402,7 @@ const ShowcaseItem = memo(
             : '(max-width: 1024px) 100vw, 50vw'
         }
         priority={priority}
-        style={{ objectFit: 'contain' }}
+        // style={{ objectFit: 'contain' }}
       />
     );
   }
@@ -749,7 +749,15 @@ const ShowcaseSection = memo(
           key={section.id}
           className={clsx(
             'grid grid-cols-2',
-            section.type === 'text' ? 'gap-6 max-lg:grid-cols-1' : ''
+            section.type === 'text' ? 'max-lg:grid-cols-1' : '',
+            section.type === 'text' &&
+              items?.length > 1 &&
+              (items?.[1]?.title ||
+                items?.[1]?.subtitle ||
+                items?.[1]?.largeTitle ||
+                items?.[1]?.description)
+              ? 'gap-6'
+              : ''
           )}
         >
           {items.map((item: any, itemIndex: number) => {

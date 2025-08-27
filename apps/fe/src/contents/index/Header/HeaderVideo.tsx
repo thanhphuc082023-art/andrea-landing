@@ -261,7 +261,7 @@ function HeaderVideo({
                 ref={desktopYouTubeRef}
                 className={clsx(
                   'relative z-20 h-full w-full object-cover',
-                  'pointer-events-none'
+                  'pointer-events-none max-md:pointer-events-auto'
                 )}
                 style={{ width: '100%', height: '100%' }}
                 aria-hidden="true"
