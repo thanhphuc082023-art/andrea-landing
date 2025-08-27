@@ -21,10 +21,9 @@ function HeaderVideo({
     if (typeof videoData === 'string') {
       return videoData;
     }
-
     // Common shape: { url: '/uploads/..' } or { url: 'https://...' }
     if (videoData.url && typeof videoData.url === 'string') {
-      return videoData.url.startsWith('/')
+      return videoData.url.startsWith('/') && getStrapiMediaUrl(videoData.url)
         ? (getStrapiMediaUrl(videoData.url) ?? null)
         : videoData.url;
     }

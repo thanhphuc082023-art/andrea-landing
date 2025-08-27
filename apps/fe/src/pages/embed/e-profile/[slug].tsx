@@ -27,7 +27,6 @@ interface EmbedBookPageProps {
 
 export default function EmbedBookPage({ book, error }: EmbedBookPageProps) {
   const router = useRouter();
-
   // Handle fallback state
   if (router.isFallback) {
     return (
@@ -217,7 +216,7 @@ export default function EmbedBookPage({ book, error }: EmbedBookPageProps) {
         `}</style>
       </Head>
 
-      <div className="h-screen w-full bg-pdf">
+      <div className="bg-pdf h-screen w-full">
         <MinimalFlipBook isSimpleLayout pdfUrl={pdfUrl} bookData={bookData} />
       </div>
     </>
@@ -295,7 +294,6 @@ export const getStaticProps: GetStaticProps<EmbedBookPageProps> = async ({
     }
 
     const data = await response.json();
-
     if (!data.data || data.data.length === 0) {
       return {
         props: {

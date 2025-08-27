@@ -51,6 +51,7 @@ function getLayoutNoFooter(page: ReactElement, pageProps?: any): ReactNode {
     <WithNavigationFooter
       serverGlobal={pageProps?.serverGlobal}
       menuItems={pageProps?.menuItems}
+      noFooter
     >
       {page}
     </WithNavigationFooter>

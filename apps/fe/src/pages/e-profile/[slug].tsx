@@ -261,7 +261,7 @@ export const getStaticProps: GetStaticProps<PDFBookPageProps> = async ({
       }
 
       const bookData = data.data[0];
-      console.log(data);
+
       const book: BookAttributes = {
         title: bookData.title,
         slug: bookData.slug,

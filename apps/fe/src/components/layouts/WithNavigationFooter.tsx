@@ -12,6 +12,7 @@ interface WithNavigationFooterProps extends PropsWithChildren {
   serverGlobal?: StrapiGlobal;
   menuItems?: NavigationItem[];
   footerData?: FooterSettings;
+  noFooter?: boolean;
 }
 
 function WithNavigationFooter({
@@ -19,6 +20,7 @@ function WithNavigationFooter({
   serverGlobal = undefined,
   menuItems = [],
   footerData = undefined,
+  noFooter = false,
 }: WithNavigationFooterProps) {
   return (
     <>
@@ -26,7 +28,7 @@ function WithNavigationFooter({
       <Navigation menuItems={menuItems} serverGlobal={serverGlobal} />
       <main>{children}</main>
       <Toaster />
-      {footerData && <Footer footerData={footerData} />}
+      {!noFooter && <Footer footerData={footerData} />}
     </>
   );
 }
