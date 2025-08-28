@@ -246,7 +246,7 @@ function SloganSection({
         style = {
           position: 'absolute',
           left: `${36 + xPercent + jitterX}%`,
-          top: `${38 + yPercent + jitterY}%`,
+          top: `${40 + yPercent + jitterY}%`,
           rotate: rotationDeg,
           zIndex: 100 - index, // stacking so earlier items are on top
         };
