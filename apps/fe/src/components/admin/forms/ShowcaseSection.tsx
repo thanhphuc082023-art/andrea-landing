@@ -161,11 +161,9 @@ const SortableSection = ({
                   <span className="inline-flex items-center rounded-full bg-white/60 px-2.5 py-0.5 text-xs font-medium text-gray-700 backdrop-blur-sm">
                     {section.type}
                   </span>
-                  {!section?.type.includes([
-                    'video',
-                    'image-text',
-                    'flipbook',
-                  ]) && (
+                  {!['video', 'image-text', 'flipbook'].includes(
+                    section?.type || ''
+                  ) && (
                     <select
                       value={section.layout}
                       onChange={(e) => {
@@ -1326,38 +1324,6 @@ const SortableSection = ({
                       placeholder="800"
                     />
                   </div>
-
-                  {/* Preview */}
-                  <div className="rounded-md bg-gray-50 p-2">
-                    <p className="mb-1 text-xs font-medium text-gray-700">
-                      Kích thước preview:
-                    </p>
-                    <div className="space-y-1">
-                      <div className="text-xs text-gray-600">
-                        • Cột 1:{' '}
-                        {Math.floor(
-                          (section?.width || 1300) /
-                            (section.layout === 'half-half' ? 2 : 3)
-                        )}
-                        px × {section.items[0]?.height || 800}px
-                      </div>
-                      {section.items[1] && (
-                        <div className="text-xs text-gray-600">
-                          • Cột 2:{' '}
-                          {(section?.width || 1300) -
-                            Math.floor(
-                              (section?.width || 1300) /
-                                (section.layout === 'half-half' ? 2 : 3)
-                            )}
-                          px ×{' '}
-                          {section.items[1]?.height ||
-                            section.items[0]?.height ||
-                            800}
-                          px
-                        </div>
-                      )}
-                    </div>
-                  </div>
                 </div>
               ) : (
                 // Half-half and one-third layouts - shared dimensions
@@ -1503,38 +1469,6 @@ const SortableSection = ({
                       className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       placeholder="800"
                     />
-                  </div>
-
-                  {/* Preview */}
-                  <div className="rounded-md bg-gray-50 p-2">
-                    <p className="mb-1 text-xs font-medium text-gray-700">
-                      Kích thước preview:
-                    </p>
-                    <div className="space-y-1">
-                      <div className="text-xs text-gray-600">
-                        • Cột 1:{' '}
-                        {Math.floor(
-                          (section?.width || 1300) /
-                            (section.layout === 'half-half' ? 2 : 3)
-                        )}
-                        px × {section.items[0]?.height || 800}px
-                      </div>
-                      {section.items[1] && (
-                        <div className="text-xs text-gray-600">
-                          • Cột 2:{' '}
-                          {(section?.width || 1300) -
-                            Math.floor(
-                              (section?.width || 1300) /
-                                (section.layout === 'half-half' ? 2 : 3)
-                            )}
-                          px ×{' '}
-                          {section.items[1]?.height ||
-                            section.items[0]?.height ||
-                            800}
-                          px
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </div>
               )}
@@ -2153,27 +2087,6 @@ const SortableSection = ({
                           placeholder="800"
                         />
                       </div>
-
-                      {/* Preview of dimensions */}
-                      <div className="rounded-md bg-gray-50 p-2">
-                        <p className="mb-1 text-xs font-medium text-gray-700">
-                          Kích thước preview:
-                        </p>
-                        <div className="space-y-1">
-                          <div className="text-xs text-gray-600">
-                            • Item 1 (50%):{' '}
-                            {Math.floor((section.items[0].width || 1300) / 2)}px
-                            × {section.items[0].height || 800}px
-                          </div>
-                          {section.items[1] && (
-                            <div className="text-xs text-gray-600">
-                              • Item 2 (50%):{' '}
-                              {Math.floor((section.items[1].width || 1300) / 2)}
-                              px × {section.items[1].height || 800}px
-                            </div>
-                          )}
-                        </div>
-                      </div>
                     </div>
                   ) : (
                     // Half-half and one-third layouts - shared dimensions
@@ -2334,38 +2247,6 @@ const SortableSection = ({
                           className="mt-1 block w-full rounded-md border-gray-300 px-2 py-1 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                           placeholder="800"
                         />
-                      </div>
-
-                      {/* Preview */}
-                      <div className="rounded-md bg-gray-50 p-2">
-                        <p className="mb-1 text-xs font-medium text-gray-700">
-                          Kích thước preview:
-                        </p>
-                        <div className="space-y-1">
-                          <div className="text-xs text-gray-600">
-                            • Cột 1:{' '}
-                            {Math.floor(
-                              (section?.width || 1300) /
-                                (section.layout === 'half-half' ? 2 : 3)
-                            )}
-                            px × {section.items[0]?.height || 800}px
-                          </div>
-                          {section.items[1] && (
-                            <div className="text-xs text-gray-600">
-                              • Cột 2:{' '}
-                              {(section?.width || 1300) -
-                                Math.floor(
-                                  (section?.width || 1300) /
-                                    (section.layout === 'half-half' ? 2 : 3)
-                                )}
-                              px ×{' '}
-                              {section.items[1]?.height ||
-                                section.items[0]?.height ||
-                                800}
-                              px
-                            </div>
-                          )}
-                        </div>
                       </div>
                     </div>
                   )}
@@ -2813,10 +2694,7 @@ export default function ShowcaseSection({
                 : type === 'text' || type === 'image-text'
                   ? 'text'
                   : 'image',
-          title:
-            type === 'text' || type === 'image-text'
-              ? ''
-              : ``,
+          title: type === 'text' || type === 'image-text' ? '' : ``,
           description:
             type === 'text' || type === 'image-text' ? '' : undefined,
           src: type === 'text' ? undefined : '',
@@ -2905,7 +2783,7 @@ export default function ShowcaseSection({
           {/* Popover Options */}
           <div className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 translate-y-2 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:-translate-y-1 group-hover:opacity-100">
             <div className="rounded-lg border border-gray-200 bg-white p-2 shadow-lg">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => addQuickSection('image', 'single')}
@@ -2913,6 +2791,16 @@ export default function ShowcaseSection({
                 >
                   <PhotoIcon className="h-6 w-6 text-blue-500" />
                   <span className="mt-1 text-xs text-gray-600">Hình ảnh</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => addQuickSection('image-text', 'single')}
+                  className="flex flex-col items-center rounded-lg border border-gray-200 p-3 transition-colors hover:border-purple-300 hover:bg-purple-50"
+                >
+                  <PhotoIcon className="h-6 w-6 text-indigo-500" />
+                  <span className="mt-1 text-xs text-gray-600">
+                    Hình + Text
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -2937,16 +2825,6 @@ export default function ShowcaseSection({
                 >
                   <DocumentTextIcon className="h-6 w-6 text-purple-500" />
                   <span className="mt-1 text-xs text-gray-600">Text</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => addQuickSection('image-text', 'single')}
-                  className="flex flex-col items-center rounded-lg border border-gray-200 p-3 transition-colors hover:border-purple-300 hover:bg-purple-50"
-                >
-                  <PhotoIcon className="h-6 w-6 text-indigo-500" />
-                  <span className="mt-1 text-xs text-gray-600">
-                    Hình + Text
-                  </span>
                 </button>
               </div>
             </div>

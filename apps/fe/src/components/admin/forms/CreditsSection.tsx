@@ -7,6 +7,7 @@ import {
 import { PlusIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { vi } from 'date-fns/locale';
+import { format } from 'date-fns';
 import { type ProjectFormData } from '@/lib/validations/project';
 
 // Register Vietnamese locale
@@ -85,7 +86,7 @@ export default function CreditsSection({
             placeholder="Nhập tiêu đề chính..."
             className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
-          {errors.credits?.title && (
+          {errors.credits?.title && !watch('credits.title') && (
             <p className="mt-1 text-sm text-red-600">
               {errors.credits.title.message}
             </p>
@@ -105,7 +106,7 @@ export default function CreditsSection({
             placeholder="Nhập nhãn credits (VD: Credit:, Team:, Thành viên:)"
             className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
-          {errors.credits?.creditLabel && (
+          {errors.credits?.creditLabel && !watch('credits.creditLabel') && (
             <p className="mt-1 text-sm text-red-600">
               {errors.credits.creditLabel.message}
             </p>
@@ -128,7 +129,8 @@ export default function CreditsSection({
               }
               onChange={(date: Date | null) => {
                 if (date) {
-                  setValue('credits.date', date.toISOString().split('T')[0]);
+                  // use local date (yyyy-MM-dd) to avoid UTC timezone shift
+                  setValue('credits.date', format(date, 'yyyy-MM-dd'));
                 } else {
                   setValue('credits.date', '');
                 }
@@ -137,7 +139,7 @@ export default function CreditsSection({
               dateFormat="dd/MM/yyyy"
               locale="vi"
               className={`h-9 w-full rounded-lg border px-4 py-3 pr-12 shadow-sm transition-all duration-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 sm:text-sm ${
-                errors.credits?.date
+                errors.credits?.date && !watch('credits.date')
                   ? 'border-red-300 bg-red-50/50'
                   : 'border-gray-300 bg-white hover:border-gray-400'
               } placeholder:text-gray-400`}
@@ -157,7 +159,9 @@ export default function CreditsSection({
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
               <svg
                 className={`h-5 w-5 transition-colors duration-200 ${
-                  errors.credits?.date ? 'text-red-400' : 'text-gray-400'
+                  errors.credits?.date && !watch('credits.date')
+                    ? 'text-red-400'
+                    : 'text-gray-400'
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -172,19 +176,8 @@ export default function CreditsSection({
               </svg>
             </div>
           </div>
-          {errors.credits?.date && (
+          {errors.credits?.date && !watch('credits.date') && (
             <div className="mt-2 flex items-center">
-              <svg
-                className="mr-1 h-4 w-4 text-red-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
               <p className="text-sm text-red-600">
                 {errors.credits.date.message}
               </p>
@@ -242,11 +235,12 @@ export default function CreditsSection({
             Mỗi dòng sẽ được hiển thị như một credit riêng biệt
           </p>
           {/* Show validation error for projectManager */}
-          {errors.credits?.projectManager && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.credits.projectManager.message}
-            </p>
-          )}
+          {errors.credits?.projectManager &&
+            !watch('credits.projectManager') && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.credits.projectManager.message}
+              </p>
+            )}
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+'use client';
 import Divider from '@/components/services/Divider';
 import React from 'react';
 
@@ -6,7 +7,7 @@ export default function FinalSection({ data }: any) {
     <section className="content-wrapper my-[56px] max-md:my-[29px]">
       <div className="max-sd:grid-cols-1 grid grid-cols-[528px_1fr] gap-5">
         <h2 className="text-brand-orange font-playfair text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px]">
-          Khác biệt của Andrea khi thiết kế bao bì
+          {data?.title}
         </h2>
 
         <div className="max-sd:mt-0 mt-[67px] w-full space-y-6">
@@ -14,7 +15,7 @@ export default function FinalSection({ data }: any) {
             data.highlights.map((h: string, i: number) => (
               <React.Fragment key={i}>
                 <div className="text-[24px] text-black max-md:text-[20px]">
-                  {h}
+                  <div dangerouslySetInnerHTML={{ __html: h || '' }} />
                 </div>
                 {i < data.highlights.length - 1 && <Divider />}
               </React.Fragment>

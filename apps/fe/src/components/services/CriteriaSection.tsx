@@ -7,14 +7,14 @@ export default function CriteriaSection({ data }: any) {
     <section className="content-wrapper my-[56px] max-md:my-[29px]">
       <div>
         <h2 className="text-brand-orange font-playfair mb-8 text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px]">
-          Bao bì tốt cần đáp ứng tiêu chí nào?
+          {data?.title}
         </h2>
 
         <div className="max-sd:gap-[55px] mb-12 flex flex-col items-center gap-[120px] lg:flex-row">
           <div className="w-full max-md:w-[calc(100%+58px)] lg:w-1/2">
             <div className="max-sd:aspect-square max-sd:max-w-full rounded-15 relative aspect-[650/466] h-[466px] w-full max-w-[650px] overflow-hidden max-md:rounded-none max-sm:aspect-[487/469] max-sm:h-[469px]">
               <Image
-                src="/assets/images/services/baobi/baobi6.png"
+                src={data?.image}
                 alt="Supermarket aisle with products"
                 fill
                 sizes="(min-width: 1024px) 512px, 100vw"
@@ -25,12 +25,15 @@ export default function CriteriaSection({ data }: any) {
           <div className="w-full space-y-5 lg:w-1/2">
             <div className="flex flex-col gap-5">
               {data?.list ? (
-                data.list.map((item: string, i: number) => (
+                data.list.map((item: any, i: number) => (
                   <React.Fragment key={i}>
-                    <div>
-                      <h3 className="mb-2 text-[24px] font-semibold text-black max-sm:text-[20px]">
-                        {item}
+                    <div className="mb-2">
+                      <h3 className="text-[24px] font-semibold text-black max-sm:text-[20px]">
+                        {item?.title}
                       </h3>
+                      <p className="text-[16px] text-black">
+                        {item?.description}
+                      </p>
                     </div>
                     {i < data.list.length - 1 && (
                       <div className="h-[1px] w-full bg-black/20" />

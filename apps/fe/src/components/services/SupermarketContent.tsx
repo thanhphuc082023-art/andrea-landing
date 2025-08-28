@@ -1,13 +1,16 @@
+'use client';
+
 import BrandSection from '@/components/services/BrandSection';
 import Divider from '@/components/services/Divider';
 import Image from 'next/image';
 
 export default function SupermarketContent({ data }: any) {
+  const subheadingHtml = data?.subheading || '';
   return (
     <>
       {/* Supermarket Section */}
       <section className="content-wrapper my-[56px] max-md:my-[29px]">
-        <BrandSection />
+        <BrandSection title={data.title} description={data.description} />
 
         {/* Section one */}
         <div className="max-md:hidden">
@@ -22,28 +25,21 @@ export default function SupermarketContent({ data }: any) {
                 alt={data?.heading || 'Supermarket aisle with products'}
                 fill
                 sizes="(min-width: 1024px) 512px, 100vw"
-                className="object-cover"
+                className="object-contain"
               />
             </div>
           </div>
           <div className="lg:w-1/2">
-            <p className="text-[16px] leading-relaxed text-[#3F3F3F]">
-              {data?.heading ||
-                'Bao bì là một trong những điểm chạm đầu tiên với khách hàng để tạo ấn tượng và truyền tải bản sắc thương hiệu.'}
-            </p>
-            <p className="mt-8 text-[16px] leading-relaxed text-[#3F3F3F]">
-              {data?.subheading || (
-                <>
-                  Bao bì cũng là{' '}
-                  <span className="font-playfair text-brand-orange text-[20px]">
-                    công cụ truyền thông
-                  </span>{' '}
-                  trực tiếp nhất của thương hiệu. Một thiết kế bao bì chuyên
-                  nghiệp, sáng tạo và đúng chiến lược không chỉ bảo vệ sản phẩm
-                  mà còn nâng cao giá trị thương hiệu trong mắt người tiêu dùng.
-                </>
-              )}
-            </p>
+            {data?.heading && (
+              <div className="text-[16px] leading-relaxed text-[#3F3F3F]">
+                {data?.heading}
+              </div>
+            )}
+            <div
+              className="mt-8 text-[16px] leading-relaxed text-[#3F3F3F]"
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: subheadingHtml }}
+            />
           </div>
         </div>
 

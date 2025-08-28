@@ -1,13 +1,12 @@
 import clsx from 'clsx';
 
-function BrandSection() {
+function BrandSection({ title = '', description = '' }: any) {
   // Extract data with fallbacks
-  const title = 'Thiết kế bao bì';
 
   return (
     <section
       className={clsx(
-        'relative mb-[56px] flex items-center justify-center max-md:mb-[29px]'
+        'relative mb-[56px] flex h-[300px] items-center justify-center max-md:mb-[29px] max-md:h-auto'
       )}
     >
       <div className={clsx('w-full text-center leading-[70px]')}>
@@ -31,10 +30,10 @@ function BrandSection() {
           className={clsx(
             'font-playfair text-[27px] text-black md:text-xl lg:text-[30px]',
             'max-sd:!leading-[40px] font-medium !leading-[55px] tracking-wide',
-            'mx-auto max-w-md'
+            'mx-auto max-w-[644px]'
           )}
         >
-          Thiết kế bao bì sáng tạo, chuyên nghiệp, đúng nhận diện thương hiệu
+          {description}
         </p>
       </div>
     </section>
