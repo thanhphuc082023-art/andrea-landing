@@ -14,6 +14,7 @@ function HeaderVideo({
   heroData = {},
   mobileAspectRatio = '',
 }: HeaderVideoProps) {
+  console.log('heroData', heroData);
   // Robust video url extractor (handles string, {url}, Strapi shapes)
   const getVideoUrl = (videoData: any): string | null => {
     if (!videoData) return null;
@@ -116,7 +117,12 @@ function HeaderVideo({
         const tag = document.createElement('script');
         tag.src = 'https://www.youtube.com/iframe_api';
         document.head.appendChild(tag);
-        (window as any).onYouTubeIframeAPIReady = () => resolve();
+        // do not overwrite existing handler — compose
+        const prev = (window as any).onYouTubeIframeAPIReady;
+        (window as any).onYouTubeIframeAPIReady = () => {
+          if (typeof prev === 'function') prev();
+          resolve();
+        };
       });
       return promise;
     };
@@ -159,7 +165,10 @@ function HeaderVideo({
           } catch (err) {}
           hideSkeleton();
         },
-        onError: hideSkeleton,
+        onError: (e: any) => {
+          console.log('error', e);
+          hideSkeleton();
+        },
       },
     });
   };
@@ -253,17 +262,17 @@ function HeaderVideo({
       {/* Desktop: if YouTube -> iframe embed, else <video> */}
       {isYouTubeUrl(desktopSrc) ? (
         (() => {
-          // Mount YouTube IFrame API player into a container to ensure we can call mute/play reliably
           const embed = getYouTubeEmbedUrl(desktopSrc!);
           return embed ? (
-            <div className="video-responsive">
+            // ensure wrapper has full height so YT iframe can fill
+            <div className="video-responsive h-full">
               <div
                 ref={desktopYouTubeRef}
+                // make the inner container absolute so iframe gets full size
                 className={clsx(
-                  'relative z-20 h-full w-full object-cover',
+                  'absolute inset-0 z-20 object-cover',
                   'pointer-events-none max-md:pointer-events-auto'
                 )}
-                style={{ width: '100%', height: '100%' }}
                 aria-hidden="true"
               />
             </div>

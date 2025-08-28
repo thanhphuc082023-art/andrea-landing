@@ -175,17 +175,33 @@ const ShowcaseItem = memo(
       } catch (e) {}
     };
 
-    // Load YouTube IFrame API once
+    // Load YouTube IFrame API once (preserve existing onYouTubeIframeAPIReady)
     const loadYouTubeAPI = (() => {
       let promise: Promise<void> | null = null;
       return () => {
         if (promise) return promise;
         promise = new Promise<void>((resolve) => {
           if ((window as any).YT && (window as any).YT.Player) return resolve();
-          const tag = document.createElement('script');
-          tag.src = 'https://www.youtube.com/iframe_api';
-          document.head.appendChild(tag);
-          (window as any).onYouTubeIframeAPIReady = () => resolve();
+
+          // only append script once
+          if (
+            !document.querySelector(
+              'script[src="https://www.youtube.com/iframe_api"]'
+            )
+          ) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
+          }
+
+          // preserve previous handler so multiple components can coexist
+          const prev = (window as any).onYouTubeIframeAPIReady;
+          (window as any).onYouTubeIframeAPIReady = () => {
+            try {
+              if (typeof prev === 'function') prev();
+            } catch (e) {}
+            resolve();
+          };
         });
         return promise;
       };
@@ -968,7 +984,7 @@ ShowcaseSection.displayName = 'ShowcaseSection';
 
 function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
   const sections = project?.showcaseSections || legacyShowcaseData;
-  console.log('sections', sections);
+
   return (
     <section className="content-wrapper max-md:px-0">
       <div>
