@@ -420,7 +420,7 @@ const SelectedCard = ({
         whileHover={{ scale: 1.02, zIndex: 999999 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="transform-3d rounded-10 relative z-[70] h-[70vh] w-[80vw] overflow-hidden bg-neutral-100 p-6 shadow-2xl max-md:h-[50vh] max-md:w-[90vw] max-md:p-2 dark:bg-neutral-900"
+        className="transform-3d rounded-10 relative z-[70] h-[70vh] w-[70vw] overflow-hidden bg-neutral-100 p-6 shadow-2xl max-md:h-[50vh] max-md:w-[90vw] max-md:p-2 dark:bg-neutral-900"
       >
         {selected?.content}
       </motion.div>
