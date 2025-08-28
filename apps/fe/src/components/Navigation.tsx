@@ -33,7 +33,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
     const rawPath = router.asPath || '';
     // path without hash for most comparisons
     const currentPath = rawPath.split('#')[0];
-
+    console.log('currentPath', currentPath, 'vs', item.url);
     if (!item.url) return false;
 
     // Exact match for homepage
@@ -54,9 +54,9 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
 
     // Special case for Services - treat as active when on a /services route
     // OR when the raw URL contains the #services anchor.
-    if (item.url === '/services') {
+    if (item.url === '/services' || item.url === '/#services') {
       return (
-        currentPath.startsWith('/services') || rawPath.includes('#services')
+        currentPath.startsWith('/service') || rawPath.includes('#services')
       );
     }
 
