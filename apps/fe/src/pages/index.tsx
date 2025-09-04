@@ -44,6 +44,6 @@ function HomePage({
   );
 }
 
-export const getStaticProps = getStaticPropsWithGlobal;
+// export const getStaticProps = getStaticPropsWithGlobal;
 
 export default HomePage;

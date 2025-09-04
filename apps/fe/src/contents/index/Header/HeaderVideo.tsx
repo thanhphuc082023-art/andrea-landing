@@ -241,7 +241,7 @@ function HeaderVideo({
     <div
       className={clsx(
         'header-video-container relative inset-0 z-0 w-full overflow-hidden',
-        'h-[calc(100vh-65px)]',
+        'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-65px)]',
         mobileAspectRatio ? `max-sd:${mobileClasses} max-sd:!h-auto` : ''
       )}
     >

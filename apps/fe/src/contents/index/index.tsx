@@ -9,6 +9,7 @@ import ProjectGrid from '@/contents/index/ProjectGrid';
 import ProjectGridOld from '@/contents/index/ProjectGrid/old';
 import Services from '@/contents/index/Services';
 import Workflow from '@/contents/index/Workflow';
+import HeaderContent from '@/contents/index/Header/HeaderContent';
 
 interface IndexContentsProps {
   heroData?: any;
@@ -30,6 +31,7 @@ function IndexContents({
   return (
     <>
       <Header heroData={heroData} />
+      <HeaderContent heroData={heroData} />
       <BrandSection brandSectionData={brandSectionData} />
 
       <div className="py-[50px]">

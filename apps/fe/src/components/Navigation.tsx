@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { m, AnimatePresence } from 'framer-motion';
 import StrapiLogo from '@/components/StrapiLogo';
 import type { NavigationItem, StrapiGlobal } from '@/types/strapi';
+import SwapText from '@/components/ui/SwapText';
 
 interface NavbarProps {
   // Optional server-side data for static generation
@@ -33,7 +34,6 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
     const rawPath = router.asPath || '';
     // path without hash for most comparisons
     const currentPath = rawPath.split('#')[0];
-    console.log('currentPath', currentPath, 'vs', item.url);
     if (!item.url) return false;
 
     // Exact match for homepage
@@ -116,17 +116,18 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
               const href = item.url || '/';
 
               return (
-                <Link
-                  key={item.label}
-                  href={href}
-                  className={clsx(
-                    'text-lg transition-colors duration-200',
-                    isItemActive(item)
-                      ? 'text-brand-orange hover:text-brand-orange-dark !font-semibold'
-                      : 'hover:text-brand-orange font-normal text-gray-700'
-                  )}
-                >
-                  {item.label}
+                <Link key={item.label} href={href}>
+                  <SwapText
+                    finalText={item.label}
+                    initialText={item.label}
+                    supportsHover
+                    textClassName={clsx(
+                      'text-lg transition-colors duration-200 cursor-pointer',
+                      isItemActive(item)
+                        ? 'text-brand-orange hover:text-brand-orange-dark !font-semibold'
+                        : 'hover:text-brand-orange font-normal text-gray-700'
+                    )}
+                  />
                 </Link>
               );
             })}
@@ -205,16 +206,21 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
                   >
                     <Link
                       href={href}
-                      className={clsx(
-                        'block border-b border-gray-200/50 py-4 text-xl transition-colors duration-300',
-                        'hover:border-brand-orange/30',
-                        isItemActive(item)
-                          ? 'text-brand-orange border-brand-orange/30 translate-x-1 font-semibold'
-                          : 'hover:text-brand-orange font-normal text-gray-700'
-                      )}
                       onClick={() => handleMobileMenuClick(item.label)}
                     >
-                      {item.label}
+                      <SwapText
+                        finalText={item.label}
+                        initialText={item.label}
+                        supportsHover
+                        className="my-4"
+                        textClassName={clsx(
+                          'block border-b border-gray-200/50  text-xl transition-colors duration-300',
+                          'hover:border-brand-orange/30',
+                          isItemActive(item)
+                            ? 'text-brand-orange border-brand-orange/30 translate-x-1 font-semibold'
+                            : 'hover:text-brand-orange font-normal text-gray-700'
+                        )}
+                      />
                     </Link>
                   </m.div>
                 );
