@@ -14,7 +14,6 @@ function HeaderVideo({
   heroData = {},
   mobileAspectRatio = '',
 }: HeaderVideoProps) {
-  console.log('heroData', heroData);
   // Robust video url extractor (handles string, {url}, Strapi shapes)
   const getVideoUrl = (videoData: any): string | null => {
     if (!videoData) return null;
