@@ -12,7 +12,6 @@ export default function ContactSection({
   contactPageData,
   serverGlobal,
 }: any) {
-  console.log('contactPageData', contactPageData);
   // Use Google Maps URL from Strapi or fallback to environment variable or default
   const mapSrc =
     contactPageData?.googleMaps?.embedUrl ||
