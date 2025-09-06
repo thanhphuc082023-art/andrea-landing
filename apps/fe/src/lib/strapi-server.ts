@@ -225,6 +225,35 @@ export async function getFeaturedProjectsSettings(): Promise<
   return response;
 }
 
+/**
+ * Server-side function to fetch contact page settings directly from Strapi
+ */
+export async function getContactPageSettings(): Promise<StrapiResponse<any>> {
+  const params = {
+    populate: {
+      seo: {
+        populate: '*',
+      },
+      heroImage: true,
+      workingHours: true,
+      offices: {
+        populate: '*',
+      },
+      contactInfo: {
+        populate: '*',
+      },
+      googleMaps: true,
+      contactSections: {
+        populate: '*',
+        sort: ['position:asc'],
+      },
+      brandInfo: true,
+    },
+  };
+
+  return fetchStrapiAPI('contact-page', params);
+}
+
 // Static versions (same implementation for now)
 export const getStaticGlobalSettings = getGlobalSettings;
 export const getStaticMenuSettings = getMenuSettings;
