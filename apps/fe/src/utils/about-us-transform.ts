@@ -52,8 +52,8 @@ export function transformWorkflowDataForSlogan(
       : `${strapiUrl}${imageUrl || '/assets/images/workflow/workflow-image-1.jpg'}`;
 
     return {
-      id: index,
-      position: index,
+      id: index + 1,
+      position: index + 1,
       image: fullImageUrl,
       alt:
         item?.file?.name ||

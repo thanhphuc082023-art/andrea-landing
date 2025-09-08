@@ -169,9 +169,10 @@ function SloganSection({
     const sourceData =
       workflowData?.length > 0 ? workflowData : defaultWorkflows;
 
-    // Expand / clone items to a larger total (change TOTAL_ITEMS to desired count)
+      // Expand / clone items to a larger total (change TOTAL_ITEMS to desired count)
     const TOTAL_ITEMS = 16;
     const expanded: any[] = [...sourceData];
+
     while (expanded.length < TOTAL_ITEMS) {
       const template =
         sourceData[expanded.length % sourceData.length] ||
@@ -255,7 +256,7 @@ function SloganSection({
       }
 
       const imageUrl =
-        getStrapiMediaUrl(workflow.image) ||
+        workflow.image ||
         defaultWorkflows[index % defaultWorkflows.length]?.image ||
         '/assets/images/workflow/workflow-image-3.jpg';
       const altText = workflow.alt || `Workflow step ${index + 1}`;
