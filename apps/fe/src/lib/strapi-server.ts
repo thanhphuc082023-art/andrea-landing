@@ -71,7 +71,17 @@ async function fetchStrapiAPI(
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
+      // read body for better debugging
+      const text = await response.text().catch(() => '<unreadable body>');
+      console.error(`Strapi API Error for ${endpoint}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        url: apiUrl,
+        body: text,
+      });
+      throw new Error(
+        `Failed to fetch ${endpoint}: ${response.status} - ${text}`
+      );
     }
 
     const data = await response.json();
@@ -254,6 +264,42 @@ export async function getContactPageSettings(): Promise<StrapiResponse<any>> {
   return fetchStrapiAPI('contact-page', params);
 }
 
+/**
+ * Server-side function to fetch about us page settings directly from Strapi
+ */
+export async function getAboutUsPageSettings(): Promise<StrapiResponse<any>> {
+  const params = {
+    populate: {
+      seo: {
+        populate: '*',
+      },
+      heroVideo: {
+        populate: [
+          'desktopVideo',
+          'mobileVideo',
+          'mobileBanner',
+          'desktopBanner',
+        ],
+      },
+      aboutUsContent: {
+        populate: ['image'],
+      },
+      visions: {
+        populate: '*',
+      },
+      workflow: {
+        populate: {
+          images: {
+            populate: 'file',
+          },
+        },
+      },
+    },
+  };
+
+  return fetchStrapiAPI('about-us-page', params);
+}
+
 // Static versions (same implementation for now)
 export const getStaticGlobalSettings = getGlobalSettings;
 export const getStaticMenuSettings = getMenuSettings;
@@ -264,3 +310,4 @@ export const getStaticWorkflowSettings = getWorkflowSettings;
 export const getStaticPartnersSettings = getPartnersSettings;
 export const getStaticFooterSettings = getFooterSettings;
 export const getStaticFeaturedProjectsSettings = getFeaturedProjectsSettings;
+export const getStaticAboutUsPageSettings = getAboutUsPageSettings;

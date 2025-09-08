@@ -1,27 +1,35 @@
 import StrapiHead from '@/components/meta/StrapiHead';
 import ContentSection from '@/contents/about-us/Content';
 import Header from '@/contents/about-us/Header';
-import InsightsSection from '@/contents/about-us/Insights';
+import VisionsSection from '@/contents/about-us/Visions';
 import SloganSection from '@/contents/about-us/Slogan';
 import {
   getStaticPropsWithGlobalAndData,
   type PagePropsWithGlobal,
 } from '@/lib/page-helpers';
-import { getHeroSettings, getWorkflowSettings } from '@/lib/strapi-server';
-import { getStrapiMediaUrl } from '@/utils/helper';
+import { getAboutUsPageSettings } from '@/lib/strapi-server';
+import {
+  transformHeroVideoForHeader,
+  transformWorkflowDataForSlogan,
+  extractAboutUsSEO,
+} from '@/utils/about-us-transform';
+import { AboutUsPageData } from '@/types/about-us';
 import { useRouter } from 'next/router';
+
+interface AboutUsPageProps extends PagePropsWithGlobal {
+  aboutUsData?: AboutUsPageData | null;
+}
 
 function AboutUsPage({
   serverGlobal = null,
-  heroData = null,
-  workflowData = [],
-}: PagePropsWithGlobal) {
+  aboutUsData = null,
+}: AboutUsPageProps) {
   const { query } = useRouter();
   const currentGlobal = serverGlobal;
   const siteName = currentGlobal?.siteName || 'ANDREA';
-  const siteDescription =
-    currentGlobal?.siteDescription ||
-    'Liên hệ Andrea — dịch vụ thiết kế thương hiệu và digital. Liên hệ để thảo luận dự án, hợp tác hoặc gửi hồ sơ ứng tuyển.';
+
+  // Extract SEO data from About Us data or use fallbacks
+  const seoData = extractAboutUsSEO(aboutUsData, siteName);
 
   // Normalize and validate the query param so it matches the expected union type
   const rawRotation = Array.isArray(query?.sloganMode)
@@ -32,37 +40,43 @@ function AboutUsPage({
       ? rawRotation
       : undefined;
 
+  // Transform data for components
+  const heroData = transformHeroVideoForHeader(aboutUsData?.heroVideo);
+  const workflowData = transformWorkflowDataForSlogan(aboutUsData?.workflow);
+
   return (
     <>
       <StrapiHead
-        title={`Về chúng tôi - ${siteName}`}
-        description={siteDescription}
-        ogImage={'/assets/images/about-us/content.png'}
-        // seo={currentGlobal?.defaultSeo}
+        title={seoData.title}
+        description={seoData.description}
+        ogImage={
+          seoData.image?.data?.attributes?.url ||
+          '/assets/images/about-us/content.png'
+        }
         global={currentGlobal}
         overrideTitle
       />
 
-      <Header
-        heroData={{
-          desktopVideo: { url: '/assets/video/about-us.mp4' },
-          mobileVideo: { url: '/assets/video/about-us.mp4' },
-        }}
-      />
+      <Header heroData={heroData} />
 
-      <ContentSection />
-      <InsightsSection />
-      <SloganSection workflowData={workflowData} rotationMode={rotationMode} />
+      <ContentSection content={aboutUsData?.aboutUsContent} />
+
+      <VisionsSection visions={aboutUsData?.visions} />
+
+      <SloganSection
+        slogan={aboutUsData?.workflow?.slogan || ''}
+        workflowData={workflowData || []}
+        rotationMode={rotationMode}
+      />
     </>
   );
 }
 
 export const getStaticProps = async () =>
   getStaticPropsWithGlobalAndData(async () => {
-    // const heroResult = await getHeroSettings();
-    const workflowResult = await getWorkflowSettings();
-    // return { props: { heroData: heroResult.data || null } };
-    return { workflowData: workflowResult.data || [] };
+    const aboutUsResult = await getAboutUsPageSettings();
+
+    return { aboutUsData: aboutUsResult?.data || {} };
   });
 
 export default AboutUsPage;

@@ -15,6 +15,7 @@ import {
 import { cn } from '@/utils';
 
 interface WorkflowProps {
+  slogan?: string;
   workflowData?: any[];
   rotationMode?: 'random' | 'radial';
 }
@@ -131,6 +132,7 @@ const defaultWorkflows: WorkflowItem[] = [
 ];
 
 function SloganSection({
+  slogan = '',
   workflowData = [],
   rotationMode = 'random',
 }: WorkflowProps) {
@@ -289,10 +291,8 @@ function SloganSection({
     <DraggableCardContainer className="relative flex min-h-[1300px] w-full items-center justify-center overflow-clip max-md:min-h-[750px]">
       <div className="content-wrapper flex items-center justify-center">
         <p className="max-w-[860px] text-center text-2xl font-semibold text-neutral-700 max-md:max-w-full max-md:text-[20px]">
-          Với khát vọng tôn vinh giá trị thương hiệu Việt và đồng hành cùng
-          doanh nghiệp trong nước vươn tầm quốc tế, Andrea định hướng trở thành
-          đơn vị tư vấn, thiết kế thương hiệu cảm xúc và đồng hành cùng doanh
-          nghiệp phát triển thương hiệu bền vững tại Việt Nam.
+          {slogan ||
+            'Với khát vọng tôn vinh giá trị thương hiệu Việt và đồng hành cùng doanh nghiệp trong nước vươn tầm quốc tế, Andrea định hướng trở thành đơn vị tư vấn, thiết kế thương hiệu cảm xúc và đồng hành cùng doanh nghiệp phát triển thương hiệu bền vững tại Việt Nam.'}
         </p>
       </div>
       {processedWorkflows.map((item) => (
