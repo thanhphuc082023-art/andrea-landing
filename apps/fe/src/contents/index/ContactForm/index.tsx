@@ -193,7 +193,7 @@ function ContactForm() {
                 )}
               />
               {errors.name && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
+                <p className="text-primary absolute bottom-0 left-0 translate-y-full transform text-sm">
                   {errors.name.message}
                 </p>
               )}
@@ -217,7 +217,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.phone && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
+                  <p className="text-primary absolute bottom-0 left-0 translate-y-full transform text-sm">
                     {errors.phone.message}
                   </p>
                 )}
@@ -238,7 +238,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.email && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
+                  <p className="text-primary absolute bottom-0 left-0 translate-y-full transform text-sm">
                     {errors.email.message}
                   </p>
                 )}
@@ -265,7 +265,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.industry && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
+                  <p className="text-primary absolute bottom-0 left-0 translate-y-full transform text-sm">
                     {errors.industry.message}
                   </p>
                 )}
@@ -287,7 +287,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.captcha && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
+                  <p className="text-primary absolute bottom-0 left-0 translate-y-full transform text-sm">
                     {errors.captcha.message}
                   </p>
                 )}
@@ -353,7 +353,7 @@ function ContactForm() {
                 )}
               />
               {errors.message && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
+                <p className="text-primary absolute bottom-0 left-0 translate-y-full transform text-sm">
                   {errors.message.message}
                 </p>
               )}
@@ -383,7 +383,7 @@ function ContactForm() {
                 disabled={isSubmitting}
                 textColor="text-white"
                 onClick={() => {
-                  window.open(`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`);
+                  window.location.href = `tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`;
                 }}
                 borderColor="border-white"
                 beforeBgColor="before:bg-white"
@@ -395,7 +395,9 @@ function ContactForm() {
               >
                 <span className="flex items-center justify-center gap-[6px]">
                   <PhoneIcon color="white" />
-                  <span className='text-[13px]'>{process.env.NEXT_PUBLIC_PHONE_NUMBER}</span>
+                  <span className="text-[13px]">
+                    {process.env.NEXT_PUBLIC_PHONE_NUMBER}
+                  </span>
                 </span>
               </SubmitButton>
             </div>
