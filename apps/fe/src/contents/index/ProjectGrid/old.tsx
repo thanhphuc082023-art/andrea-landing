@@ -49,7 +49,6 @@ function ProjectGrid() {
             textColor="text-brand-orange"
             borderColor="border-brand-orange"
             beforeBgColor="before:bg-brand-orange"
-            hoverBgColor="hover:bg-brand-orange"
             hoverTextColor="hover:text-white"
             focusRingColor="focus:ring-brand-orange"
             focusRingOffsetColor="focus:ring-offset-brand-orange-dark"

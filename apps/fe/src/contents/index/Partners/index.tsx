@@ -2,54 +2,6 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { getStrapiMediaUrl } from '@/utils/helper';
 
-// Fallback data for development/testing
-const fallbackPartners = [
-  [
-    {
-      id: 1,
-      name: 'Mitsubishi',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-    {
-      id: 2,
-      name: 'Mobifone',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-    {
-      id: 3,
-      name: 'Mobifone',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-    {
-      id: 4,
-      name: 'An Phong',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-  ],
-  [
-    {
-      id: 5,
-      name: 'Mobifone',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-    {
-      id: 6,
-      name: 'Evngenco3',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-    {
-      id: 7,
-      name: 'Mitsubishi',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-    {
-      id: 8,
-      name: 'An Phong',
-      logo: '/assets/images/partners/mitsubishi-logo.svg',
-    },
-  ],
-];
-
 type Partner = {
   id: number;
   name?: string;
@@ -70,17 +22,13 @@ function PartnerCard({ partner }: { partner: Partner }) {
   if (!logoUrl) return null;
 
   return (
-    <div className={clsx('flex items-center justify-center')}>
-      <div
-        className={clsx(
-          'relative flex h-full w-full items-center justify-center'
-        )}
-      >
+    <div className={clsx('flex h-20 w-36 items-center justify-center')}>
+      <div className={clsx('relative h-full w-full')}>
         <Image
           src={logoUrl}
           alt={altText}
-          width={150}
-          height={60}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-contain grayscale filter transition-all duration-300 hover:grayscale-0"
         />
       </div>
@@ -109,12 +57,13 @@ function Partners({ partnersData = {} }: PartnersProps) {
         </div>
 
         {/* Partners Grid */}
-        <div className={clsx('flex flex-col space-y-[22px] lg:space-y-11')}>
-          {partners?.map((row) => (
+        <div className={clsx('flex flex-col space-y-[22px] lg:space-y-[26px]')}>
+          {partners?.map((row, index) => (
             <div
               key={`row-${row?.id}`}
               className={clsx(
-                'flex items-center justify-end space-x-6 border-b border-black/20 pb-[22px] lg:space-x-[145px]'
+                'flex items-center justify-end space-x-6 pb-[22px] lg:space-x-[145px]',
+                index + 1 < partners.length ? 'border-b border-black/20' : ''
               )}
             >
               {row?.partners?.map((partner) => (

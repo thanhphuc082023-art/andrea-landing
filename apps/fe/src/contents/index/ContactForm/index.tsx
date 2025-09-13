@@ -18,6 +18,7 @@ import {
   type ContactFormData,
   contactFormSchema,
 } from '@/lib/validations/contact';
+import { PhoneIcon } from '@/assets/icons';
 
 function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -145,7 +146,9 @@ function ContactForm() {
   };
 
   return (
-    <section className={clsx('max-sd:min-h-[500px] bg-brand-orange py-12')}>
+    <section
+      className={clsx('max-sd:min-h-[500px] bg-brand-orange-light py-12')}
+    >
       <div className="content-wrapper relative flex h-full items-center justify-center">
         <div className={clsx('mx-auto w-full max-w-[795px]')}>
           {/* Section Title */}
@@ -190,7 +193,7 @@ function ContactForm() {
                 )}
               />
               {errors.name && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
                   {errors.name.message}
                 </p>
               )}
@@ -214,7 +217,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.phone && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
+                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
                     {errors.phone.message}
                   </p>
                 )}
@@ -235,7 +238,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.email && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
+                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
                     {errors.email.message}
                   </p>
                 )}
@@ -262,7 +265,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.industry && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
+                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
                     {errors.industry.message}
                   </p>
                 )}
@@ -284,7 +287,7 @@ function ContactForm() {
                   )}
                 />
                 {errors.captcha && (
-                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
+                  <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
                     {errors.captcha.message}
                   </p>
                 )}
@@ -350,26 +353,50 @@ function ContactForm() {
                 )}
               />
               {errors.message && (
-                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-white">
+                <p className="absolute bottom-0 left-0 translate-y-full transform text-sm text-red-500">
                   {errors.message.message}
                 </p>
               )}
             </div>
 
             {/* Submit Button */}
-            <div className={clsx('text-center')}>
+            <div
+              className={clsx(
+                'flex items-center justify-center gap-[20px] text-center'
+              )}
+            >
               <SubmitButton
                 isSubmitting={isSubmitting}
                 disabled={isSubmitting}
                 textColor="text-white"
                 borderColor="border-white"
                 beforeBgColor="before:bg-white"
-                hoverBgColor="hover:bg-white"
-                hoverTextColor="hover:text-brand-orange"
+                hoverBgColor="hover:before:bg-brand-orange"
+                hoverTextColor="hover:text-white"
                 focusRingColor="focus:ring-brand-orange"
                 focusRingOffsetColor="focus:ring-offset-white-dark"
               >
                 {isSubmitting ? 'Đang gửi...' : 'Gửi'}
+              </SubmitButton>
+              <SubmitButton
+                isSubmitting={isSubmitting}
+                disabled={isSubmitting}
+                textColor="text-white"
+                onClick={() => {
+                  window.open(`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`);
+                }}
+                borderColor="border-white"
+                beforeBgColor="before:bg-white"
+                hoverBgColor="hover:before:bg-brand-orange"
+                hoverTextColor="hover:text-white"
+                focusRingColor="focus:ring-brand-orange"
+                type="button"
+                focusRingOffsetColor="focus:ring-offset-white-dark"
+              >
+                <span className="flex items-center justify-center gap-[6px]">
+                  <PhoneIcon color="white" />
+                  <span className='text-[13px]'>{process.env.NEXT_PUBLIC_PHONE_NUMBER}</span>
+                </span>
               </SubmitButton>
             </div>
           </form>

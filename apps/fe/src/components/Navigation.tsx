@@ -16,6 +16,8 @@ interface NavbarProps {
 function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const defaultNavigationItems = [
     { label: 'Về chúng tôi', url: '/about' },
@@ -64,6 +66,29 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
     return currentPath.startsWith(item.url);
   };
 
+  // Handle scroll to hide/show navigation
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Show navbar when at top or scrolling up
+      if (currentScrollY < 10) {
+        setIsVisible(true);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and past 100px
+        setIsVisible(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   // Prefetch navigation routes for faster navigation (modern approach)
   useEffect(() => {
     const prefetchNavigationRoutes = () => {
@@ -92,7 +117,17 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
   };
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-[1000] w-full">
+    <m.header
+      className="fixed left-0 right-0 top-0 z-[1000] w-full"
+      animate={{
+        y: isVisible ? 0 : -100,
+      }}
+      transition={{
+        type: 'tween',
+        duration: isVisible ? 0.6 : 0.4, // Hiện chậm hơn, ẩn nhanh hơn
+        ease: 'easeInOut', // Custom easing curves
+      }}
+    >
       <div className="max-sd:h-[60px] h-[65px] w-full bg-white shadow-md">
         <div className="content-wrapper flex h-full items-center justify-between">
           {/* Logo */}
@@ -229,7 +264,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
           </m.div>
         )}
       </AnimatePresence>
-    </header>
+    </m.header>
   );
 }
 

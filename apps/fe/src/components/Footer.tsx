@@ -289,7 +289,7 @@ function Footer({ footerData = {} }: FooterProps) {
               )}
 
               {contactInfo ? (
-                <div className={clsx('mt-1 flex flex-wrap space-x-3')}>
+                <div className={clsx('mt-1 flex flex-wrap gap-2')}>
                   {socialMediaLinks.length > 0 ? (
                     socialMediaLinks
                       .sort((a, b) => Number(b.position) - Number(a.position))
@@ -440,7 +440,7 @@ function Footer({ footerData = {} }: FooterProps) {
                       info@andrea.vn
                     </a>
                   </div>
-                  <div className={clsx('mt-1 flex flex-wrap space-x-3')}>
+                  <div className={clsx('mt-1 flex flex-wrap gap-2')}>
                     {socialMediaLinks.length > 0 ? (
                       socialMediaLinks
                         .sort((a, b) => Number(b.position) - Number(a.position))

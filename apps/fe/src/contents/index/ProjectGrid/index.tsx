@@ -22,7 +22,7 @@ function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
   const regularProjects = allProjects
     .slice(2)
     ?.map((item) => item?.projectItem?.project);
-
+  console.log('regularProjects', regularProjects);
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto max-md:!px-0')}>
@@ -71,7 +71,7 @@ function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
             textColor="text-brand-orange"
             borderColor="border-brand-orange"
             beforeBgColor="before:bg-brand-orange"
-            hoverBgColor="hover:bg-brand-orange"
+            hoverBgColor="hover:before:bg-brand-orange"
             hoverTextColor="hover:text-white"
             focusRingColor="focus:ring-brand-orange"
             focusRingOffsetColor="focus:ring-offset-brand-orange-dark"

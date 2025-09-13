@@ -69,18 +69,18 @@ export default function HeaderMotion({ heroData }: Props) {
   const [yConfig, setYConfig] = useState({
     inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
     outputRange: [
-      0, // Bắt đầu ở giữa
-      window.innerHeight * 0.02, // Di chuyển nhẹ lên trên
-      window.innerHeight * 0.04, // Tiếp tục di chuyển lên
-      window.innerHeight * 0.06, // Đạt đỉnh điểm di chuyển lên
-      window.innerHeight * 0.03, // Quay trở lại một chút
-      0, // Trở về vị trí ban đầu khi đạt full scale
-      // Sau đây là quá trình di chuyển container lên trên để hiển thị nội dung phía dưới, bắt đầu chậm và nhanh dần dần đề có hiệu ứng như là nó di chuyển chùng lúc với BrandSection
-      -window.innerHeight * 0.1, // Bắt đầu di chuyển chậm (ease-in) - 10% của tổng quãng đường
-      -window.innerHeight * 0.3, // Tăng tốc dần - 20% tiếp theo
-      -window.innerHeight * 0.6, // Tăng tốc mạnh - 30% tiếp theo
-      -window.innerHeight * 1.0, // Đạt tốc độ cao nhất - 40% tiếp theo
-      -window.innerHeight * 1.5, // Di chuyển hết màn hình
+      window.innerWidth >= 768 ? 32.5 : 30, // Bắt đầu cách mép trên 32.5px (desktop) hoặc 30px (mobile)
+      (window.innerWidth >= 768 ? 32.5 : 30) + window.innerHeight * 0.01, // Di chuyển nhẹ lên trên
+      (window.innerWidth >= 768 ? 32.5 : 30) + window.innerHeight * 0.02, // Tiếp tục di chuyển lên
+      -window.innerHeight * 0.1, // Khi scale full viewport, đặt gần trên cùng màn hình
+      -window.innerHeight * 0.1, // Giữ ở vị trí gần trên cùng
+      -window.innerHeight * 0.1, // Duy trì vị trí gần trên cùng
+      // Sau đây là quá trình di chuyển container lên trên để hiển thị nội dung phía dưới, bắt đầu chậm và nhanh dần dần
+      -window.innerHeight * 0.18, // Bắt đầu di chuyển chậm từ vị trí gần trên cùng
+      -window.innerHeight * 0.35, // Tăng tốc dần
+      -window.innerHeight * 0.6, // Tăng tốc mạnh
+      -window.innerHeight * 0.95, // Đạt tốc độ cao nhất
+      -window.innerHeight * 1.3, // Di chuyển hết màn hình
     ],
   });
 
@@ -138,21 +138,22 @@ export default function HeaderMotion({ heroData }: Props) {
 
     // Cấu hình di chuyển Y khi scroll - đơn giản hóa
     const vh = window.innerHeight;
+    const width = window.innerWidth;
     setYConfig({
       inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
       outputRange: [
-        0, // Bắt đầu ở giữa
-        vh * 0.02, // Di chuyển nhẹ lên trên
-        vh * 0.04, // Tiếp tục di chuyển lên
-        vh * 0.06, // Đạt đỉnh điểm di chuyển lên
-        vh * 0.03, // Quay trở lại một chút
-        0, // Trở về vị trí ban đầu khi đạt full scale
-        // Sau đây là quá trình di chuyển container lên trên để hiển thị nội dung phía dưới, bắt đầu chậm và nhanh dần dần đề có hiệu ứng như là nó di chuyển chùng lúc với BrandSection
-        -vh * 0.1, // Bắt đầu di chuyển chậm (ease-in) - 10% của tổng quãng đường
-        -vh * 0.3, // Tăng tốc dần - 20% tiếp theo
-        -vh * 0.6, // Tăng tốc mạnh - 30% tiếp theo
-        -vh * 1.0, // Đạt tốc độ cao nhất - 40% tiếp theo
-        -vh * 1.5, // Di chuyển hết màn hình
+        width >= 768 ? 32.5 : 30, // Bắt đầu cách mép trên 32.5px (desktop) hoặc 30px (mobile)
+        (width >= 768 ? 32.5 : 30) + vh * 0.01, // Di chuyển nhẹ lên trên
+        (width >= 768 ? 32.5 : 30) + vh * 0.02, // Tiếp tục di chuyển lên
+        0, // Khi scale full viewport, đặt gần trên cùng màn hình
+        0, // Giữ ở vị trí gần trên cùng
+        0, // Duy trì vị trí gần trên cùng
+        // Sau đây là quá trình di chuyển container lên trên để hiển thị nội dung phía dưới, bắt đầu chậm và nhanh dần dần
+        -vh * 0.18, // Bắt đầu di chuyển chậm từ vị trí gần trên cùng
+        -vh * 0.35, // Tăng tốc dần
+        -vh * 0.6, // Tăng tốc mạnh
+        -vh * 0.95, // Đạt tốc độ cao nhất
+        -vh * 1.3, // Di chuyển hết màn hình
       ],
     });
 
@@ -275,18 +276,18 @@ export default function HeaderMotion({ heroData }: Props) {
       setYConfig({
         inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
         outputRange: [
-          0, // Bắt đầu ở giữa
-          vh * 0.02, // Di chuyển nhẹ lên trên
-          vh * 0.04, // Tiếp tục di chuyển lên
-          vh * 0.06, // Đạt đỉnh điểm di chuyển lên
-          vh * 0.03, // Quay trở lại một chút
-          0, // Trở về vị trí ban đầu khi đạt full scale
+          width >= 768 ? 32.5 : 30, // Bắt đầu cách mép trên 32.5px (desktop) hoặc 30px (mobile)
+          (width >= 768 ? 32.5 : 30) + vh * 0.01, // Di chuyển nhẹ lên trên
+          (width >= 768 ? 32.5 : 30) + vh * 0.02, // Tiếp tục di chuyển lên
+          0, // Khi scale full viewport, đặt gần trên cùng màn hình
+          0, // Giữ ở vị trí gần trên cùng
+          0, // Duy trì vị trí gần trên cùng
           // Sau đây là quá trình di chuyển container lên trên để hiển thị nội dung phía dưới, bắt đầu chậm và nhanh dần dần
-          -vh * 0.15, // Tăng tốc nhanh hơn ngay từ đầu - 15% của tổng quãng đường
-          -vh * 0.45, // Tăng tốc mạnh hơn - 30% tiếp theo
-          -vh * 0.8, // Tăng tốc rất mạnh - 35% tiếp theo
-          -vh * 1.2, // Đạt tốc độ cao nhất - 40% tiếp theo
-          -vh * 1.6, // Di chuyển hết màn hình và xa hơn một chút
+          -vh * 0.18, // Bắt đầu di chuyển chậm từ vị trí gần trên cùng
+          -vh * 0.35, // Tăng tốc dần
+          -vh * 0.6, // Tăng tốc mạnh
+          -vh * 0.95, // Đạt tốc độ cao nhất
+          -vh * 1.3, // Di chuyển hết màn hình
         ],
       });
     };
@@ -430,7 +431,7 @@ export default function HeaderMotion({ heroData }: Props) {
     // Container with dynamic height based on device characteristics
     <div
       ref={ref}
-      className="max-sd:mt-[60px] max-sd:h-[calc(100vh-60px)] relative mt-[65px] h-[calc(100vh-65px)]"
+      className="relative h-screen"
       {...(isMobile
         ? { style: { overflow: 'visible' } }
         : { style: { height: containerHeight, overflow: 'visible' } })}
@@ -480,9 +481,7 @@ export default function HeaderMotion({ heroData }: Props) {
         >
           {/* Main video container */}
           <m.div
-            className={clsx(
-              'max-sd:h-[calc(100vh-60px)] max-sd:mt-[60px] mt-[65px] flex h-[calc(100vh-65px)] items-center justify-center'
-            )}
+            className={clsx('flex h-screen items-center justify-center')}
             style={{
               zIndex: animationComplete ? 50 : 'auto',
               position: 'relative',
@@ -536,7 +535,7 @@ export default function HeaderMotion({ heroData }: Props) {
                       opacity: 0,
                     }}
                     animate={studiosControls}
-                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[170px] text-black md:text-[170px]"
+                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[155px] text-black md:text-[170px]"
                     style={{
                       position: 'absolute',
                       right: isMobile ? '50%' : 0,
@@ -583,9 +582,7 @@ export default function HeaderMotion({ heroData }: Props) {
         <m.div className="content-wrapper inset-0 hidden h-screen w-screen bg-white max-md:block">
           {/* Main video container */}
           <m.div
-            className={clsx(
-              'max-sd:h-[calc(100vh-60px)] max-sd:mt-[60px] mt-[65px] flex h-[calc(100vh-65px)] items-center justify-center'
-            )}
+            className={clsx('flex h-screen items-center justify-center')}
             style={{
               zIndex: animationComplete ? 50 : 'auto',
               position: 'relative',
@@ -639,7 +636,7 @@ export default function HeaderMotion({ heroData }: Props) {
                       opacity: 0,
                     }}
                     animate={studiosControls}
-                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[95px] text-black md:text-[170px]"
+                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[90px] text-black md:text-[170px]"
                     style={{
                       position: 'absolute',
                       right: isMobile ? '50%' : 0,
@@ -654,7 +651,7 @@ export default function HeaderMotion({ heroData }: Props) {
                   {/* Video container with 16:9 aspect ratio */}
                   <div
                     style={{
-                      paddingTop: isMobile ? '56.25%' : `${(330 / 586) * 100}%`,
+                      paddingTop: isMobile ? '56.25%' : `${(477 / 848) * 100}%`,
                     }}
                     className="relative z-[21] w-full"
                   >

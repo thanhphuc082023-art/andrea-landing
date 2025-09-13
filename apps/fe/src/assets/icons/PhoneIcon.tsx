@@ -1,6 +1,36 @@
 import React from 'react';
 
-export function PhoneIcon() {
+export function PhoneIcon({ color = '' }) {
+  if (color === 'white')
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+      >
+        <rect width="20" height="20" fill="url(#pattern0_1588_480)" />
+        <defs>
+          <pattern
+            id="pattern0_1588_480"
+            patternContentUnits="objectBoundingBox"
+            width="1"
+            height="1"
+          >
+            <use xlinkHref="#image0_1588_480" transform="scale(0.0166667)" />
+          </pattern>
+          <image
+            id="image0_1588_480"
+            width="60"
+            height="60"
+            preserveAspectRatio="none"
+            xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAACXBIWXMAAAsTAAALEwEAmpwYAAACv0lEQVR4nO2aXYhNURTHl/EZSfnIm8/wIF/lxYtSXhSelDcJD56EFGXKZOSdPAmFUpo8eSDy5AEJUaMUQxPdpjvde9b/v+eWwSxtc6duU9Pse+7MOPvM+dV6PHV+rX32WXutLVJQUFBQkDNIbgJwl2QZQB/J05JHzGwGgAsAfpG0xgBwQPImS/LWaNEG4V4zmy95gWTHWLINcVHygKruBTA0njCAWrVaXS0xY2azSX4NyO5IPJCYIXmwCdmR2C2xAuB+CuFuvzIkRkj2pBD2cVJiBMDPlMJVAMtkGgkbyesSGwB60woD+ENys8QEgCctZNhHp8QEgPMtCp+SmHDObW1Btl9Vl0hsAHib8hs+LjEC4FgK2TdmNlMirqd7mpAdUtUdEjOqeqSJDHdJ7JhZG8mXgcInJA8457YB+B0gfEPyAsnOgG94EMBOyQNmNitwafcnSbJG8oCqriOpAZl+VyqVFkgeUNV99cPBeNJPzWyuTKNOpgG453d5ycmvqitQ+qrkATObA+BZoPS1XGS6UqksAvChieUdZ4OvkVqttgLAt0DpRyG7N4ClzrkzJC8757ZI1kiSZC2AH4HS78eaUvhl75w75KeTjQcSAHdILpcsoarrAZQCa+5+krsanx8YGNg+TmHju6Fn/d4hGZsf9wVmetDX3r4V5Mc0ITOsenRnasKhqhsAfA98+VbiYWZK2Gq1uorkl8mW9r1zAFfK5fLCLOzeK0l+nIJM/xvKZ+ImQpIki0k+nwrpzLSGzWxeaBk6AZkuSYZq744mduK0UZYsoar7Q87TLWT4tmS0ifBqEmT9f32jZLjffSmwMRgq3C4xdENJvpgA4Zv+PpnEgJm1qerhNFcs6geL9mhkRy9zAEcBvA4U/uyc2yN5gMOHkHMAHtfvilU4zCffSPBVlW8b/+/3LCgoKCgoKJAg/gKzhzgyGi4i7wAAAABJRU5ErkJggg=="
+          />
+        </defs>
+      </svg>
+    );
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

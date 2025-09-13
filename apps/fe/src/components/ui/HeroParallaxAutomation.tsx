@@ -130,7 +130,7 @@ export const Header = () => {
   return (
     <div className="content-wrapper flex h-full w-full items-center justify-center">
       <div className="relative w-full py-20 md:py-40">
-        <h1 className="text-2xl font-bold md:text-7xl dark:text-white">
+        <h1 className="font-playfair text-2xl font-bold md:text-7xl dark:text-white">
           Studio Thiết Kế <br /> Sáng Tạo Hàng Đầu
         </h1>
         <p className="mt-8 max-w-2xl text-base md:text-xl dark:text-neutral-200">
@@ -181,7 +181,7 @@ export const ProductCard = ({
           <span className="relative inline-block shrink-0">
             <button
               onClick={() => router.push(product.link)}
-              className="after:bg-brand-orange relative z-30 shrink-0 overflow-hidden rounded-md bg-black/10 px-2 py-1 text-sm font-semibold text-white after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700"
+              className="after:bg-brand-orange relative z-30 h-[40px] min-h-[140px] shrink-0 overflow-hidden rounded-md bg-black/10 px-2 py-1 text-sm font-semibold text-white after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700"
             >
               Xem thêm
             </button>

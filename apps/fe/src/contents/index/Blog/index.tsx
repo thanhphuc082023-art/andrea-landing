@@ -151,7 +151,15 @@ export function BlogCard({
   );
 }
 
-function Blog({ title, category, excludeSlug }: { title?: string; category?: string; excludeSlug?: string }) {
+function Blog({
+  title,
+  category,
+  excludeSlug,
+}: {
+  title?: string;
+  category?: string;
+  excludeSlug?: string;
+}) {
   const [blogPosts, setBlogPosts] = useState(fallbackBlogPosts);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -292,7 +300,7 @@ function Blog({ title, category, excludeSlug }: { title?: string; category?: str
               textColor="text-brand-orange"
               borderColor="border-brand-orange"
               beforeBgColor="before:bg-brand-orange"
-              hoverBgColor="hover:bg-brand-orange"
+              hoverBgColor="hover:before:bg-brand-orange"
               hoverTextColor="hover:text-white"
               focusRingColor="focus:ring-brand-orange"
               focusRingOffsetColor="focus:ring-offset-brand-orange-dark"

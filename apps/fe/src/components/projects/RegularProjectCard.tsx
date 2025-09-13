@@ -15,7 +15,7 @@ function RegularProjectCard({ project, className }: ProjectCardProps) {
           )}
         >
           <Image
-            src={getStrapiMediaUrl(project?.thumbnail?.formats?.medium) || ''}
+            src={getStrapiMediaUrl(project?.thumbnail) || ''}
             alt={project?.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
