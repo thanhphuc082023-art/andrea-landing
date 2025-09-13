@@ -59,6 +59,7 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       thumbnail: initialData?.thumbnail || undefined,
       heroVideo: initialData?.heroVideo || undefined,
       heroBanner: initialData?.heroBanner || undefined,
+      body: initialData?.body || undefined,
     },
   });
 
@@ -142,6 +143,8 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
           setValue('thumbnail', parsedData.thumbnail || undefined);
           setValue('heroVideo', parsedData.heroVideo || undefined);
           setValue('heroBanner', parsedData.heroBanner || undefined);
+          setValue('content', parsedData.content || undefined);
+          setValue('body', parsedData.body || undefined);
 
           // Important: File objects are lost during JSON serialization
           // Only preserve URLs and uploadIds, remove file references
@@ -369,6 +372,8 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       heroVideo: currentData.heroVideo,
       heroBanner: currentData.heroBanner,
       thumbnail: currentData.thumbnail,
+      content: currentData.content,
+      body: currentData.body,
     };
 
     sessionStorage.setItem('projectFormData', JSON.stringify(finalData));
@@ -396,6 +401,8 @@ export function useProjectForm({ initialData, onSubmit }: UseProjectFormProps) {
       heroVideo: data.heroVideo,
       heroBanner: data.heroBanner,
       thumbnail: data.thumbnail,
+      content: data.content,
+      body: data.body,
     };
 
     // Clear sessionStorage after successful submission

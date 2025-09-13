@@ -10,6 +10,7 @@ import {
   SeoSection,
   useProjectForm,
 } from './forms';
+import { ContentSection } from './forms/project';
 import {
   useSessionCleanup,
   sessionCleanupConfigs,
@@ -361,12 +362,21 @@ export default function ProjectFormPage({
                   onLogout={handleLogout}
                 />
 
+                {/* Content Section */}
+                <ContentSection
+                  register={register}
+                  watch={watch}
+                  control={control}
+                  errors={errors}
+                  setValue={setValue}
+                />
+
                 {/* Showcase Section */}
-                <ShowcaseSection
+                {/* <ShowcaseSection
                   showcaseSections={showcaseSections}
                   setShowcaseSections={setShowcaseSections}
                   onLogout={handleLogout}
-                />
+                /> */}
 
                 {/* Credits Section */}
                 <CreditsSection

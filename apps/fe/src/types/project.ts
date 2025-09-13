@@ -81,6 +81,7 @@ export interface ProjectData {
   description: string;
   projectIntroTitle: string;
 
+  body?: any;
   content?: string;
   overview?: string;
   challenge?: string;

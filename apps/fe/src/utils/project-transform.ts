@@ -4,6 +4,7 @@ import {
   MediaFile,
 } from '@/types/project';
 import { StrapiAPI } from '@/lib/strapi';
+import { replaceMaxWidth } from '@/utils';
 
 // Transform Strapi project response to ProjectData format
 export function transformStrapiProject(strapiProject: any): ProjectData {
@@ -108,7 +109,7 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
                     order: 1,
                   },
                 ]
-                : [
+              : [
                   {
                     id: `item-${section.id || 's'}-0`,
                     type: 'text',
@@ -147,7 +148,6 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
     description: project.description || '',
     projectIntroTitle: project.projectIntroTitle || '',
 
-    content: project.content || '',
     overview: project.overview || '',
     challenge: project.challenge || '',
     solution: project.solution || '',
@@ -192,6 +192,11 @@ export function transformStrapiProject(strapiProject: any): ProjectData {
     createdAt: project.createdAt,
     updatedAt: project.updatedAt,
     publishedAt: project.publishedAt || null,
+
+    body: {
+      ...project?.body,
+      html: replaceMaxWidth(project?.body?.html || ''),
+    },
   };
 }
 

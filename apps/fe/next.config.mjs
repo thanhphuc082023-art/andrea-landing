@@ -27,18 +27,52 @@ const nextConfig = {
     },
   ],
   images: {
-    domains: [
-      'tremendous-delight-4e1d7b6669.media.strapiapp.com',
-      'joyful-basket-ea764d9c28.media.strapiapp.com',
-      'api.builder.io',
-      'images.unsplash.com',
-      'res.cloudinary.com',
-      'cdn.builder.io',
-      'strapi.andrea.dev',
-      'andrea.dev',
-      'andrea-landing.pages.dev',
-      'localhost',
-      'localhost:1337',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'tremendous-delight-4e1d7b6669.media.strapiapp.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'joyful-basket-ea764d9c28.media.strapiapp.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.builder.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.builder.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'strapi.andrea.dev',
+      },
+      {
+        protocol: 'https',
+        hostname: 'andrea.dev',
+      },
+      {
+        protocol: 'https',
+        hostname: 'andrea-landing.pages.dev',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '1337',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [480, 768, 1024, 1440, 1920],

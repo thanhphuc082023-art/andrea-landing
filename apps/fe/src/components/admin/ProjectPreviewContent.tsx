@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { type ProjectFormData } from '@/lib/validations/project';
 import ProjectDetailContents from '@/contents/project-detail';
+import { replaceMaxWidth } from '@/utils';
 
 interface ProjectPreviewContentProps {
   formData: Partial<ProjectFormData>;
@@ -19,6 +20,7 @@ export default function ProjectPreviewContent({
     description: formData.description || 'Mô tả dự án sẽ hiển thị ở đây...',
     projectMetaInfo: formData.projectMetaInfo || [],
     projectIntroTitle: formData.projectIntroTitle || 'Giới thiệu dự án:',
+    body: formData?.body,
 
     // Required fields for ProjectData interface
     projectStatus:

@@ -16,6 +16,8 @@ export function transformStrapiProjectToFormData(
     description: project.description || '',
     slug: project.slug || '',
     projectIntroTitle: project.projectIntroTitle || '',
+    content: project.content || undefined,
+    body: project.body || undefined,
 
     // Status and settings
     status: project.projectStatus || 'draft',

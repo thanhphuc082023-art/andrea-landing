@@ -1,5 +1,6 @@
 import ProjectCredits from '@/contents/project-detail/ProjectCredits';
 import ProjectHero from './ProjectHero';
+import ProjectContent from './ProjectContent';
 import ProjectShowcase from './ProjectShowcase';
 import ContactForm from '@/contents/index/ContactForm';
 import NextProjects from '@/contents/project-detail/NextProjects';
@@ -18,6 +19,9 @@ function ProjectDetailContents({
     <>
       {/* Hero Section */}
       <ProjectHero project={project} />
+
+      {/* Project Content */}
+      <ProjectContent project={project} />
 
       {/* Project Showcase */}
       <ProjectShowcase project={project} />

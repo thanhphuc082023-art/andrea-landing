@@ -115,6 +115,7 @@ export default async function handler(
       metrics: projectData.metrics,
       credits: projectData.credits,
       seo: projectData.seo,
+      body: projectData.body,
     };
 
     // Set media IDs (use uploadIds sent from client)

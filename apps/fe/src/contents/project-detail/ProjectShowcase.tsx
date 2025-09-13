@@ -779,9 +779,7 @@ const ShowcaseSection = memo(
           {items.map((item: any, itemIndex: number) => {
             const transformedItem = transformItem(item, itemIndex);
             // For half-half layout, divide width by 2 for proper aspect ratio
-            const adjustedWidth = section.width
-              ? section.width / 2
-              : items[0]?.width;
+            const adjustedWidth = section.width ? section.width / 2 : 1300 / 2;
             return (
               <div key={itemIndex} className="group">
                 <div
@@ -824,10 +822,10 @@ const ShowcaseSection = memo(
               itemIndex === 0
                 ? section?.width
                   ? section?.width / 3
-                  : items[0]?.width // First item: 33%
+                  : 1300 / 3 // First item: 33%
                 : section?.width
                   ? (section?.width / 3) * 2
-                  : items[0]?.width * 2; // Second item: 67%
+                  : (1300 / 3) * 2; // Second item: 67%
             return (
               <div
                 key={itemIndex}
@@ -871,9 +869,7 @@ const ShowcaseSection = memo(
             // Use one third of the first item's width for aspect ratio calculations
             const adjustedWidth = section?.width
               ? section?.width / 3
-              : items[0]?.width
-                ? items[0]?.width
-                : 1300 / 3;
+              : 1300 / 3;
 
             return (
               <div key={itemIndex} className="group">
@@ -955,7 +951,7 @@ const ShowcaseSection = memo(
           const effectiveColSpan = transformedItem.colSpan || 1;
           const adjustedWidth = section?.width
             ? (section?.width * effectiveColSpan) / gridCols
-            : items[0]?.width;
+            : 1300 / gridCols;
           return (
             <div
               key={itemIndex}
@@ -983,7 +979,8 @@ const ShowcaseSection = memo(
 ShowcaseSection.displayName = 'ShowcaseSection';
 
 function ProjectShowcase({ project = null }: ProjectShowcaseProps) {
-  const sections = project?.showcaseSections || legacyShowcaseData;
+  const sections = project?.showcaseSections || [];
+  if (sections?.length === 0 || !sections) return;
 
   return (
     <section className="content-wrapper max-md:px-0">

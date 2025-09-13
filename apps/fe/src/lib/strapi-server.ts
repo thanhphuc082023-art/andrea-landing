@@ -300,6 +300,19 @@ export async function getAboutUsPageSettings(): Promise<StrapiResponse<any>> {
   return fetchStrapiAPI('about-us-page', params);
 }
 
+/**
+ * Server-side function to fetch insights directly from Strapi
+ */
+export async function getInsights(): Promise<StrapiResponse<any>> {
+  const params = {
+    populate: '*',
+    sort: ['createdAt:desc'],
+    publicationState: 'live',
+  };
+
+  return fetchStrapiAPI('insights', params);
+}
+
 // Static versions (same implementation for now)
 export const getStaticGlobalSettings = getGlobalSettings;
 export const getStaticMenuSettings = getMenuSettings;

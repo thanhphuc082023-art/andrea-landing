@@ -57,6 +57,8 @@ export const projectFormSchema = z.object({
   heroBanner: z.any().optional(),
   thumbnail: z.any().optional(),
   showcase: z.array(z.any()).optional(),
+  content: z.any().optional(), // Content field for rich text editor
+  body: z.any(),
 });
 
 export type ProjectFormData = z.infer<typeof projectFormSchema>;
