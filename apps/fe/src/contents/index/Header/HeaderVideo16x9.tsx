@@ -33,7 +33,6 @@ export default function HeaderVideo16x9({
         ref={videoRef}
         className="absolute inset-0 h-full w-full object-cover"
         autoPlay
-        muted
         loop
         playsInline
         preload="metadata"

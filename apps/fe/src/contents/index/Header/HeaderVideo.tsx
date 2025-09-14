@@ -228,7 +228,7 @@ function HeaderVideo({
 
   const commonVideoProps = {
     autoPlay: true,
-    muted: true,
+    muted: false,
     loop: true,
     playsInline: true,
     preload: 'metadata' as const,

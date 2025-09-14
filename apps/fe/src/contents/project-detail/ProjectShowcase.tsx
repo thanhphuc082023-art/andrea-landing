@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { memo, useEffect, useRef } from 'react';
 import MinimalFlipBook from '@/components/MinimalFlipBook';
+import VideoPlayer from '@/components/VideoPlayer';
 import {
   ProjectData,
   ProjectShowcaseSection,
@@ -164,87 +165,10 @@ const ShowcaseItem = memo(
       'object-cover transition-transform duration-700 group-hover:scale-[1.02] z-[10]';
     const html = item.description?.replace(/\n/g, '<br/>') || '';
 
-    // Refs and helpers for YouTube mounting (applies when item.type === 'video')
-    const ytContainerRef = useRef<HTMLDivElement | null>(null);
-    const ytPlayerRef = useRef<any>(null);
-    const skeletonRef = useRef<HTMLDivElement | null>(null);
-
+    // Helper function for skeleton hiding (used by other item types)
     const hideSkeleton = () => {
-      try {
-        skeletonRef.current?.classList.add('hidden');
-      } catch (e) {}
-    };
-
-    // Load YouTube IFrame API once (preserve existing onYouTubeIframeAPIReady)
-    const loadYouTubeAPI = (() => {
-      let promise: Promise<void> | null = null;
-      return () => {
-        if (promise) return promise;
-        promise = new Promise<void>((resolve) => {
-          if ((window as any).YT && (window as any).YT.Player) return resolve();
-
-          // only append script once
-          if (
-            !document.querySelector(
-              'script[src="https://www.youtube.com/iframe_api"]'
-            )
-          ) {
-            const tag = document.createElement('script');
-            tag.src = 'https://www.youtube.com/iframe_api';
-            document.head.appendChild(tag);
-          }
-
-          // preserve previous handler so multiple components can coexist
-          const prev = (window as any).onYouTubeIframeAPIReady;
-          (window as any).onYouTubeIframeAPIReady = () => {
-            try {
-              if (typeof prev === 'function') prev();
-            } catch (e) {}
-            resolve();
-          };
-        });
-        return promise;
-      };
-    })();
-
-    const createYouTubePlayer = async (
-      container: HTMLDivElement | null,
-      videoId: string | null
-    ) => {
-      if (!container || !videoId) return;
-      await loadYouTubeAPI();
-      if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
-        try {
-          ytPlayerRef.current.destroy();
-        } catch (e) {}
-      }
-      ytPlayerRef.current = new (window as any).YT.Player(container, {
-        videoId,
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          loop: 1,
-          playlist: videoId, // required for loop
-          playsinline: 1,
-          disablekb: 1,
-          modestbranding: 1,
-          showInfo: 0,
-          rel: 0,
-          iv_load_policy: 3,
-        },
-        events: {
-          onReady: (e: any) => {
-            try {
-              e.target.mute();
-              e.target.playVideo();
-              hideSkeleton();
-            } catch (err) {}
-          },
-          onError: () => {
-            hideSkeleton();
-          },
-        },
-      });
+      // This function is kept for compatibility with other item types
+      // that might still use skeleton loading
     };
 
     if (item.type === 'text') {
@@ -284,96 +208,22 @@ const ShowcaseItem = memo(
     if (item.type === 'video') {
       const src = item.src || item.videoLink || '';
 
-      const isYouTubeUrl = (u?: string | null) =>
-        !!u && (u.includes('youtube.com') || u.includes('youtu.be'));
-
-      const getYouTubeId = (u: string) => {
-        const match =
-          u.match(/(?:v=|\/embed\/|\.be\/)([A-Za-z0-9_-]{11})/) ||
-          u.match(/([A-Za-z0-9_-]{11})/);
-        return match ? match[1] : null;
-      };
-
-      useEffect(() => {
-        if (!isYouTubeUrl(src)) return;
-        const id = getYouTubeId(src!);
-        createYouTubePlayer(ytContainerRef.current, id);
-        return () => {
-          if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
-            try {
-              ytPlayerRef.current.destroy();
-            } catch (e) {}
-          }
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [src]);
-
-      if (isYouTubeUrl(src)) {
-        return (
-          <div className="video-responsive pointer-events-none relative max-md:pointer-events-auto">
-            {/* skeleton overlay */}
-            <div
-              ref={skeletonRef}
-              className="skeleton-video absolute inset-0 z-10"
-              aria-hidden="true"
-              style={{
-                background:
-                  'linear-gradient(90deg, #e0e0e0 10%, #f5f5f5 20%, #e0e0e0 30%, #e0e0e0 40%, #f5f5f5 50%, #e0e0e0 60%, #e0e0e0 70%, #f5f5f5 80%, #e0e0e0 90%)',
-                backgroundSize: '200% 100%',
-                animation: 'shimmer 1.5s infinite',
-              }}
-            />
-            <div
-              ref={ytContainerRef}
-              className={clsx('relative z-20 h-full w-full object-cover')}
-              style={{ width: '100%', height: '100%' }}
-              aria-hidden="true"
-            />
-            {/* visual overlays (can't inject into iframe) */}
-            <div className="video-overlay-top" aria-hidden="true" />
-            <div className="video-overlay-watermark" aria-hidden="true" />
-            <style>{`
-              @keyframes shimmer {
-                0% { background-position: -200% 0; }
-                100% { background-position: 200% 0; }
-              }
-            `}</style>
-          </div>
-        );
-      }
-
       return (
-        <div className="relative h-full w-full">
-          <div
-            ref={skeletonRef}
-            className="skeleton-video absolute inset-0 z-10"
-            aria-hidden="true"
-            style={{
-              background:
-                'linear-gradient(90deg, #e0e0e0 10%, #f5f5f5 20%, #e0e0e0 30%, #e0e0e0 40%, #f5f5f5 50%, #e0e0e0 60%, #e0e0e0 70%, #f5f5f5 80%, #e0e0e0 90%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite',
-            }}
-          />
-          <video
-            src={src}
-            className="pointer-events-none relative z-20 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-            controls
-            muted
-            loop
-            playsInline
-            autoPlay
-            preload="metadata"
-            onLoadedData={() => hideSkeleton()}
-            onError={() => hideSkeleton()}
-          />
-          <style>{`
-            @keyframes shimmer {
-              0% { background-position: -200% 0; }
-              100% { background-position: 200% 0; }
-            }
-          `}</style>
-        </div>
+        <VideoPlayer
+          src={src}
+          alt={item.alt}
+          width={item.width}
+          height={item.height}
+          className="pointer-events-none h-full w-full max-md:pointer-events-auto"
+          autoPlay={true}
+          controls={true}
+          loop={true}
+          muted={true}
+          playsInline={true}
+          preload="metadata"
+          onLoadedData={() => {}}
+           onError={() => {}}
+        />
       );
     }
 
