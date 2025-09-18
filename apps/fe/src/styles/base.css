@@ -132,3 +132,22 @@
   width: 100%;
   position: absolute;
 }
+
+body {
+  background: transparent !important;
+}
+
+.scroll-reveal {
+  margin: 0;
+  padding: 0;
+}
+
+.scroll-reveal-text {
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.word {
+  display: inline-block;
+}

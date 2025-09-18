@@ -427,6 +427,26 @@ export default function HeaderMotion({ heroData }: Props) {
     isMobile, // Thêm isMobile vào dependencies để animation cập nhật khi giá trị thay đổi
   ]);
 
+  // Control page scroll based on animation state
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const htmlElement = document.documentElement;
+    
+    if (!animationComplete) {
+      // Prevent scrolling during animation
+      htmlElement.style.overflow = 'hidden';
+    } else {
+      // Allow scrolling after animation completes
+      htmlElement.style.overflow = 'auto';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      htmlElement.style.overflow = 'auto';
+    };
+  }, [animationComplete]);
+
   return (
     // Container with dynamic height based on device characteristics
     <div

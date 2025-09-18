@@ -8,8 +8,12 @@ import StrapiHead from '@/components/meta/StrapiHead';
 import ServiceHero from '@/components/services/ServiceHero';
 import ContactForm from '@/contents/index/ContactForm';
 import ImageTextSectionWithTitle from '@/components/services/ImageTextSectionWithTitle';
+import SubmitButton from '@/components/SubmitButton';
+import clsx from 'clsx';
+import { useRouter } from 'next/router';
 
 export default function ServicesPage({ servicesData, currentGlobal }: any) {
+  const router = useRouter();
   const defaultSeo = currentGlobal?.defaultSeo || {};
   const pageSeo = {
     metaTitle: 'Thiết kế website',
@@ -41,6 +45,20 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
       <ProcessSection data={servicesData?.process} />
 
       <FinalSection data={servicesData?.final} />
+      <div className={clsx('my-9 text-center')}>
+        <SubmitButton
+          onClick={() => router.back()}
+          textColor="text-brand-orange"
+          borderColor="border-brand-orange"
+          beforeBgColor="before:bg-brand-orange"
+          hoverBgColor="hover:before:bg-brand-orange"
+          hoverTextColor="hover:text-white"
+          focusRingColor="focus:ring-brand-orange"
+          focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
+        >
+          Trở về
+        </SubmitButton>
+      </div>
       <ContactForm />
     </div>
   );

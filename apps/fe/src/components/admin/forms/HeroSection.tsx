@@ -293,7 +293,6 @@ export default function HeroSection({
                       <video
                         src={heroVideo?.url}
                         className="h-8 w-12 rounded object-cover"
-                        muted
                       />
                     )}
                     <span className="block max-w-[12rem] truncate text-sm text-gray-700">

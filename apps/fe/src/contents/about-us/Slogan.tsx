@@ -1,23 +1,22 @@
 import { useMemo, useState, useEffect, type ReactNode, useRef } from 'react';
-import 'keen-slider/keen-slider.min.css';
-import { getStrapiMediaUrl } from '@/utils/helper';
 import {
   DraggableCardBody,
   DraggableCardContainer,
 } from '@/components/ui/DraggableCardBody';
 import {
   motion,
-  useAnimationControls,
   useMotionValue,
   useSpring,
   useTransform,
+  useScroll,
 } from 'motion/react';
-import { cn } from '@/utils';
+import { useImageDimensions } from '@/hooks/useImageDimensions';
 
 interface WorkflowProps {
   slogan?: string;
   workflowData?: any[];
   rotationMode?: 'random' | 'radial';
+  disableDrag?: boolean;
 }
 
 interface WorkflowItem {
@@ -29,6 +28,99 @@ interface WorkflowItem {
   style?: React.CSSProperties; // allow passing inline styles for small per-item nudges
   content?: ReactNode;
 }
+
+// Component to handle auto-sized images
+const AutoSizedImage = ({
+  src,
+  alt,
+  maxWidth,
+  maxHeight,
+}: {
+  src: string;
+  alt: string;
+  maxWidth?: number;
+  maxHeight?: number;
+}) => {
+  const { aspectRatio, isLoading, error } = useImageDimensions(src);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const updateSize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    // Set initial size
+    updateSize();
+
+    // Add event listener
+    window.addEventListener('resize', updateSize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  // Calculate responsive max dimensions based on screen size
+  const getResponsiveMaxDimensions = () => {
+    if (maxWidth && maxHeight) {
+      return { maxWidth, maxHeight };
+    }
+
+    const baseMaxWidth = windowSize.width > 768 ? 480 : 480;
+    const baseMaxHeight = windowSize.width > 768 ? 360 : 360;
+
+    // Scale based on screen size
+    const scaleFactor = Math.min(windowSize.width / 1920, 1); // Scale down for smaller screens
+
+    return {
+      maxWidth: Math.max(baseMaxWidth * scaleFactor, 300), // Minimum 200px
+      maxHeight: Math.max(baseMaxHeight * scaleFactor, 250), // Minimum 150px
+    };
+  };
+
+  const { maxWidth: responsiveMaxWidth, maxHeight: responsiveMaxHeight } =
+    getResponsiveMaxDimensions();
+
+  if (isLoading) {
+    return (
+      <div
+        className="flex animate-pulse items-center justify-center bg-gray-200"
+        style={{ width: responsiveMaxWidth, height: responsiveMaxHeight }}
+      ></div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className="flex items-center justify-center bg-gray-200"
+        style={{ width: responsiveMaxWidth, height: responsiveMaxHeight }}
+      >
+        <span className="text-sm text-gray-400">Error loading image</span>
+      </div>
+    );
+  }
+
+  // Calculate dimensions while maintaining aspect ratio and staying within max bounds
+  let width = responsiveMaxWidth;
+  let height = responsiveMaxWidth / aspectRatio;
+
+  if (height > responsiveMaxHeight) {
+    height = responsiveMaxHeight;
+    width = responsiveMaxHeight * aspectRatio;
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="pointer-events-none relative z-10 object-cover max-md:mx-auto"
+      style={{ width, height }}
+    />
+  );
+};
 
 // Default workflow data for fallback (expanded / cloned to 16 items)
 const defaultWorkflows: WorkflowItem[] = [
@@ -135,10 +227,96 @@ function SloganSection({
   slogan = '',
   workflowData = [],
   rotationMode = 'random',
+  disableDrag = false,
 }: WorkflowProps) {
   const [selected, setSelected] = useState<any>(null);
   // initialize as false on SSR, then determine actual value on mount
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Container ref for scroll tracking
+  const containerRef = useRef(null);
+
+  // Scroll-based parallax
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start'],
+  });
+
+  // Different parallax speeds for different layers
+  const parallaxSlow = useTransform(
+    scrollYProgress,
+    [0, 2],
+    isMobile ? [150, -200] : [250, -700]
+  );
+  const parallaxFast = useTransform(
+    scrollYProgress,
+    [0, 2],
+    isMobile ? [300, 0] : [500, -600]
+  );
+
+  // Floating animation motion values
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Spring animations for stronger floating effect
+  const plane1X = useSpring(
+    useTransform(mouseX, [-800, 800], isMobile ? [-40, 40] : [-80, 80]),
+    {
+      stiffness: 50,
+      damping: 22,
+    }
+  );
+  const plane1Y = useSpring(
+    useTransform(mouseY, [-800, 800], isMobile ? [-40, 40] : [-80, 80]),
+    {
+      stiffness: 50,
+      damping: 22,
+    }
+  );
+  const plane2X = useSpring(
+    useTransform(mouseX, [-800, 800], isMobile ? [-50, 50] : [-100, 100]),
+    {
+      stiffness: 50,
+      damping: 20,
+    }
+  );
+  const plane2Y = useSpring(
+    useTransform(mouseY, [-800, 800], isMobile ? [-50, 50] : [-100, 100]),
+    {
+      stiffness: 50,
+      damping: 20,
+    }
+  );
+  const plane3X = useSpring(
+    useTransform(mouseX, [-800, 800], isMobile ? [-50, 50] : [-100, 100]),
+    {
+      stiffness: 50,
+      damping: 22,
+    }
+  );
+  const plane3Y = useSpring(
+    useTransform(mouseY, [-800, 800], isMobile ? [-50, 50] : [-100, 100]),
+    {
+      stiffness: 50,
+      damping: 22,
+    }
+  );
+
+  // Handle mouse movement for floating effect
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const deltaX = e.clientX - centerX;
+    const deltaY = e.clientY - centerY;
+    mouseX.set(deltaX);
+    mouseY.set(deltaY);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -169,7 +347,7 @@ function SloganSection({
     const sourceData =
       workflowData?.length > 0 ? workflowData : defaultWorkflows;
 
-      // Expand / clone items to a larger total (change TOTAL_ITEMS to desired count)
+    // Expand / clone items to a larger total (change TOTAL_ITEMS to desired count)
     const TOTAL_ITEMS = 16;
     const expanded: any[] = [...sourceData];
 
@@ -261,15 +439,12 @@ function SloganSection({
         '/assets/images/workflow/workflow-image-3.jpg';
       const altText = workflow.alt || `Workflow step ${index + 1}`;
 
-      const contentNode = (
-        <img
-          src={imageUrl}
-          alt={altText}
-          width={450}
-          height={300}
-          className="rounded-8 pointer-events-none relative z-10 h-full w-full object-cover max-md:mx-auto"
-        />
-      );
+      const contentNode = <AutoSizedImage src={imageUrl} alt={altText} />;
+
+      // Determine which plane this item belongs to for floating effect
+      const planeIndex = index % 3; // 0, 1, or 2
+      // const brightness = planeIndex === 0 ? 0.7 : planeIndex === 1 ? 0.6 : 0.5;
+      const brightness = 1;
 
       return {
         id: workflow.id || index + 1,
@@ -280,6 +455,8 @@ function SloganSection({
         style: style as any,
         zIndex: 100 - index,
         content: contentNode,
+        planeIndex,
+        brightness,
       };
     });
   }, [workflowData, isMobile, rotationMode]);
@@ -289,34 +466,313 @@ function SloganSection({
   };
 
   return (
-    <DraggableCardContainer className="relative flex min-h-[1300px] w-full items-center justify-center overflow-clip max-md:min-h-[750px]">
-      <div className="content-wrapper flex items-center justify-center">
-        <p className="max-w-[860px] text-center text-2xl font-semibold text-neutral-700 max-md:max-w-full max-md:text-[20px]">
-          {slogan ||
-            'Với khát vọng tôn vinh giá trị thương hiệu Việt và đồng hành cùng doanh nghiệp trong nước vươn tầm quốc tế, Andrea định hướng trở thành đơn vị tư vấn, thiết kế thương hiệu cảm xúc và đồng hành cùng doanh nghiệp phát triển thương hiệu bền vững tại Việt Nam.'}
-        </p>
+    <div
+      ref={containerRef}
+      className="relative w-full"
+      style={{ height: isMobile ? '130vh' : '185vh' }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Title section in center */}
+      <div
+        className="absolute left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 transform text-center max-md:w-full"
+        style={{ top: isMobile ? '45%' : '42%' }}
+      >
+        <h1 className="m-0 mb-2.5 max-w-[623px] text-[20px] font-normal leading-[35px] text-black max-md:mx-auto max-md:max-w-[95%] max-md:text-[16px] max-md:leading-[28px]">
+          {slogan ? slogan.split('.')[0] : 'Andrea Creative Studio'}
+        </h1>
       </div>
-      {processedWorkflows.map((item) => (
-        <>
-          {selected?.id === item.id && (
-            <SelectedCard
-              handleOutsideClick={handleOutsideClick}
-              selected={selected}
-            />
-          )}
 
-          <DraggableCardBody
-            key={`${item.id}`}
-            isSelected={selected?.id === item.id}
-            className={`absolute h-[250px] w-[400px] max-md:mx-3 max-md:my-2 max-md:h-[120px] max-md:w-[180px] max-md:p-2`}
-            style={item.style}
-            onClick={() => setSelected(item)}
-          >
-            {item.content}
-          </DraggableCardBody>
-        </>
-      ))}
-    </DraggableCardContainer>
+      <DraggableCardContainer className="relative z-[51] h-full w-full">
+        {processedWorkflows
+          .filter((_, index) => index % 3 === 0)
+          .slice(0, 3)
+          .map((item, index) => {
+            const positions = [
+              { left: isMobile ? '4%' : '25%', top: isMobile ? '5%' : '17%' }, // Ảnh Andrea
+              { left: isMobile ? '2%' : '16%', top: isMobile ? '35%' : '46%' }, // Ảnh giữa trái
+              { left: isMobile ? '5%' : '20%', top: isMobile ? '74%' : '90%' }, // Ảnh dưới trái
+            ];
+
+            // Config cho từng position của plane2
+            const positionConfigs = [
+              {
+                // Position 0 - Ảnh Andrea
+                xMultiplier: 1,
+                yMultiplier: 1.2,
+                parallaxMultiplier: 0.8,
+                extraEffects: { scale: 0.0001 },
+              },
+              {
+                // Position 1 - Ảnh giữa trái
+                xMultiplier: 0.8,
+                yMultiplier: 1,
+                parallaxMultiplier: 3.0,
+                extraEffects: { rotate: 0.02 },
+              },
+              {
+                // Position 2 - Ảnh dưới trái
+                xMultiplier: 1.1,
+                yMultiplier: 1,
+                parallaxMultiplier: 1.8,
+                extraEffects: { opacity: 0.001 },
+              },
+            ];
+
+            const config = positionConfigs[index] || positionConfigs[0];
+
+            return (
+              <motion.div
+                className="absolute h-full w-full"
+                style={{
+                  x: useTransform(() => plane2X.get() * config.xMultiplier),
+                  y: useTransform(
+                    () =>
+                      plane2Y.get() * config.yMultiplier +
+                      parallaxSlow.get() * config.parallaxMultiplier
+                  ),
+                  ...(config.extraEffects?.scale && {
+                    scale: useTransform(
+                      () => 1 + plane2Y.get() * config.extraEffects.scale!
+                    ),
+                  }),
+                  ...(config.extraEffects?.rotate && {
+                    rotate: useTransform(
+                      () => plane2X.get() * config.extraEffects.rotate!
+                    ),
+                  }),
+                  ...(config.extraEffects?.opacity && {
+                    opacity: useTransform(() =>
+                      Math.max(
+                        0.7,
+                        1 -
+                          Math.abs(plane2Y.get()) * config.extraEffects.opacity!
+                      )
+                    ),
+                  }),
+                }}
+              >
+                <motion.div
+                  key={`plane1-${item.id}`}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 max-md:transform-none"
+                  style={{
+                    left: positions[index]?.left,
+                    top: positions[index]?.top,
+                  }}
+                  onClick={() => setSelected(item)}
+                >
+                  <DraggableCardBody
+                    isSelected={selected?.id === item.id}
+                    className=""
+                    disableDrag={disableDrag}
+                    autoSize={true}
+                  >
+                    {item.content}
+                  </DraggableCardBody>
+                </motion.div>
+              </motion.div>
+            );
+          })}
+
+        {processedWorkflows
+          .filter((_, index) => index % 3 === 1)
+          .slice(0, 3)
+          .map((item, index) => {
+            const positions = [
+              {
+                left: isMobile ? 'auto' : '70%',
+                right: isMobile ? '2%' : 'auto',
+                top: isMobile ? '14%' : '19%',
+              }, // Ảnh trên phải
+              {
+                right: isMobile ? '1%' : '-10%',
+                top: isMobile ? '60%' : '55%',
+              }, // Ảnh giữa phải
+              {
+                right: isMobile ? '1%' : 'auto',
+                left: isMobile ? 'auto' : '51%',
+                top: isMobile ? '89%' : '68%',
+              }, // Ảnh center-right
+            ];
+
+            // Config cho từng position của plane1
+            const positionConfigs = [
+              {
+                // Position 0 - Ảnh trên phải
+                xMultiplier: 1.1,
+                yMultiplier: 1,
+                parallaxMultiplier: 1.3,
+                extraEffects: { scale: 0.0002 },
+              },
+              {
+                // Position 1 - Ảnh giữa phải
+                xMultiplier: 0.9,
+                yMultiplier: 1.1,
+                parallaxMultiplier: 1.2,
+                extraEffects: { rotate: -0.015 },
+              },
+              {
+                // Position 1 - Ảnh giữa trái
+                xMultiplier: 0.8,
+                yMultiplier: 1,
+                parallaxMultiplier: 0.9,
+                extraEffects: { rotate: 0.02 },
+              },
+              {
+                // Position 2 - Ảnh center-right
+                xMultiplier: 1.2,
+                yMultiplier: 0.9,
+                parallaxMultiplier: 1.1,
+                extraEffects: { opacity: 0.0008 },
+              },
+            ];
+
+            const config = positionConfigs[index] || positionConfigs[0];
+
+            return (
+              <motion.div
+                className="absolute h-full w-full"
+                style={{
+                  x: useTransform(() => plane1X.get() * config.xMultiplier),
+                  y: useTransform(
+                    () =>
+                      plane1Y.get() * config.yMultiplier +
+                      parallaxSlow.get() * config.parallaxMultiplier
+                  ),
+                  ...(config.extraEffects?.scale && {
+                    scale: useTransform(
+                      () => 1 + plane1Y.get() * config.extraEffects.scale!
+                    ),
+                  }),
+                  ...(config.extraEffects?.rotate && {
+                    rotate: useTransform(
+                      () => plane1X.get() * config.extraEffects.rotate!
+                    ),
+                  }),
+                  ...(config.extraEffects?.opacity && {
+                    opacity: useTransform(() =>
+                      Math.max(
+                        0.7,
+                        1 -
+                          Math.abs(plane1Y.get()) * config.extraEffects.opacity!
+                      )
+                    ),
+                  }),
+                }}
+              >
+                <motion.div
+                  key={`plane2-${item.id}`}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 max-md:transform-none"
+                  style={{
+                    left: positions[index]?.left,
+                    right: positions[index]?.right,
+                    top: positions[index]?.top,
+                  }}
+                  onClick={() => setSelected(item)}
+                >
+                  <DraggableCardBody
+                    isSelected={selected?.id === item.id}
+                    className=""
+                    disableDrag={disableDrag}
+                    autoSize={true}
+                  >
+                    {item.content}
+                  </DraggableCardBody>
+                </motion.div>
+              </motion.div>
+            );
+          })}
+
+        {processedWorkflows
+          .filter((_, index) => index % 3 === 2)
+          .slice(0, 1)
+          .map((item, index) => {
+            const positions = [
+              {
+                right: isMobile ? '31%' : '1%',
+                bottom: isMobile ? '11%' : '0%',
+              }, // Ảnh dưới phải
+            ];
+
+            // Config cho từng position của plane3
+            const positionConfigs = [
+              {
+                // Position 0 - Ảnh dưới phải
+                xMultiplier: 1.3,
+                yMultiplier: 1.2,
+                parallaxMultiplier: 1.5,
+                extraEffects: {
+                  scale: 0.0003,
+                  rotate: 0.025,
+                  opacity: 0.0012,
+                },
+              },
+            ];
+
+            const config = positionConfigs[index] || positionConfigs[0];
+
+            return (
+              <motion.div
+                className="absolute h-full w-full"
+                style={{
+                  x: useTransform(() => plane3X.get() * config.xMultiplier),
+                  y: useTransform(
+                    () =>
+                      plane3Y.get() * config.yMultiplier +
+                      parallaxFast.get() * config.parallaxMultiplier
+                  ),
+                  ...(config.extraEffects?.scale && {
+                    scale: useTransform(
+                      () => 1 + plane3Y.get() * config.extraEffects.scale!
+                    ),
+                  }),
+                  ...(config.extraEffects?.rotate && {
+                    rotate: useTransform(
+                      () => plane3X.get() * config.extraEffects.rotate!
+                    ),
+                  }),
+                  ...(config.extraEffects?.opacity && {
+                    opacity: useTransform(() =>
+                      Math.max(
+                        0.6,
+                        1 -
+                          Math.abs(plane3Y.get()) * config.extraEffects.opacity!
+                      )
+                    ),
+                  }),
+                }}
+              >
+                <motion.div
+                  key={`plane3-${item.id}`}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 max-md:transform-none"
+                  style={{
+                    right: positions[index]?.right,
+                    bottom: positions[index]?.bottom,
+                  }}
+                  onClick={() => setSelected(item)}
+                >
+                  <DraggableCardBody
+                    isSelected={selected?.id === item.id}
+                    className=""
+                    disableDrag={disableDrag}
+                    autoSize={true}
+                  >
+                    {item.content}
+                  </DraggableCardBody>
+                </motion.div>
+              </motion.div>
+            );
+          })}
+
+        {/* Selected Card Modal */}
+        {selected && (
+          <SelectedCard
+            handleOutsideClick={handleOutsideClick}
+            selected={selected}
+          />
+        )}
+      </DraggableCardContainer>
+    </div>
   );
 }
 
@@ -332,6 +788,20 @@ const SelectedCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [windowSize, setWindowSize] = useState({ width: 800, height: 600 });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+
+      const handleResize = () => {
+        setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY } = e;
@@ -356,7 +826,7 @@ const SelectedCard = ({
   };
 
   const springConfig = {
-    stiffness: 100,
+    stiffness: 50,
     damping: 20,
     mass: 0.5,
   };
@@ -408,7 +878,7 @@ const SelectedCard = ({
         transition={{
           duration: 0.3,
           ease: 'easeInOut',
-          stiffness: 100,
+          stiffness: 50,
           damping: 20,
         }}
         style={{
@@ -421,9 +891,14 @@ const SelectedCard = ({
         whileHover={{ scale: 1.02, zIndex: 999999 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="transform-3d rounded-10 relative z-[70] h-[70vh] w-[70vw] overflow-hidden bg-neutral-100 p-6 shadow-2xl max-md:h-[50vh] max-md:w-[90vw] max-md:p-2 dark:bg-neutral-900"
+        className="transform-3d rounded-10 relative z-[70] flex items-center justify-center overflow-hidden bg-neutral-100 p-4 shadow-2xl dark:bg-neutral-900"
       >
-        {selected?.content}
+        <AutoSizedImage
+          src={selected?.image}
+          alt={selected?.alt}
+          maxWidth={Math.min(windowSize.width * 0.8, 900)}
+          maxHeight={Math.min(windowSize.height * 0.8, 700)}
+        />
       </motion.div>
     </div>
   );

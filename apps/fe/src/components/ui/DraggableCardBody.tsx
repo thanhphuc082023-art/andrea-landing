@@ -17,12 +17,16 @@ export const DraggableCardBody = ({
   style,
   onClick,
   isSelected,
+  disableDrag = false,
+  autoSize = false,
 }: {
   isSelected?: boolean;
   onClick?: any;
   className?: string;
   children?: React.ReactNode;
   style?: React.CSSProperties; // accept inline style nudges
+  disableDrag?: boolean; // prop to disable drag functionality
+  autoSize?: boolean; // prop to enable automatic sizing based on content
 }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -129,9 +133,9 @@ export const DraggableCardBody = ({
   return (
     <motion.div
       ref={cardRef}
-      drag
+      drag={!disableDrag}
       onClick={handleClick}
-      dragConstraints={constraints}
+      dragConstraints={disableDrag ? false : constraints}
       onDragStart={() => {
         document.body.style.cursor = 'grabbing';
         isDraggingRef.current = true;
@@ -196,7 +200,8 @@ export const DraggableCardBody = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        'transform-3d rounded-10 relative h-96 w-80 overflow-hidden bg-neutral-100 p-4 shadow-2xl dark:bg-neutral-900',
+        'transform-3d relative overflow-hidden bg-neutral-100 shadow-2xl dark:bg-neutral-900',
+        autoSize ? 'h-auto w-auto' : 'h-96 w-80',
         className
       )}
     >
