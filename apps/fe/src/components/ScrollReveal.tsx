@@ -40,9 +40,9 @@ function LineReveal({
   blurStrength?: number;
 }) {
   // Nhóm 6 dòng cùng lúc để sweep chậm hơn, mỗi dòng có offset khác nhau
-  const groupIndex = Math.floor(index / 5);
-  const totalGroups = Math.ceil(total / 5);
-  const lineInGroup = index % 5; // 0, 1, 2, 3, 4, hoặc 5
+  const groupIndex = Math.floor(index / 3);
+  const totalGroups = Math.ceil(total / 3);
+  const lineInGroup = index % 3; // 0, 1, 2, 3, 4, hoặc 5
   const baseStartProgress = groupIndex / totalGroups;
   const baseEndProgress = (groupIndex + 1) / totalGroups;
 
@@ -110,7 +110,7 @@ export default function ScrollReveal({
   const { scrollYProgress } = useScroll({
     target: containerRef,
     container: scrollContainerRef,
-    offset: ['start end', 'end start'],
+    offset: ['start end', 'end center'],
   });
 
   // Debug scroll progress
@@ -133,7 +133,7 @@ export default function ScrollReveal({
     >
       <div
         className={cn(
-          'scroll-reveal-text lg:text-[40px] mx-auto flex w-fit flex-col text-sm leading-relaxed sm:text-base sm:leading-relaxed md:text-[20px] md:leading-relaxed lg:leading-relaxed xl:text-[50px] xl:leading-relaxed',
+          'scroll-reveal-text mx-auto flex w-fit flex-col text-[25px] leading-relaxed sm:text-[30px] md:leading-relaxed lg:text-[40px] lg:leading-relaxed xl:text-[50px] xl:leading-relaxed',
           textClassName
         )}
       >

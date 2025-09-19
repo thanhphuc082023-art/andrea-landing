@@ -68,15 +68,15 @@ const AutoSizedImage = ({
       return { maxWidth, maxHeight };
     }
 
-    const baseMaxWidth = windowSize.width > 768 ? 480 : 480;
-    const baseMaxHeight = windowSize.width > 768 ? 360 : 360;
+    const baseMaxWidth = windowSize.width > 768 ? 480 : 380;
+    const baseMaxHeight = windowSize.width > 768 ? 360 : 260;
 
     // Scale based on screen size
     const scaleFactor = Math.min(windowSize.width / 1920, 1); // Scale down for smaller screens
 
     return {
-      maxWidth: Math.max(baseMaxWidth * scaleFactor, 300), // Minimum 200px
-      maxHeight: Math.max(baseMaxHeight * scaleFactor, 250), // Minimum 150px
+      maxWidth: Math.max(baseMaxWidth * scaleFactor, 200), // Minimum 200px
+      maxHeight: Math.max(baseMaxHeight * scaleFactor, 150), // Minimum 150px
     };
   };
 

@@ -39,7 +39,7 @@ const CoreValues = () => {
     <section className="content-wrapper">
       {/* Title */}
       <m.h2
-        className="font-playfair mb-16 text-center text-4xl font-normal text-orange-500 max-md:mb-10 md:text-[50px]"
+        className="font-playfair mb-16 text-center text-4xl font-semibold text-orange-500 max-md:mb-10 md:text-[50px]"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -72,10 +72,12 @@ const CoreValues = () => {
 
             {/* Content */}
             <div className="space-y-1 p-[22px]">
-              <h3 className="font-playfair text-[35px] font-bold text-orange-500">
+              <h3 className="text-[35px] font-bold text-orange-500 max-md:text-[25px]">
                 {value.title}
               </h3>
-              <p className="text-[24px] text-gray-600">{value.subtitle}</p>
+              <p className="text-[24px] text-gray-600 max-md:text-[20px]">
+                {value.subtitle}
+              </p>
             </div>
           </m.div>
         ))}
