@@ -227,15 +227,6 @@ function InsightPage({
               {insight?.title}
             </h1>
 
-            {/* Excerpt */}
-            {insight?.excerpt && (
-              <div className="mb-8">
-                <p className="text-[17px] italic leading-relaxed text-gray-700">
-                  {insight.excerpt}
-                </p>
-              </div>
-            )}
-
             {/* Content HTML */}
             {processedContent && (
               <div
@@ -265,9 +256,9 @@ function InsightPage({
 
       {/* Related articles */}
       <div className={clsx('py-[50px]')}>
-        <Blog 
-          category={insight?.category} 
-          title="Bài viết liên quan" 
+        <Blog
+          category={insight?.category}
+          title="Bài viết liên quan"
           excludeSlug={insight?.slug}
         />
       </div>

@@ -107,7 +107,7 @@ export default function InsightFormPage({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen bg-gray-50">
       {/* Header */}
       <div className="border-b border-gray-200 bg-white shadow-sm">
         <div className="content-wrapper">

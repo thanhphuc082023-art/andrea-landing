@@ -59,15 +59,10 @@ export default function EditInsightPage() {
         // First try to get insight by slug using Strapi API directly
         const strapiUrl =
           process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-        const strapiToken = localStorage.getItem('strapiToken');
 
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
         };
-
-        if (strapiToken) {
-          headers.Authorization = `Bearer ${strapiToken}`;
-        }
 
         // Try to fetch by slug first (assuming slug might be a slug)
         const populateParams = new URLSearchParams({
