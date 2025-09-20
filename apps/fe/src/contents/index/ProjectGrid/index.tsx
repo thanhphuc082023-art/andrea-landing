@@ -22,7 +22,7 @@ function ProjectGrid({ featuredProjectsData }: ProjectGridProps) {
   const regularProjects = allProjects
     .slice(2)
     ?.map((item) => item?.projectItem?.project);
-  console.log('regularProjects', regularProjects);
+
   return (
     <section>
       <div className={clsx('content-wrapper mx-auto max-md:!px-0')}>

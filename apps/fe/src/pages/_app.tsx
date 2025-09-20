@@ -1,6 +1,4 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { useEffect } from 'react';
-import Lenis from 'lenis';
 
 import RootLayout from '@/components/layouts/Root';
 import WithNavigationFooter from '@/components/layouts/WithNavigationFooter';
@@ -61,33 +59,6 @@ function getLayoutNoFooter(page: ReactElement, pageProps?: any): ReactNode {
 }
 
 function App({ Component, pageProps, router }: AppPropsWithLayout) {
-  // Initialize Lenis smooth scroll with easeInOut
-  useEffect(() => {
-    // Check if current route is admin page
-    const isAdminPage = router.pathname.startsWith('/admin');
-
-    // Don't initialize Lenis for admin pages
-    if (isAdminPage) {
-      return;
-    }
-
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeInOut mạnh hơn
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, [router.pathname]);
-
   let getLayout;
 
   if (router.query.simpleLayout) {
