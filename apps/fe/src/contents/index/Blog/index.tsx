@@ -155,10 +155,12 @@ function Blog({
   title,
   category,
   excludeSlug,
+  isEmpty,
 }: {
   title?: string;
   category?: string;
   excludeSlug?: string;
+  isEmpty?: boolean;
 }) {
   const [blogPosts, setBlogPosts] = useState(fallbackBlogPosts);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -280,16 +282,22 @@ function Blog({
         )}
 
         {/* Blog Grid */}
-        <div
-          className={clsx(
-            'grid grid-cols-1 gap-8 md:grid-cols-3',
-            'max-md:gap-4'
-          )}
-        >
-          {blogPosts.map((post) => (
-            <BlogCard key={post.id} post={post} />
-          ))}
-        </div>
+        {isEmpty && blogPosts.length === 0 ? (
+          <div className={clsx('my-10 text-center')}>
+            <p className={clsx('text-gray-600')}>Không có bài viết</p>
+          </div>
+        ) : (
+          <div
+            className={clsx(
+              'grid grid-cols-1 gap-8 md:grid-cols-3',
+              'max-md:gap-4'
+            )}
+          >
+            {blogPosts.map((post) => (
+              <BlogCard key={post.id} post={post} />
+            ))}
+          </div>
+        )}
 
         {/* See More Button */}
         {hasMore && (

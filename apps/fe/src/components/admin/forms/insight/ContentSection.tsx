@@ -168,9 +168,6 @@ export default function ContentSection({
             </div>
             <div>
               <h3 className="text-xl font-semibold text-gray-900">Nội dung</h3>
-              <p className="mt-1 text-sm text-gray-600">
-                Tạo nội dung insight bằng React Email Editor
-              </p>
             </div>
           </div>
 

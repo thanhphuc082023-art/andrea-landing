@@ -273,19 +273,18 @@ export async function getAboutUsPageSettings(): Promise<StrapiResponse<any>> {
       seo: {
         populate: '*',
       },
-      heroVideo: {
-        populate: [
-          'desktopVideo',
-          'mobileVideo',
-          'mobileBanner',
-          'desktopBanner',
-        ],
-      },
       aboutUsContent: {
         populate: ['image'],
       },
       visions: {
         populate: '*',
+      },
+      coreValue: {
+        populate: {
+          coreValues: {
+            populate: '*',
+          },
+        },
       },
       workflow: {
         populate: {

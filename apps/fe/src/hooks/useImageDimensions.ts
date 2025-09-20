@@ -29,10 +29,10 @@ export const useImageDimensions = (src: string): ImageDimensions => {
       return;
     }
 
-    setDimensions(prev => ({ ...prev, isLoading: true, error: null }));
+    setDimensions((prev) => ({ ...prev, isLoading: true, error: null }));
 
     const img = new Image();
-    
+
     img.onload = () => {
       const aspectRatio = img.naturalWidth / img.naturalHeight;
       setDimensions({

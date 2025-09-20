@@ -197,7 +197,7 @@ function InsightPage({
           )}
 
           {/** Current insight title */}
-          <span className="min-w-0 max-w-[120px] truncate font-[300] text-[#979797]">
+          <span className="min-w-0 max-w-[300px] truncate font-[300] text-[#979797]">
             {insight?.title}
           </span>
         </nav>
@@ -260,6 +260,7 @@ function InsightPage({
           category={insight?.category}
           title="Bài viết liên quan"
           excludeSlug={insight?.slug}
+          isEmpty={true}
         />
       </div>
 

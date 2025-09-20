@@ -3,38 +3,34 @@
 import Image from 'next/image';
 import { m } from 'framer-motion';
 
-const coreValues = [
-  {
-    id: 1,
-    title: 'Chú tâm',
-    subtitle: 'trong từng dịch vụ',
-    image: '/assets/images/about-us/about3.png',
-    color: 'bg-[#EFEFEF]',
-  },
-  {
-    id: 2,
-    title: 'Sáng tạo',
-    subtitle: 'Có định hướng',
-    image: '/assets/images/about-us/about4.png',
-    color: 'bg-[#EFEFEF]',
-  },
-  {
-    id: 3,
-    title: 'Thẩm mỹ',
-    subtitle: 'Có chiều sâu',
-    image: '/assets/images/about-us/about5.png',
-    color: 'bg-[#EFEFEF]',
-  },
-  {
-    id: 4,
-    title: 'Thiết kế',
-    subtitle: 'Chạm cảm xúc',
-    image: '/assets/images/about-us/about6.png',
-    color: 'bg-[#EFEFEF]',
-  },
-];
+interface CoreValuesData {
+  id: number;
+  title: string;
+  coreValues: any[];
+}
 
-const CoreValues = () => {
+const CoreValues = ({ data }: { data: CoreValuesData }) => {
+  const getImageUrl = (image: any['image']) => {
+    // Use large format if available, otherwise fallback to original
+    return (
+      image?.formats?.large?.url ||
+      image?.formats?.medium?.url ||
+      image?.formats?.small?.url ||
+      image?.formats?.thumbnail?.url ||
+      image.url
+    )?.includes('http')
+      ? image?.formats?.large?.url ||
+          image?.formats?.medium?.url ||
+          image?.formats?.small?.url ||
+          image?.formats?.thumbnail?.url ||
+          image.url
+      : `${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.formats?.large?.url || image?.formats?.medium?.url || image?.formats?.small?.url || image?.formats?.thumbnail?.url || image.url}`;
+  };
+
+  if (!data || !data.coreValues || data.coreValues.length === 0) {
+    return null;
+  }
+
   return (
     <section className="content-wrapper">
       {/* Title */}
@@ -45,15 +41,15 @@ const CoreValues = () => {
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
       >
-        Giá trị cốt lõi
+        {data.title}
       </m.h2>
 
       {/* Cards Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {coreValues.map((value, index) => (
+        {data.coreValues.map((value, index) => (
           <m.div
             key={value.id}
-            className={`${value.color} flex h-[450px] flex-col justify-between shadow-lg transition-all duration-300 hover:!translate-y-[-10px] hover:transform hover:shadow-xl`}
+            className="flex h-[450px] flex-col justify-between bg-[#EFEFEF] shadow-lg transition-all duration-300 hover:!translate-y-[-10px] hover:transform hover:shadow-xl"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -62,8 +58,8 @@ const CoreValues = () => {
             {/* Image */}
             <div className="relative flex-1">
               <Image
-                src={value.image}
-                alt={value.title}
+                src={getImageUrl(value.image)}
+                alt={value.image.alternativeText || value.title}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -76,7 +72,7 @@ const CoreValues = () => {
                 {value.title}
               </h3>
               <p className="text-[24px] text-gray-600 max-md:text-[20px]">
-                {value.subtitle}
+                {value.description}
               </p>
             </div>
           </m.div>

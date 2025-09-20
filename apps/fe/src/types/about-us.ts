@@ -50,7 +50,7 @@ export interface AboutUsPageData {
     url: string;
     alternativeText?: string;
   };
-  heroVideo?: HeroVideoData;
+  coreValue?: any;
   workflow?: WorkflowSection;
   seo?: {
     metaTitle?: string;

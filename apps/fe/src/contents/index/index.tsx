@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import Blog, { BlogOld } from '@/contents/index/Blog';
+import Blog from '@/contents/index/Blog';
 import BrandSection from '@/contents/index/BrandSection';
 import ContactForm from '@/contents/index/ContactForm';
 import Header from '@/contents/index/Header';
@@ -53,7 +53,7 @@ function IndexContents({
       <Partners partnersData={partnersData} />
 
       <div className={clsx('py-[50px]')}>
-        <BlogOld />
+        <Blog />
       </div>
 
       <div>
