@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rm -rf .next && rm -rf node_modules/.cache && rm -rf .turbo && next build",
     "build:clean": "rm -rf .next && rm -rf node_modules/.cache && next build",
     "build:force": "rm -rf .next && rm -rf node_modules/.cache && rm -rf .turbo && next build",
     "deploy:force": "pnpm run build:force && vercel --prod --force",
