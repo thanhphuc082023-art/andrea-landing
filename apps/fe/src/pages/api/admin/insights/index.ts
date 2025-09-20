@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
 import fs from 'fs';
-import path from 'path';
+import os from 'os';
 
 // Disable body parser for file uploads
 export const config = {
@@ -32,19 +32,8 @@ export default async function handler(
   }
 
   try {
-    // Ensure tmp directory exists
-    const tmpDir = path.join(process.cwd(), 'tmp');
-    try {
-      if (!fs.existsSync(tmpDir)) {
-        fs.mkdirSync(tmpDir, { recursive: true });
-      }
-    } catch (mkdirError) {
-      console.error('Error creating tmp directory:', mkdirError);
-      return res.status(500).json({
-        error: 'File system error',
-        message: 'Unable to create temporary directory for file uploads',
-      });
-    }
+    // Use system temp directory instead of creating our own
+    const tmpDir = os.tmpdir();
 
     // Parse form data
     const form = formidable({
