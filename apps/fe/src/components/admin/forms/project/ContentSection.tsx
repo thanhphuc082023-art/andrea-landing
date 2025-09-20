@@ -189,7 +189,7 @@ export default function ContentSection({
           </button>
         </div>
       </div>
-
+      <></>
       {/* React Email Editor */}
       <div className="overflow-hidden rounded-lg border-2 border-gray-200 shadow-sm">
         <EmailEditor
