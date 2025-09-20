@@ -5,38 +5,43 @@ import SubmitButton from '@/components/SubmitButton';
 import StrapiHead from '@/components/meta/StrapiHead';
 import { useRouter } from 'next/router';
 import ContactForm from '@/contents/index/ContactForm';
+import { getStaticPropsWithGlobalAndData } from '@/lib/page-helpers';
 
-import { getInsights } from '@/lib/strapi-server';
-
-interface InsightsPageProps {
-  insights: InsightsItem[];
-}
-
-export default function InsightsPage({ insights }: InsightsPageProps) {
+export default function InsightsPage() {
   const router = useRouter();
-  const { category } = router.query;
-  const items = insights;
-
-  // Check if we have a category filter but no results
-  const hasCategory = category && typeof category === 'string';
-  const hasNoResults = hasCategory && items.length === 0;
+  const items = insightsPageItems;
 
   // heroTop: first hero in the list
-  const heroTop = items.find((item) => item.type === 'hero') as InsightsItem & {
-    type: 'hero';
-  };
+  const heroTopIndex = items.findIndex((i) => i.type === 'hero');
+  const heroTop = heroTopIndex >= 0 ? (items[heroTopIndex] as any) : undefined;
 
-  // heroMid: second hero in the list (around position 8)
-  const heroItems = items.filter((item) => item.type === 'hero');
+  // next 6 items after heroTop (only posts)
+  const mainSixStart = Math.max(0, heroTopIndex + 1);
+  const mainSix = items
+    .slice(mainSixStart, mainSixStart + 6)
+    .filter((v) => v.type === 'post') as any[];
+
+  // heroMid: prefer the original item at index heroTopIndex + 7 (i.e., item thứ 8),
+  // otherwise fallback to the next hero found after heroTop
+  const candidateIndex = heroTopIndex + 7;
   const heroMid =
-    heroItems.length > 1
-      ? (heroItems[1] as InsightsItem & { type: 'hero' })
-      : undefined;
+    items[candidateIndex] && items[candidateIndex].type === 'hero'
+      ? (items[candidateIndex] as any)
+      : (items.find((v, idx) => idx > heroTopIndex && v.type === 'hero') as
+          | any
+          | undefined);
 
-  // posts: all non-hero items
-  const posts = items.filter(
-    (item) => item.type === 'post'
-  ) as (InsightsItem & { type: 'post' })[];
+  // last three posts after heroMid (or after mainSix if heroMid not present)
+  const afterHeroMidStart = heroMid
+    ? items.findIndex((i) => i === heroMid) + 1
+    : mainSixStart + mainSix.length;
+  const lastThree = items
+    .slice(afterHeroMidStart)
+    .filter((v) => v.type === 'post')
+    .slice(0, 3) as any[];
+
+  // posts to render in the main grid = the 6 posts after heroTop
+  const posts = mainSix;
 
   return (
     <div className="max-sd:mt-[60px] max-sd:pt-[60px] mt-[65px] min-h-screen bg-white pt-[65px]">
@@ -89,34 +94,16 @@ export default function InsightsPage({ insights }: InsightsPageProps) {
       <div className={clsx('py-[100px] max-md:py-[50px]')}>
         <section>
           <div className={clsx('content-wrapper mx-auto')}>
-            {hasNoResults ? (
-              <div className="py-20 text-center">
-                <h2 className="mb-4 text-2xl font-semibold">
-                  Không tìm thấy bài viết
-                </h2>
-                <p className="mb-6 text-gray-600">
-                  Không có bài viết nào trong danh mục "
-                  {decodeURIComponent(category as string)}"
-                </p>
-                <button
-                  onClick={() => router.push('/insights')}
-                  className="bg-brand-orange hover:bg-brand-orange-dark rounded-lg px-6 py-3 text-white transition-colors"
-                >
-                  Xem tất cả bài viết
-                </button>
-              </div>
-            ) : (
-              <div
-                className={clsx(
-                  'grid grid-cols-1 gap-8 md:grid-cols-3',
-                  'max-md:gap-4'
-                )}
-              >
-                {posts.map((post) => (
-                  <BlogCard key={post.id} post={post} />
-                ))}
-              </div>
-            )}
+            <div
+              className={clsx(
+                'grid grid-cols-1 gap-8 md:grid-cols-3',
+                'max-md:gap-4'
+              )}
+            >
+              {posts.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
           </div>
         </section>
       </div>
@@ -159,6 +146,39 @@ export default function InsightsPage({ insights }: InsightsPageProps) {
         </div>
       )}
 
+      {/* CTA / preview slice */}
+      <div className={clsx('py-[100px] max-md:py-[50px]')}>
+        <section>
+          <div className={clsx('content-wrapper mx-auto')}>
+            <div
+              className={clsx(
+                'grid grid-cols-1 gap-8 md:grid-cols-3',
+                'max-md:gap-4'
+              )}
+            >
+              {posts.slice(0, 3).map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
+
+            <div className={clsx('mt-6 text-center')}>
+              <SubmitButton
+                textColor="text-brand-orange"
+                borderColor="border-brand-orange"
+                beforeBgColor="before:bg-brand-orange"
+                hoverBgColor="hover:bg-brand-orange"
+                hoverTextColor="hover:text-white"
+                focusRingColor="focus:ring-brand-orange"
+                focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
+                onClick={() => router.push('/insights?page=2')}
+              >
+                Xem thêm
+              </SubmitButton>
+            </div>
+          </div>
+        </section>
+      </div>
+
       <div>
         <ContactForm />
       </div>
@@ -168,30 +188,28 @@ export default function InsightsPage({ insights }: InsightsPageProps) {
 
 export type InsightsItem =
   | {
-      id: number;
+      id: string | number;
       type: 'hero';
-      date: string;
+      date?: string;
       title: string;
       excerpt?: string;
       image: string;
       link?: string;
-      category?: string;
     }
   | {
-      id: number;
+      id: string | number;
       type: 'post';
-      date: string;
+      date?: string;
       title: string;
       image: string;
       slug?: string;
       excerpt?: string;
-      category?: string;
     };
 
 export const insightsPageItems: InsightsItem[] = [
-  // Hero item 1
+  // item 1 (Large Top Hero)
   {
-    id: 1001,
+    id: 'hero-1',
     type: 'hero',
     date: '01/08/2025',
     title: 'Đã đến lúc phải kể câu chuyện về thương hiệu của chính mình',
@@ -199,7 +217,6 @@ export const insightsPageItems: InsightsItem[] = [
       'Cốt lõi của câu chuyện thương hiệu vốn đã được hình thành từ trước khi khởi nghiệp và vẫn luôn tiếp tục trải dài theo từng năm tháng phát triển của thương hiệu.',
     image: '/assets/images/insights/coffee/coffee1.png',
     link: '/insight/bao-bi',
-    category: 'Thiết kế thương hiệu',
   },
 
   // regular posts
@@ -210,7 +227,6 @@ export const insightsPageItems: InsightsItem[] = [
     title: 'Tạo tính riêng trong thiết kế bao bì qua giá trị văn hóa',
     image: '/assets/images/blog/blog-1.png',
     slug: 'thiet-ke-bao-bi-gia-tri-van-hoa',
-    category: 'Thiết kế bao bì',
   },
   {
     id: 2,
@@ -219,7 +235,6 @@ export const insightsPageItems: InsightsItem[] = [
     title: 'Kể câu chuyện thương hiệu: Bắt đầu từ đâu?',
     image: '/assets/images/blog/blog-1.png',
     slug: 'ke-cau-chuyen-thuong-hieu',
-    category: 'Thiết kế thương hiệu',
   },
   {
     id: 3,
@@ -254,9 +269,9 @@ export const insightsPageItems: InsightsItem[] = [
     slug: 'case-study-bao-bi-van-hoa',
   },
 
-  // Hero item 2 (middle)
+  // item 8 (Large Middle Hero at index 7)
   {
-    id: 1002,
+    id: 'hero-2',
     type: 'hero',
     date: '15/06/2025',
     title: 'Tập trung vào trải nghiệm khách hàng qua bao bì',
@@ -293,75 +308,7 @@ export const insightsPageItems: InsightsItem[] = [
   },
 ];
 
-export const getServerSideProps = async (context: any) => {
-  const { category } = context.query;
-
-  try {
-    const insightsResponse = await getInsights();
-    const insights = insightsResponse?.data || [];
-
-    // Filter insights by category if provided
-    const filteredInsights =
-      category && typeof category === 'string'
-        ? insights.filter(
-            (insight: any) =>
-              insight.category &&
-              insight.category === decodeURIComponent(category)
-          )
-        : insights;
-
-    // Transform Strapi data to match InsightsItem format
-    const transformedInsights: InsightsItem[] = filteredInsights.map(
-      (insight: any, index: number) => {
-        const insightId =
-          typeof insight.id === 'string'
-            ? parseInt(insight.id, 10)
-            : insight.id;
-
-        // Create hero items for featured insights (first and middle)
-        if (insight.featured && (index === 0 || index === 7)) {
-          return {
-            id: insightId + 1000, // Ensure unique ID for hero items
-            type: 'hero' as const,
-            date: new Date(insight.createdAt).toLocaleDateString('vi-VN'),
-            title: insight.title,
-            excerpt: insight.excerpt,
-            image: insight.thumbnail?.url
-              ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${insight.thumbnail.url}`
-              : '/assets/images/insights/coffee/coffee1.png',
-            link: `/insight/${insight.slug}`,
-            category: insight.category,
-          };
-        }
-
-        // Regular post items
-        return {
-          id: insightId,
-          type: 'post' as const,
-          date: new Date(insight.createdAt).toLocaleDateString('vi-VN'),
-          title: insight.title,
-          image: insight.thumbnail?.url
-            ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${insight.thumbnail.url}`
-            : '/assets/images/blog/blog-1.png',
-          slug: insight.slug,
-          excerpt: insight.excerpt,
-          category: insight.category,
-        };
-      }
-    );
-
-    return {
-      props: {
-        insights: transformedInsights,
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching insights:', error);
-    // Fallback to static data if API fails
-    return {
-      props: {
-        insights: insightsPageItems,
-      },
-    };
-  }
-};
+export const getStaticProps = async () =>
+  getStaticPropsWithGlobalAndData(async () => {
+    return { props: {} };
+  });
