@@ -32,9 +32,23 @@ export default async function handler(
   }
 
   try {
+    // Ensure tmp directory exists
+    const tmpDir = path.join(process.cwd(), 'tmp');
+    try {
+      if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      }
+    } catch (mkdirError) {
+      console.error('Error creating tmp directory:', mkdirError);
+      return res.status(500).json({
+        error: 'File system error',
+        message: 'Unable to create temporary directory for file uploads',
+      });
+    }
+
     // Parse form data
     const form = formidable({
-      uploadDir: './tmp',
+      uploadDir: tmpDir,
       keepExtensions: true,
       maxFileSize: 10 * 1024 * 1024, // 10MB
     });
@@ -104,29 +118,64 @@ export default async function handler(
 
     // Helper function to upload file to Strapi
     const uploadFileToStrapi = async (file: formidable.File) => {
-      const formData = new FormData();
-      const fileBuffer = fs.readFileSync(file.filepath);
-      const blob = new Blob([fileBuffer], {
-        type: file.mimetype || 'application/octet-stream',
-      });
-      formData.append('files', blob, file.originalFilename || file.newFilename);
+      try {
+        // Check if file exists before reading
+        if (!fs.existsSync(file.filepath)) {
+          throw new Error(`File not found: ${file.filepath}`);
+        }
 
-      const uploadResponse = await fetch(`${strapiBaseUrl}/api/upload`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${STRAPI_API_TOKEN}`,
-        },
-        body: formData,
-      });
+        const formData = new FormData();
+        const fileBuffer = fs.readFileSync(file.filepath);
+        const blob = new Blob([fileBuffer], {
+          type: file.mimetype || 'application/octet-stream',
+        });
+        formData.append(
+          'files',
+          blob,
+          file.originalFilename || file.newFilename
+        );
 
-      if (!uploadResponse.ok) {
-        throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
+        const uploadResponse = await fetch(`${strapiBaseUrl}/api/upload`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+          },
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(
+            `Failed to upload file: ${uploadResponse.statusText}`
+          );
+        }
+
+        const uploadResult = await uploadResponse.json();
+        // Clean up temp file
+        try {
+          fs.unlinkSync(file.filepath);
+        } catch (unlinkError) {
+          console.warn(
+            'Warning: Could not delete temp file:',
+            file.filepath,
+            unlinkError
+          );
+        }
+        return uploadResult[0]; // Strapi returns array of uploaded files
+      } catch (error) {
+        // Clean up temp file on error
+        try {
+          if (fs.existsSync(file.filepath)) {
+            fs.unlinkSync(file.filepath);
+          }
+        } catch (cleanupError) {
+          console.warn(
+            'Warning: Could not delete temp file on error:',
+            file.filepath,
+            cleanupError
+          );
+        }
+        throw error;
       }
-
-      const uploadResult = await uploadResponse.json();
-      // Clean up temp file
-      fs.unlinkSync(file.filepath);
-      return uploadResult[0]; // Strapi returns array of uploaded files
     };
 
     // Upload files and get their IDs
@@ -180,14 +229,14 @@ export default async function handler(
       hero.desktop = {
         file: uploadedFiles.heroDesktop.id,
         name: uploadedFiles.heroDesktop.name,
-        url: uploadedFiles.heroDesktop.url
+        url: uploadedFiles.heroDesktop.url,
       };
     }
     if (uploadedFiles.heroMobile) {
       hero.mobile = {
         file: uploadedFiles.heroMobile.id,
         name: uploadedFiles.heroMobile.name,
-        url: uploadedFiles.heroMobile.url
+        url: uploadedFiles.heroMobile.url,
       };
     }
 
@@ -197,7 +246,7 @@ export default async function handler(
       authorWithAvatar.avatar = {
         file: uploadedFiles.authorAvatar.id,
         name: uploadedFiles.authorAvatar.name,
-        url: uploadedFiles.authorAvatar.url
+        url: uploadedFiles.authorAvatar.url,
       };
     }
 
@@ -207,14 +256,14 @@ export default async function handler(
       seoWithImages.ogImage = {
         file: uploadedFiles.seoOgImage.id,
         name: uploadedFiles.seoOgImage.name,
-        url: uploadedFiles.seoOgImage.url
+        url: uploadedFiles.seoOgImage.url,
       };
     }
     if (uploadedFiles.seoTwitterImage) {
       seoWithImages.twitterImage = {
         file: uploadedFiles.seoTwitterImage.id,
         name: uploadedFiles.seoTwitterImage.name,
-        url: uploadedFiles.seoTwitterImage.url
+        url: uploadedFiles.seoTwitterImage.url,
       };
     }
 
@@ -234,7 +283,7 @@ export default async function handler(
           ? {
               file: uploadedFiles.thumbnail.id,
               name: uploadedFiles.thumbnail.name,
-              url: uploadedFiles.thumbnail.url
+              url: uploadedFiles.thumbnail.url,
             }
           : undefined,
         seo: seoWithImages,
