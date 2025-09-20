@@ -80,7 +80,7 @@ const nextConfig = {
     minimumCacheTTL: 31536000, // 1 year
   },
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  reactStrictMode: true,
+  reactStrictMode: false,
   compress: true,
   poweredByHeader: false,
   experimental: {

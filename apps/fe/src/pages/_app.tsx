@@ -63,9 +63,17 @@ function getLayoutNoFooter(page: ReactElement, pageProps?: any): ReactNode {
 function App({ Component, pageProps, router }: AppPropsWithLayout) {
   // Initialize Lenis smooth scroll with easeInOut
   useEffect(() => {
+    // Check if current route is admin page
+    const isAdminPage = router.pathname.startsWith('/admin');
+
+    // Don't initialize Lenis for admin pages
+    if (isAdminPage) {
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -8 * t)), // easeInOut mạnh hơn
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeInOut mạnh hơn
     });
 
     function raf(time: number) {
@@ -78,7 +86,7 @@ function App({ Component, pageProps, router }: AppPropsWithLayout) {
     return () => {
       lenis.destroy();
     };
-  }, []);
+  }, [router.pathname]);
 
   let getLayout;
 

@@ -151,3 +151,11 @@ body {
 .word {
   display: inline-block;
 }
+
+.hide-mobile {
+  @apply !hidden md:!block;
+}
+
+.hide-desktop {
+  @apply !block md:!hidden;
+}

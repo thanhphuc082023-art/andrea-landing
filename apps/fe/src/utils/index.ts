@@ -9,8 +9,11 @@ export function replaceMaxWidth(html) {
   // thay thế tất cả "max-width: 900px;" thành "max-width: 100%;"
   // thay thế tất cả "width: 900px;" thành "width: 100%;"
   // thay thế tất cả "width: 900px !important" thành "width: 100% !important"
+  // xóa tất cả min-width properties
   return html
     .replace(/max-width:\s*900px;/g, 'max-width: 100%;')
     .replace(/width:\s*900px;/g, 'width: 100%;')
-    .replace(/width:\s*900px\s*!important/g, 'width: 100% !important');
+    .replace(/width:\s*900px\s*!important/g, 'width: 100% !important')
+    .replace(/min-width:\s*[^;]+;?/g, '') // Remove all min-width properties
+    .replace(/min-width:\s*[^}]+!important/g, ''); // Remove min-width with !important
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   UseFormRegister,
   UseFormWatch,
@@ -7,6 +7,8 @@ import {
 import EmailEditor, { EditorRef } from 'react-email-editor';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import { type InsightFormData } from '@/lib/validations/insight';
+import { uploadEditorImage, getStrapiToken } from '@/utils/editor-image-upload';
+import { EDITOR_CONFIG, UPLOAD_CONFIG } from '@/constants/editor';
 
 interface ContentSectionProps {
   register: UseFormRegister<InsightFormData>;
@@ -26,35 +28,87 @@ export default function ContentSection({
   setValue,
 }: ContentSectionProps) {
   const emailEditorRef = useRef<EditorRef>(null);
-  const [editorReady, setEditorReady] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const content = watch('content');
 
-  // Handle editor ready event
-  const onReady = (unlayer: any) => {
-    setEditorReady(true);
+  // Optimized image upload handler
+  const handleImageUpload = useCallback(async (file: File): Promise<string> => {
+    const token = getStrapiToken();
+    const result = await uploadEditorImage(file, {
+      token: token || undefined,
+      path: UPLOAD_CONFIG.DEFAULT_PATH,
+    });
+    return result.url;
+  }, []);
 
-    // Set initial content to ensure form validation passes (only for new insights)
-    if (!content && emailEditorRef.current?.editor) {
-      emailEditorRef.current.editor.exportHtml((data: any) => {
-        const contentData = {
-          design: data.design,
-          html: data.html,
-        };
-        setValue('content', JSON.stringify(contentData), {
-          shouldValidate: true,
-        });
-      });
+  // Handle loading existing design
+  const handleLoadDesign = useCallback(() => {
+    if (emailEditorRef.current?.editor && content) {
+      try {
+        const contentData = JSON.parse(content);
+        const design = contentData.design || contentData; // Fallback for old format
+
+        if (design && Object.keys(design).length > 0) {
+          emailEditorRef.current.editor.loadDesign(design);
+        } else {
+          console.warn('No valid design found in content');
+        }
+      } catch (e) {
+        console.warn('Could not parse existing content:', e);
+      }
     }
-  };
+  }, [content]);
 
-  // Handle design changes
-  const onDesignLoad = () => {
-    console.log('Design loaded');
-  };
+  // Handle editor ready event
+  const onReady = useCallback(
+    (unlayer: any) => {
+      if (emailEditorRef.current?.editor) {
+        emailEditorRef.current.editor.exportHtml((data: any) => {
+          const contentData = {
+            design: data.design,
+            html: data.html,
+          };
+          setValue('content', JSON.stringify(contentData), {
+            shouldValidate: true,
+          });
+        });
+      }
+    },
+    [setValue]
+  );
 
-  // Auto-save on design changes
-  const saveDesign = () => {
+  // Common upload callback handler
+  const createUploadCallback = useCallback(() => {
+    return (file: { accepted: File[] }, done: Function) => {
+      done({ progress: 0 });
+      handleImageUpload(file?.accepted?.[0])
+        .then((url: string) => done({ progress: 100, url }))
+        .catch((error: any) => {
+          console.error('Upload error:', error);
+          done({ progress: 0, url: null });
+        });
+    };
+  }, [handleImageUpload]);
+
+  const onLoad = useCallback(() => {
+    handleLoadDesign();
+    if (emailEditorRef.current?.editor) {
+      try {
+        if (
+          typeof emailEditorRef.current.editor.registerCallback === 'function'
+        ) {
+          emailEditorRef.current.editor.registerCallback(
+            'image',
+            createUploadCallback()
+          );
+        }
+      } catch (error) {
+        console.error('Error setting up onLoad upload handler:', error);
+      }
+    }
+  }, [handleLoadDesign, createUploadCallback]);
+
+  const saveDesign = useCallback(() => {
     if (emailEditorRef.current?.editor) {
       emailEditorRef.current.editor.exportHtml((data: any) => {
         const contentData = {
@@ -66,37 +120,43 @@ export default function ContentSection({
         });
       });
     }
-  };
+  }, [setValue]);
 
   // Manual save with visual feedback
-  const handleManualSave = () => {
+  const handleManualSave = useCallback(() => {
     setIsSaving(true);
     saveDesign();
-    setTimeout(() => {
-      setIsSaving(false);
-    }, 1000);
-  };
+    setTimeout(() => setIsSaving(false), 1000);
+  }, [saveDesign]);
 
   // Load existing content when editor is ready
   useEffect(() => {
-    if (editorReady && content && emailEditorRef.current?.editor) {
-      try {
-        const contentData = JSON.parse(content);
+    handleLoadDesign();
+  }, [handleLoadDesign]);
 
-        // Check if content has the new format with design and html
-        const design = contentData.design || contentData; // Fallback for old format
-
-        if (design && Object.keys(design).length > 0) {
-          emailEditorRef.current.editor.loadDesign(design);
-        } else {
-          console.warn('No valid design found in content');
+  // Setup custom upload handler after editor is ready
+  useEffect(() => {
+    const setupCustomUpload = () => {
+      if (emailEditorRef.current?.editor) {
+        try {
+          if (
+            typeof emailEditorRef.current.editor.registerCallback === 'function'
+          ) {
+            emailEditorRef.current.editor.registerCallback(
+              'image',
+              createUploadCallback()
+            );
+          }
+        } catch (error) {
+          console.error('Error setting up custom upload:', error);
         }
-      } catch (e) {
-        console.warn('Could not parse existing content:', e);
-        console.warn('Content value:', content);
       }
-    }
-  }, [content, editorReady]);
+    };
+
+    const timer = setTimeout(setupCustomUpload, 3000);
+    return () => clearTimeout(timer);
+  }, [createUploadCallback]);
+
   return (
     <div className="space-y-8">
       {/* Section Header */}
@@ -135,21 +195,13 @@ export default function ContentSection({
         <EmailEditor
           ref={emailEditorRef}
           onReady={onReady}
-          onLoad={onDesignLoad}
-          style={{ height: '800px', width: '100%' }}
+          onLoad={onLoad}
+          style={{ height: EDITOR_CONFIG.HEIGHT, width: '100%' }}
+          projectId={EDITOR_CONFIG.PROJECT_ID}
           options={{
-            projectId: process.env.NEXT_PUBLIC_UNLAYER_PROJECT_ID
-              ? parseInt(process.env.NEXT_PUBLIC_UNLAYER_PROJECT_ID)
-              : undefined,
-            displayMode: 'email',
-            appearance: {
-              theme: 'light',
-              panels: {
-                tools: {
-                  dock: 'right',
-                },
-              },
-            },
+            displayMode: EDITOR_CONFIG.DISPLAY_MODE,
+            features: EDITOR_CONFIG.FEATURES,
+            id: EDITOR_CONFIG.ID,
           }}
         />
       </div>

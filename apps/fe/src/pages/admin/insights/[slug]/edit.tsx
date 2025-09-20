@@ -82,16 +82,6 @@ export default function EditInsightPage() {
 
         let insightData: any = null;
 
-        if (response.ok) {
-          const result = await response.json();
-          if (result.data && result.data.length > 0) {
-            insightData = result.data[0];
-            console.log('Found insight by slug:', insightData);
-            console.log('Hero data:', insightData.hero);
-            console.log('Thumbnail data:', insightData.thumbnail);
-          }
-        }
-
         if (!insightData) {
           if (!response.ok) {
             if (response.status === 401 || response.status === 403) {
@@ -105,13 +95,13 @@ export default function EditInsightPage() {
           }
 
           const result = await response.json();
-          insightData = result.data;
+          insightData = result.data?.[0];
         }
 
         if (!insightData) {
           throw new Error('Không tìm thấy insight');
         }
-        console.log('insightData', insightData);
+
         const insightItem = insightData;
         setInsight(insightItem);
 
@@ -236,18 +226,14 @@ export default function EditInsightPage() {
       setError('Không tìm thấy documentId của insight');
       return;
     }
-    console.log('insight documentId', insight.documentId);
     setIsLoading(true);
     setError('');
     try {
-      console.log('Updating insight data:', data);
-
       // Get Strapi token from localStorage
       const strapiToken = localStorage.getItem('strapiToken');
 
       // Create FormData for file uploads
       const formData = new FormData();
-      console.log('data.content', data.content);
       // Add basic fields
       formData.append('title', data.title);
       formData.append('excerpt', data.excerpt);
@@ -324,7 +310,6 @@ export default function EditInsightPage() {
       }
 
       const result = await response.json();
-      console.log('Insight updated successfully:', result);
 
       toast.success('Insight đã được cập nhật thành công!');
 
