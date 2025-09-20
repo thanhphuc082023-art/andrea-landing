@@ -11,6 +11,14 @@ function LenisProvider({ children }: PropsWithChildren) {
   const lenis = useLenis();
 
   useEffect(() => {
+    // Check if current route is admin page
+    const isAdminPage = pathname?.startsWith('/admin');
+
+    // Don't reset Lenis for admin pages
+    if (isAdminPage) {
+      return;
+    }
+
     if (lenis) {
       lenis.stop();
       requestAnimationFrame(() => {
@@ -18,6 +26,11 @@ function LenisProvider({ children }: PropsWithChildren) {
       });
     }
   }, [pathname, lenis]);
+  const isAdminPage = pathname?.startsWith('/admin');
+
+  if (isAdminPage) {
+    return <>{children}</>;
+  }
 
   return (
     <ReactLenis
