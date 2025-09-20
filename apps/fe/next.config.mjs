@@ -104,6 +104,10 @@ const nextConfig = {
       },
     },
   },
+  // Force cache invalidation
+  generateBuildId: async () => {
+    return `build-${Date.now()}`;
+  },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },

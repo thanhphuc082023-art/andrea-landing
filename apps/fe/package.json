@@ -5,6 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:clean": "rm -rf .next && rm -rf node_modules/.cache && next build",
+    "build:force": "rm -rf .next && rm -rf node_modules/.cache && rm -rf .turbo && next build",
+    "deploy:force": "pnpm run build:force && vercel --prod --force",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
+    "vercel:build": "next build",
     "start": "next start",
     "lint": "next lint",
     "lint:all": "concurrently \"yarn:lint\" \"yarn:lint:types\" \"yarn:lint:style\"",
