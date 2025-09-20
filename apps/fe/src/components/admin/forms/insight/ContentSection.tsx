@@ -189,7 +189,7 @@ export default function ContentSection({
 
       {/* React Email Editor */}
       <div className="overflow-hidden rounded-lg border-2 border-gray-200 shadow-sm">
-        <EmailEditor
+        {/* <EmailEditor
           ref={emailEditorRef}
           onReady={onReady}
           onLoad={onLoad}
@@ -200,7 +200,7 @@ export default function ContentSection({
             features: EDITOR_CONFIG.FEATURES,
             id: EDITOR_CONFIG.ID,
           }}
-        />
+        /> */}
       </div>
 
       {/* Hidden input for form validation */}
