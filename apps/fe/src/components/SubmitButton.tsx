@@ -33,7 +33,7 @@ function SubmitButton({
   borderColor = 'border-white',
   borderColorHover = 'hover:border-brand-orange',
   beforeBgColor = 'before:bg-white',
-  hoverTextColor = 'hover:text-white',
+  hoverTextColor = 'hover:text-brand-orange',
   focusRingColor = 'focus:ring-white',
   focusRingOffsetColor = 'focus:ring-offset-[#1A253A]',
   // Default sizes

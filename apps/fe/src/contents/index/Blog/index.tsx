@@ -309,7 +309,7 @@ function Blog({
               borderColor="border-brand-orange"
               beforeBgColor="before:bg-brand-orange"
               hoverBgColor="hover:before:bg-brand-orange"
-              hoverTextColor="hover:text-white"
+              hoverTextColor="hover:text-brand-orange"
               focusRingColor="focus:ring-brand-orange"
               focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
             >
@@ -493,7 +493,7 @@ export function BlogOld({ title }: { title?: string }) {
             borderColor="border-brand-orange"
             beforeBgColor="before:bg-brand-orange"
             hoverBgColor="hover:bg-brand-orange"
-            hoverTextColor="hover:text-white"
+            hoverTextColor="hover:text-brand-orange"
             focusRingColor="focus:ring-brand-orange"
             focusRingOffsetColor="focus:ring-offset-brand-orange-dark"
           >

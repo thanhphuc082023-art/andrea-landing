@@ -333,7 +333,6 @@ export const getStaticProps: GetStaticProps<InsightPageProps> = async ({
           headers,
         }
       );
-      console.log('response', response);
 
       const result = await response?.json();
 

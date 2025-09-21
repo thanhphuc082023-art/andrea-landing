@@ -62,6 +62,10 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
       );
     }
 
+    if (item.url === '/insights') {
+      return currentPath.startsWith('/insight');
+    }
+
     // Default: compare path-only prefix matches
     return currentPath.startsWith(item.url);
   };

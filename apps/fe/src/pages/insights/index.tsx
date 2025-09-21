@@ -5,17 +5,36 @@ import SubmitButton from '@/components/SubmitButton';
 import StrapiHead from '@/components/meta/StrapiHead';
 import { useRouter } from 'next/router';
 import ContactForm from '@/contents/index/ContactForm';
+import { GetStaticProps } from 'next';
+import {
+  getStaticPropsWithGlobalAndData,
+  type PagePropsWithGlobal,
+} from '@/lib/page-helpers';
 
 import { getInsights } from '@/lib/strapi-server';
 
-interface InsightsPageProps {
+interface InsightsPageProps extends PagePropsWithGlobal {
   insights: InsightsItem[];
 }
 
-export default function InsightsPage({ insights }: InsightsPageProps) {
+export default function InsightsPage({
+  serverGlobal = null,
+  insights,
+}: InsightsPageProps) {
   const router = useRouter();
   const { category } = router.query;
-  const items = insights;
+
+  // Filter insights by category on client side
+  const filteredInsights =
+    category && typeof category === 'string'
+      ? insights.filter(
+          (insight) =>
+            insight.category &&
+            insight.category === decodeURIComponent(category)
+        )
+      : insights;
+
+  const items = filteredInsights;
 
   // Check if we have a category filter but no results
   const hasCategory = category && typeof category === 'string';
@@ -44,6 +63,7 @@ export default function InsightsPage({ insights }: InsightsPageProps) {
         title="Góc nhìn"
         description="Bài viết và câu chuyện về thương hiệu từ ANDREA."
         ogImage={heroTop?.image || '/assets/images/insights/coffee/coffee1.png'}
+        global={serverGlobal}
         overrideTitle
       />
 
@@ -293,75 +313,61 @@ export const insightsPageItems: InsightsItem[] = [
   },
 ];
 
-export const getServerSideProps = async (context: any) => {
-  const { category } = context.query;
-
+export const getStaticProps: GetStaticProps<InsightsPageProps> = async () => {
   try {
-    const insightsResponse = await getInsights();
-    const insights = insightsResponse?.data || [];
+    return await getStaticPropsWithGlobalAndData(async () => {
+      const insightsResponse = await getInsights();
+      const insights = insightsResponse?.data || [];
 
-    // Filter insights by category if provided
-    const filteredInsights =
-      category && typeof category === 'string'
-        ? insights.filter(
-            (insight: any) =>
-              insight.category &&
-              insight.category === decodeURIComponent(category)
-          )
-        : insights;
+      // Transform Strapi data to match InsightsItem format
+      const transformedInsights: InsightsItem[] = insights.map(
+        (insight: any, index: number) => {
+          const insightId =
+            typeof insight.id === 'string'
+              ? parseInt(insight.id, 10)
+              : insight.id;
 
-    // Transform Strapi data to match InsightsItem format
-    const transformedInsights: InsightsItem[] = filteredInsights.map(
-      (insight: any, index: number) => {
-        const insightId =
-          typeof insight.id === 'string'
-            ? parseInt(insight.id, 10)
-            : insight.id;
+          // Create hero items for featured insights (first and middle)
+          if (insight.featured && (index === 0 || index === 7)) {
+            return {
+              id: insightId + 1000, // Ensure unique ID for hero items
+              type: 'hero' as const,
+              date: new Date(insight.createdAt).toLocaleDateString('vi-VN'),
+              title: insight.title,
+              excerpt: insight.excerpt,
+              image: insight.thumbnail?.url.includes('http')
+                ? insight.thumbnail?.url
+                : `${process.env.NEXT_PUBLIC_STRAPI_URL}${insight.thumbnail.url}`,
+              link: `/insight/${insight.slug}`,
+              category: insight.category,
+            };
+          }
 
-        // Create hero items for featured insights (first and middle)
-        if (insight.featured && (index === 0 || index === 7)) {
+          // Regular post items
           return {
-            id: insightId + 1000, // Ensure unique ID for hero items
-            type: 'hero' as const,
+            id: insightId,
+            type: 'post' as const,
             date: new Date(insight.createdAt).toLocaleDateString('vi-VN'),
             title: insight.title,
-            excerpt: insight.excerpt,
             image: insight.thumbnail?.url.includes('http')
               ? insight.thumbnail?.url
               : `${process.env.NEXT_PUBLIC_STRAPI_URL}${insight.thumbnail.url}`,
-            link: `/insight/${insight.slug}`,
+            slug: insight.slug,
+            excerpt: insight.excerpt,
             category: insight.category,
           };
         }
+      );
 
-        // Regular post items
-        return {
-          id: insightId,
-          type: 'post' as const,
-          date: new Date(insight.createdAt).toLocaleDateString('vi-VN'),
-          title: insight.title,
-          image: insight.thumbnail?.url.includes('http')
-            ? insight.thumbnail?.url
-            : `${process.env.NEXT_PUBLIC_STRAPI_URL}${insight.thumbnail.url}`,
-          slug: insight.slug,
-          excerpt: insight.excerpt,
-          category: insight.category,
-        };
-      }
-    );
-
-    return {
-      props: {
+      return {
         insights: transformedInsights,
-      },
-    };
+      };
+    });
   } catch (error) {
     console.error('Error fetching insights:', error);
     // Fallback to static data if API fails
-    return {
-      props: {
-        insights: insightsPageItems,
-      },
-    };
+    return await getStaticPropsWithGlobalAndData(async () => ({
+      insights: insightsPageItems,
+    }));
   }
 };

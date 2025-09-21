@@ -9,7 +9,7 @@ export default function QuoteSection({ data, layout = '', image }: any) {
           <div className="content-wrapper">
             <div className="mx-auto flex flex-col items-center gap-12 py-[26px] lg:flex-row lg:items-stretch">
               <div className="flex w-full flex-1 items-center justify-center">
-                <blockquote className="font-playfair relative px-[60px] text-center text-[30px] font-medium leading-relaxed max-md:py-[50px] lg:text-[40px]">
+                <blockquote className="font-playfair relative px-[60px] text-center text-[30px] font-medium leading-relaxed max-md:px-0 max-md:py-[50px] lg:text-[40px]">
                   <Image
                     src="/assets/images/queto.svg"
                     alt="quote open"
@@ -38,7 +38,7 @@ export default function QuoteSection({ data, layout = '', image }: any) {
 
               <div className="flex shrink-0 items-center justify-center">
                 <div
-                  className="relative w-[750px] max-w-full"
+                  className="relative w-[750px] max-w-full max-md:w-full"
                   style={{ aspectRatio: '750 / 562' }}
                 >
                   {image ? (
@@ -47,7 +47,7 @@ export default function QuoteSection({ data, layout = '', image }: any) {
                       alt={data?.imageAlt || 'quote image'}
                       width={750}
                       height={562}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   ) : (
                     <Image
@@ -55,7 +55,7 @@ export default function QuoteSection({ data, layout = '', image }: any) {
                       alt="quote image"
                       width={750}
                       height={562}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   )}
                 </div>
@@ -90,7 +90,7 @@ export default function QuoteSection({ data, layout = '', image }: any) {
           <section className="bg-text-primary text-white">
             <div className="content-wrapper">
               <div className="max-sd:max-w-full mx-auto w-fit max-w-[75%] py-[123px]">
-                <blockquote className="font-playfair relative px-[60px] text-center text-[30px] font-medium leading-relaxed max-md:py-[50px] lg:text-[40px]">
+                <blockquote className="font-playfair relative px-[60px] text-center text-[30px] font-medium leading-relaxed max-md:px-0 max-md:py-[50px] lg:text-[40px]">
                   <Image
                     src="/assets/images/queto.svg"
                     alt="quote open"
@@ -123,7 +123,7 @@ export default function QuoteSection({ data, layout = '', image }: any) {
         <section className="bg-text-primary text-white">
           <div className="content-wrapper">
             <div className="max-sd:max-w-full mx-auto w-fit max-w-[75%] py-[123px]">
-              <blockquote className="font-playfair relative px-[60px] text-center text-[30px] font-medium leading-relaxed max-md:py-[50px] lg:text-[40px]">
+              <blockquote className="font-playfair relative px-[60px] text-center text-[30px] font-medium leading-relaxed max-md:px-0 max-md:py-[50px] lg:text-[40px]">
                 <Image
                   src="/assets/images/queto.svg"
                   alt="quote open"

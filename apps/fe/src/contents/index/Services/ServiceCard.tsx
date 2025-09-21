@@ -192,7 +192,7 @@ function ServiceCard({ service, active = false }: ServiceCardProps) {
                   {typeof item === 'string' ? (
                     item
                   ) : item?.subtitle ? (
-                    <Link href={String(item.subtitle)} className='cursor-none'>
+                    <Link href={String(item.subtitle)}>
                       {item.title || String(item.subtitle)}
                     </Link>
                   ) : (

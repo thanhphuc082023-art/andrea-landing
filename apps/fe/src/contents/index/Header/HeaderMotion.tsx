@@ -16,9 +16,6 @@ interface Props {
 }
 
 export default function HeaderMotion({ heroData }: Props) {
-  const titleControls = useAnimation();
-  const subtitleControls = useAnimation();
-  const bgControls = useAnimation();
   const inertiaControls = useAnimation();
   const studiosControls = useAnimation();
   const videoControls = useAnimation();
@@ -31,7 +28,7 @@ export default function HeaderMotion({ heroData }: Props) {
   const [scale, setScale] = useState(1);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [videoFullScale, setVideoFullScale] = useState(false);
-  const [containerHeight, setContainerHeight] = useState('125vh'); // Default height
+  const [containerHeight, setContainerHeight] = useState('140vh'); // Default height
   const [isMobile, setIsMobile] = useState(false); // State để theo dõi kích thước màn hình
 
   // Custom scroll system
@@ -234,20 +231,17 @@ export default function HeaderMotion({ heroData }: Props) {
 
       if (width < 640) {
         // Mobile
-        heightMultiplier = 1.6; // More scroll space for small screens
+        heightMultiplier = 1.75; // More scroll space for small screens
       } else if (width < 1024) {
         // Tablet
-        heightMultiplier = 1.5;
+        heightMultiplier = 1.65;
       } else {
         // Desktop
-        heightMultiplier = aspectRatio > 1.6 ? 1.25 : 1.35; // Wide screens vs standard
+        heightMultiplier = aspectRatio > 1.6 ? 1.4 : 1.5; // Wide screens vs standard
       }
 
       // Set the dynamic height
       setContainerHeight(`${heightMultiplier * 100}vh`);
-
-      // Also update the maxScroll value for consistent animation
-      const maxScroll = height * heightMultiplier;
 
       // Update transform configurations on resize
       const vh = height;
@@ -302,68 +296,11 @@ export default function HeaderMotion({ heroData }: Props) {
     let mounted = true;
 
     const runSequence = async () => {
-      // initial background to black
-      await bgControls.start({
-        backgroundColor: '#000000',
-        transition: { duration: 0.2 },
-      });
-
-      // reveal title + subtitle
-      const isMobile = window.innerWidth <= 767;
-
-      const p1 = titleControls.start({
-        opacity: 1,
-        x: isMobile ? 10 : 40, // Vẫn slide từ phải vào ở cả mobile và desktop
-        transition: { type: 'spring', stiffness: 70, damping: 16 },
-      });
-
-      const p2 = subtitleControls.start({
-        opacity: 1,
-        x: isMobile ? 10 : 40, // Vẫn slide từ phải vào ở cả mobile và desktop
-        transition: { type: 'spring', stiffness: 70, damping: 16, delay: 0.2 },
-      });
-
-      await Promise.all([p1, p2]);
-
       const customEase = [0.2, 0.8, 0.2, 1];
       const endEase = [0.15, 0.9, 0.35, 1];
+      const isMobile = window.innerWidth <= 767;
 
-      await new Promise((res) => setTimeout(res, 500));
-      if (!mounted) return;
-
-      // fade-out title/subtitle
-      const f1 = titleControls.start({
-        x: isMobile ? 15 : 80, // Slide ra khỏi màn hình bên phải ở cả mobile và desktop
-        opacity: 0,
-        transition: {
-          type: 'spring',
-          stiffness: 70,
-          damping: 16,
-          duration: 0.2,
-        },
-      });
-      const f2 = subtitleControls.start({
-        x: isMobile ? 15 : 80, // Slide ra khỏi màn hình bên phải ở cả mobile và desktop
-        opacity: 0,
-        transition: {
-          type: 'spring',
-          stiffness: 70,
-          damping: 16,
-          delay: 0.1,
-        },
-      });
-
-      const bgSlidePromise = bgControls.start({
-        y: '100%',
-        transition: {
-          type: 'tween',
-          ease: [1, 0.1, 0.3, 1],
-          duration: 1.5,
-          delay: 0.5,
-        },
-      });
-
-      // start inertia/studios concurrently with the bg sliding (no delay)
+      // Start inertia/studios animations
       inertiaControls.start({
         x: isMobile ? '-50%' : '-50%', // Giữ nguyên logic slide từ left cho ANDREA
         opacity: 1,
@@ -371,7 +308,6 @@ export default function HeaderMotion({ heroData }: Props) {
           type: 'tween',
           ease: endEase,
           duration: 1.2,
-          delay: 1.4,
         },
       });
 
@@ -382,7 +318,6 @@ export default function HeaderMotion({ heroData }: Props) {
           type: 'tween',
           ease: endEase,
           duration: 1.2,
-          delay: 1.4,
         },
       });
 
@@ -393,17 +328,10 @@ export default function HeaderMotion({ heroData }: Props) {
           type: 'tween',
           ease: customEase,
           duration: 1.2,
-          delay: 1.5,
         },
       });
 
-      await Promise.all([f1, f2]);
-
       if (!mounted) return;
-
-      // after the bg slide finishes, ensure it no longer captures pointer events
-      await bgSlidePromise;
-      await bgControls.start({ pointerEvents: 'none' } as any);
 
       // Mark animation as complete to enable scroll behavior
       setAnimationComplete(true);
@@ -415,9 +343,6 @@ export default function HeaderMotion({ heroData }: Props) {
       mounted = false;
     };
   }, [
-    titleControls,
-    subtitleControls,
-    bgControls,
     inertiaControls,
     studiosControls,
     videoControls,
@@ -432,7 +357,7 @@ export default function HeaderMotion({ heroData }: Props) {
     if (typeof window === 'undefined') return;
 
     const htmlElement = document.documentElement;
-    
+
     if (!animationComplete) {
       // Prevent scrolling during animation
       htmlElement.style.overflow = 'hidden';
@@ -457,38 +382,6 @@ export default function HeaderMotion({ heroData }: Props) {
         : { style: { height: containerHeight, overflow: 'visible' } })}
     >
       <AnimatePresence>
-        <m.div
-          className={clsx(
-            'pointer-events-none fixed inset-0 z-[9999999] h-screen w-screen overflow-hidden'
-          )}
-        >
-          <m.div // full-bleed background that animates color and will slide away
-            initial={{ backgroundColor: '#ffffff', y: 0, opacity: 1 }}
-            animate={bgControls}
-            className="z-1 absolute left-0 top-0 h-full w-full"
-          />
-
-          <div className="z-2 absolute left-0 top-1/2 flex w-screen -translate-y-1/2 flex-row items-center gap-[30%] whitespace-nowrap max-md:flex-col max-md:items-start">
-            <m.h1
-              initial={{ opacity: 0, x: 0, y: 0 }}
-              animate={titleControls}
-              className="text-[40px] font-semibold text-white max-md:mb-3 md:text-[20px]"
-              style={{ willChange: 'transform' }}
-            >
-              ANDREA
-            </m.h1>
-
-            <m.span
-              initial={{ opacity: 0, x: 0, y: 0 }}
-              animate={subtitleControls}
-              className="whitespace-pre-line break-words text-[24px] uppercase leading-[28px] text-white md:text-[16px]"
-              style={{ willChange: 'transform, opacity' }}
-            >
-              Moving People, Brands and Visual Culture
-            </m.span>
-          </div>
-        </m.div>
-
         {/* Main video container with white background wrapper */}
         <m.div
           className="fixed inset-0 block h-screen w-screen bg-white max-md:hidden"

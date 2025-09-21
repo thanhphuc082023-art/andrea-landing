@@ -33,14 +33,25 @@ export default function MediaSection({
     null
   );
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [fileSizeError, setFileSizeError] = useState<string | null>(null);
 
   const heroImage = watch('hero');
   const thumbnail = watch('thumbnail');
 
+  // Helper function để kiểm tra kích thước file (3MB = 3 * 1000 * 1000 bytes)
+  const validateFileSize = (file: File): boolean => {
+    console.log('file.size', file.size);
+    const maxSize = 3 * 1000 * 1000; // 3MB in bytes
+    return file.size <= maxSize;
+  };
+
   // Helper function để tạo preview từ file
-  const createFilePreview = (file: File, setPreview: (preview: string) => void) => {
+  const createFilePreview = (
+    file: File,
+    setPreview: (preview: string) => void
+  ) => {
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreview(e.target?.result as string);
@@ -72,6 +83,15 @@ export default function MediaSection({
   ) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Clear previous error
+      setFileSizeError(null);
+
+      // Validate file size
+      if (!validateFileSize(file)) {
+        setFileSizeError(`Kích thước tối đa là 3MB`);
+        return;
+      }
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -94,6 +114,15 @@ export default function MediaSection({
   ) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Clear previous error
+      setFileSizeError(null);
+
+      // Validate file size
+      if (!validateFileSize(file)) {
+        setFileSizeError(`Kích thước tối đa là 3MB`);
+        return;
+      }
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -127,7 +156,7 @@ export default function MediaSection({
 
       {/* Hero Image */}
       <div>
-        <label className="flex items-center text-sm font-semibold text-gray-800 mb-4">
+        <label className="mb-4 flex items-center text-sm font-semibold text-gray-800">
           <PhotoIcon className="mr-2 h-4 w-4 text-gray-500" />
           Hình ảnh Hero *
         </label>
@@ -139,8 +168,8 @@ export default function MediaSection({
             htmlFor="hero-desktop-upload"
             className={clsx(
               'relative flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition-colors duration-200 focus-within:ring-2 focus-within:ring-blue-100',
-              heroDesktopPreview || heroImage?.desktop?.url 
-                ? 'border-blue-300 p-0' 
+              heroDesktopPreview || heroImage?.desktop?.url
+                ? 'border-blue-300 p-0'
                 : 'border-gray-200 p-6 hover:border-blue-300 hover:bg-blue-50'
             )}
           >
@@ -188,7 +217,9 @@ export default function MediaSection({
                       className="hidden"
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">Khuyến nghị: 1200x600px</p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Khuyến nghị: 1200x600px, tối đa 3MB
+                  </p>
                 </div>
               </label>
             )}
@@ -199,8 +230,8 @@ export default function MediaSection({
             htmlFor="hero-mobile-upload"
             className={clsx(
               'relative flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition-colors duration-200 focus-within:ring-2 focus-within:ring-blue-100',
-              heroMobilePreview || heroImage?.mobile?.url 
-                ? 'border-blue-300 p-0' 
+              heroMobilePreview || heroImage?.mobile?.url
+                ? 'border-blue-300 p-0'
                 : 'border-gray-200 p-6 hover:border-blue-300 hover:bg-blue-50'
             )}
           >
@@ -248,12 +279,40 @@ export default function MediaSection({
                       className="hidden"
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">Khuyến nghị: 600x800px</p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Khuyến nghị: 600x800px, tối đa 3MB
+                  </p>
                 </div>
               </label>
             )}
           </label>
         </div>
+
+        {/* File Size Error Message */}
+        {fileSizeError && (
+          <div className="mt-4 rounded-md bg-red-50 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-red-800">
+                  {fileSizeError}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Hero Image URLs */}
         {/* <label
@@ -313,7 +372,7 @@ export default function MediaSection({
 
       {/* Thumbnail */}
       <div>
-        <label className="flex items-center text-sm font-semibold text-gray-800 mb-4">
+        <label className="mb-4 flex items-center text-sm font-semibold text-gray-800">
           <PhotoIcon className="mr-2 h-4 w-4 text-gray-500" />
           Thumbnail
         </label>
@@ -323,8 +382,8 @@ export default function MediaSection({
           htmlFor="thumbnail-upload"
           className={clsx(
             'relative flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition-colors duration-200 focus-within:ring-2 focus-within:ring-blue-100',
-            thumbnailPreview || thumbnail?.url 
-              ? 'border-blue-300 p-0' 
+            thumbnailPreview || thumbnail?.url
+              ? 'border-blue-300 p-0'
               : 'border-gray-200 p-6 hover:border-blue-300 hover:bg-blue-50'
           )}
         >
@@ -371,7 +430,7 @@ export default function MediaSection({
                   />
                 </div>
                 <p className="mt-2 text-sm text-gray-500">
-                  PNG, JPG, GIF tối đa 10MB. Khuyến nghị: 800x400px
+                  PNG, JPG, GIF tối đa 3MB. Khuyến nghị: 800x400px
                 </p>
               </div>
             </label>
