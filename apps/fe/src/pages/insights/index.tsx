@@ -352,7 +352,8 @@ export const getStaticProps: GetStaticProps<InsightsPageProps> = async () => {
             image: insight.thumbnail?.url.includes('http')
               ? insight.thumbnail?.url
               : `${process.env.NEXT_PUBLIC_STRAPI_URL}${insight.thumbnail.url}`,
-            slug: insight.slug,
+            slug: `/insight/${insight.slug}`,
+            link: `/insight/${insight.slug}`,
             excerpt: insight.excerpt,
             category: insight.category,
           };
