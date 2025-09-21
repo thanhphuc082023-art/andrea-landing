@@ -40,7 +40,6 @@ export default function InsightFormPage({
   useEffect(() => {
     if (initialData) {
       reset(initialData);
-      console.log('initialData', initialData);
     }
   }, [initialData, reset]);
 

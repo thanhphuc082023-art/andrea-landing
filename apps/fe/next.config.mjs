@@ -2,6 +2,11 @@ import bundeAnalyzer from '@next/bundle-analyzer';
 import nextMDX from '@next/mdx';
 import rehypePlugins from 'rehype-plugins';
 import remarkPlugins from 'remark-plugins';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -83,6 +88,8 @@ const nextConfig = {
   reactStrictMode: false,
   compress: true,
   poweredByHeader: false,
+  // Transpile react-email-editor to ensure consistent behavior
+  transpilePackages: ['react-email-editor'],
   experimental: {
     scrollRestoration: true,
     optimizeCss: true,
@@ -94,7 +101,7 @@ const nextConfig = {
       '@react-three/drei',
     ],
     // Tắt SSR cho các component sử dụng WebGL
-    esmExternals: 'loose',
+    esmExternals: false, // Changed from 'loose' to false for better consistency
     turbo: {
       rules: {
         '*.svg': {
@@ -114,14 +121,22 @@ const nextConfig = {
   // Performance optimizations
   swcMinify: true,
   webpack: (config, { dev, isServer }) => {
+    // Ensure consistent module resolution for react-email-editor
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve.alias,
+        // Use local copy of react-email-editor from libs directory
+        'react-email-editor': path.resolve(
+          __dirname,
+          'libs/react-email-editor/es'
+        ),
+      },
+    };
+
     // Enable modern JavaScript features for better performance
     if (!dev && !isServer) {
       config.target = ['web', 'es2020'];
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        // Ensure modern builds
-        '@babel/runtime': '@babel/runtime',
-      };
     }
 
     // Handle PDF.js worker files
@@ -148,6 +163,18 @@ const nextConfig = {
         '@react-three/drei',
       ];
     }
+
+    // Ensure react-email-editor is properly handled
+    config.module.rules.push({
+      test: /libs\/react-email-editor\/es\/.*\.(js|jsx)$/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env', '@babel/preset-react'],
+          plugins: ['@babel/plugin-proposal-class-properties'],
+        },
+      },
+    });
 
     return config;
   },
