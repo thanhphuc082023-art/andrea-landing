@@ -39,17 +39,20 @@ function LineReveal({
   enableBlur?: boolean;
   blurStrength?: number;
 }) {
-  // Nhóm 6 dòng cùng lúc để sweep chậm hơn, mỗi dòng có offset khác nhau
+  // Nhóm 3 dòng cùng lúc để sweep chậm hơn, mỗi dòng có offset khác nhau
   const groupIndex = Math.floor(index / 3);
   const totalGroups = Math.ceil(total / 3);
-  const lineInGroup = index % 3; // 0, 1, 2, 3, 4, hoặc 5
-  const baseStartProgress = groupIndex / totalGroups;
-  const baseEndProgress = (groupIndex + 1) / totalGroups;
+  const lineInGroup = index % 3; // 0, 1, 2
+
+  // Đảm bảo nhóm cuối cùng có thể hoàn thành animation
+  const adjustedTotalGroups = totalGroups === 1 ? 1 : totalGroups - 0.1;
+  const baseStartProgress = groupIndex / adjustedTotalGroups;
+  const baseEndProgress = (groupIndex + 1) / adjustedTotalGroups;
 
   // Tạo offset cho mỗi dòng trong nhóm
   const offsetDelay = lineInGroup * 0.03; // Delay nhỏ cho mỗi dòng
-  const startProgress = baseStartProgress + offsetDelay;
-  const endProgress = baseEndProgress + offsetDelay;
+  const startProgress = Math.min(baseStartProgress + offsetDelay, 1);
+  const endProgress = Math.min(baseEndProgress + offsetDelay, 1);
 
   // Transform background position for line processing effect - sweep từ trái qua phải
   const backgroundPosition = useTransform(

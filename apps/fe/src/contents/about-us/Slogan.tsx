@@ -553,16 +553,16 @@ function SloganSection({
             {
               left: isMobile ? 'auto' : '70%',
               right: isMobile ? '2%' : 'auto',
-              top: isMobile ? '14%' : '19%',
+              top: isMobile ? '7%' : '19%',
             }, // Ảnh trên phải
             {
-              right: isMobile ? '10%' : '-5%',
-              top: isMobile ? '50%' : '55%',
+              right: isMobile ? '2%' : '-5%',
+              top: isMobile ? '53%' : '55%',
             }, // Ảnh giữa phải
             {
               right: isMobile ? '6%' : 'auto',
               left: isMobile ? 'auto' : '51%',
-              top: isMobile ? '72%' : '68%',
+              top: isMobile ? '76%' : '68%',
             }, // Ảnh center-right
           ];
 
