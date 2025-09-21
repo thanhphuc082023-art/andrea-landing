@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  srcDir: 'src',
   eslint: {
     // Completely disable ESLint
     ignoreDuringBuilds: true,
@@ -129,7 +130,7 @@ const nextConfig = {
         // Use local copy of react-email-editor from libs directory
         'react-email-editor': path.resolve(
           __dirname,
-          'libs/react-email-editor/es'
+          'libs/react-email-editor'
         ),
       },
     };
@@ -166,7 +167,7 @@ const nextConfig = {
 
     // Ensure react-email-editor is properly handled
     config.module.rules.push({
-      test: /libs\/react-email-editor\/es\/.*\.(js|jsx)$/,
+      test: /libs\/react-email-editor\/.*\.(js|jsx)$/,
       use: {
         loader: 'babel-loader',
         options: {

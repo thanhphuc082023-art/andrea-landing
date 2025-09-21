@@ -1,6 +1,3 @@
-'use strict';
-
-exports.__esModule = true;
 var scriptUrl = '//editor.unlayer.com/embed.js?2';
 var callbacks = [];
 var loaded = false;
@@ -26,13 +23,13 @@ var runCallbacks = function runCallbacks() {
   if (loaded) {
     var callback = void 0;
 
-    while (callback = callbacks.shift()) {
+    while ((callback = callbacks.shift())) {
       callback();
     }
   }
 };
 
-var loadScript = exports.loadScript = function loadScript(callback) {
+var loadScript = function loadScript(callback) {
   addCallback(callback);
 
   if (!isScriptInjected()) {
@@ -47,3 +44,5 @@ var loadScript = exports.loadScript = function loadScript(callback) {
     runCallbacks();
   }
 };
+
+module.exports = { loadScript: loadScript };

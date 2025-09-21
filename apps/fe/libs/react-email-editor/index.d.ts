@@ -538,3 +538,5 @@ declare class EmailEditor extends Component<EmailEditorProps> {
 }
 
 export default EmailEditor;
+
+console.log('test');
