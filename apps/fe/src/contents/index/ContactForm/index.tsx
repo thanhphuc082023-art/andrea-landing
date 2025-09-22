@@ -379,6 +379,7 @@ function ContactForm() {
                 onClick={() => {
                   window.location.href = `tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`;
                 }}
+                className="group"
                 textColor="text-white"
                 borderColor="border-white"
                 beforeBgColor="before:bg-white"
@@ -388,7 +389,7 @@ function ContactForm() {
                 focusRingOffsetColor="focus:ring-offset-white"
               >
                 <span className="flex items-center justify-center gap-[6px]">
-                  <FaPhone color="white" />
+                  <FaPhone className="group-hover:text-brand-orange text-white duration-300" />
                   <span className="text-[13px]">
                     {process.env.NEXT_PUBLIC_PHONE_NUMBER}
                   </span>
