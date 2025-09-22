@@ -12,7 +12,7 @@ export default function CriteriaSection({ data }: any) {
 
         <div className="max-sd:gap-[55px] mb-12 flex flex-col items-center gap-[120px] lg:flex-row">
           <div className="w-full max-md:w-[calc(100%+58px)] lg:w-1/2">
-            <div className="max-sd:aspect-square max-sd:max-w-full rounded-15 relative aspect-[650/466] h-[466px] w-full max-w-[650px] overflow-hidden max-md:rounded-none max-sm:aspect-[487/469] max-sm:h-[469px]">
+            <div className="max-sd:aspect-video max-sd:h-auto max-sd:max-w-full rounded-15 relative aspect-[650/466] h-[466px] w-full max-w-[650px] overflow-hidden max-md:rounded-none max-sm:aspect-[487/469] max-sm:h-[469px]">
               <Image
                 src={data?.image}
                 alt="Supermarket aisle with products"

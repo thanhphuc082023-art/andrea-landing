@@ -14,7 +14,7 @@ function BrandSection({ title = '', description = '' }: any) {
         <h2
           className={clsx(
             'font-playfair max-sd:text-[40px] text-brand-orange text-[55px]',
-            'max-370:!text-[40px] max-370:leading-[55px] font-medium max-md:mb-2'
+            'max-sd:mb-2 max-sd:text-[40px] max-sd:leading-[55px] font-medium max-md:text-[34px] max-md:leading-[40px]'
           )}
         >
           {title}
@@ -28,8 +28,8 @@ function BrandSection({ title = '', description = '' }: any) {
         {/* Description */}
         <p
           className={clsx(
-            'font-playfair text-[27px] text-black md:text-xl lg:text-[30px]',
-            'max-sd:!leading-[40px] font-medium !leading-[55px] tracking-wide',
+            'font-playfair text-[24px] text-black md:text-[30px]',
+            'max-sd:leading-[36px] font-medium leading-[55px] tracking-wide',
             'mx-auto max-w-[644px]'
           )}
         >

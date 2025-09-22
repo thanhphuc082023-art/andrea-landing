@@ -28,7 +28,7 @@ export default function HeaderMotion({ heroData }: Props) {
   const [scale, setScale] = useState(1);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [videoFullScale, setVideoFullScale] = useState(false);
-  const [containerHeight, setContainerHeight] = useState('140vh'); // Default height
+  const [containerHeight, setContainerHeight] = useState('145vh'); // Default height
   const [isMobile, setIsMobile] = useState(false); // State để theo dõi kích thước màn hình
 
   // Custom scroll system
@@ -177,14 +177,14 @@ export default function HeaderMotion({ heroData }: Props) {
       let heightMultiplier;
       if (width < 640) {
         // Mobile
-        heightMultiplier = 1.6;
+        heightMultiplier = 1.65;
       } else if (width < 1024) {
         // Tablet
-        heightMultiplier = 1.5;
+        heightMultiplier = 1.55;
       } else {
         // Desktop
         const aspectRatio = width / viewportHeight;
-        heightMultiplier = aspectRatio > 1.6 ? 1.4 : 1.35;
+        heightMultiplier = aspectRatio > 1.65 ? 1.45 : 1.34;
       }
 
       const maxScroll = viewportHeight * heightMultiplier;

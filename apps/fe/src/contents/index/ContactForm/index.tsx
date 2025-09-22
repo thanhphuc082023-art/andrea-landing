@@ -3,12 +3,8 @@ import clsx from 'clsx';
 import { AnimatePresence, m } from 'framer-motion';
 import { LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import {
-  FieldErrors,
-  SubmitHandler,
-  useForm,
-  UseFormSetError,
-} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { FaPhone } from 'react-icons/fa6';
 
 import SubmitButton from '@/components/SubmitButton';
 
@@ -18,7 +14,6 @@ import {
   type ContactFormData,
   contactFormSchema,
 } from '@/lib/validations/contact';
-import { PhoneIcon } from '@/assets/icons';
 
 function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -371,30 +366,29 @@ function ContactForm() {
                 textColor="text-white"
                 borderColor="border-white"
                 beforeBgColor="before:bg-white"
-                hoverBgColor="hover:before:bg-brand-orange"
-                hoverTextColor="hover:text-white"
-                focusRingColor="focus:ring-brand-orange"
-                focusRingOffsetColor="focus:ring-offset-white-dark"
+                hoverBgColor="hover:before:bg-white"
+                hoverTextColor="hover:text-brand-orange"
+                focusRingColor="focus:ring-white"
+                focusRingOffsetColor="focus:ring-offset-white"
               >
                 {isSubmitting ? 'Đang gửi...' : 'Gửi'}
               </SubmitButton>
               <SubmitButton
                 isSubmitting={isSubmitting}
                 disabled={isSubmitting}
-                textColor="text-white"
                 onClick={() => {
                   window.location.href = `tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`;
                 }}
+                textColor="text-white"
                 borderColor="border-white"
                 beforeBgColor="before:bg-white"
-                hoverBgColor="hover:before:bg-brand-orange"
-                hoverTextColor="hover:text-white"
-                focusRingColor="focus:ring-brand-orange"
-                type="button"
-                focusRingOffsetColor="focus:ring-offset-white-dark"
+                hoverBgColor="hover:before:bg-white"
+                hoverTextColor="hover:text-brand-orange"
+                focusRingColor="focus:ring-white"
+                focusRingOffsetColor="focus:ring-offset-white"
               >
                 <span className="flex items-center justify-center gap-[6px]">
-                  <PhoneIcon color="white" />
+                  <FaPhone color="white" />
                   <span className="text-[13px]">
                     {process.env.NEXT_PUBLIC_PHONE_NUMBER}
                   </span>

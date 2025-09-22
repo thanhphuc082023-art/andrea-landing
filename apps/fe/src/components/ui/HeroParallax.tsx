@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { InfiniteScroll } from './InfiniteScroll';
 import { useRouter } from 'next/router';
+import clsx from 'clsx';
 
 export const HeroParallax = ({
   products,
@@ -89,14 +90,22 @@ export const HeroParallax = ({
   }, [rows.length]);
 
   useEffect(() => {
+    let lastScrollY = 0;
     const handleScroll = () => {
-      setIsHidden(window.scrollY > SCROLL_THRESHOLD);
+      if (lastScrollY >= SCROLL_THRESHOLD) return setIsHidden(true);
+      lastScrollY = window.scrollY;
     };
 
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (isHidden) {
+      window.scrollTo(0, 0);
+    }
+  }, [isHidden]);
 
   // Wait for InfiniteScroll to finish hide transition before revealing static grid
   useEffect(() => {
@@ -258,17 +267,22 @@ export const HeroParallax = ({
   return (
     <div
       ref={ref}
-      className="relative flex flex-col self-auto overflow-hidden py-[65px] antialiased [perspective:1000px] [transform-style:preserve-3d] max-md:py-[60px] max-md:pb-[330px]"
+      className={clsx(
+        'relative flex flex-col self-auto overflow-hidden antialiased [perspective:1000px] [transform-style:preserve-3d]',
+        isHidden
+          ? 'max-sd:pt-[120px] max-sd:pb-[60px] pb-[65px] pt-[130px]'
+          : 'max-sd:py-[60px] py-[65px]'
+      )}
     >
-      <Header />
+      {!isHidden && <Header />}
       {/* Content parallax */}
       <motion.div
         style={{
-          rotateX,
-          rotateZ,
-          translateY,
-          translateX: containerTranslateX, // Use translateX instead of marginLeft
-          opacity,
+          rotateX: isHidden ? 0 : rotateX,
+          rotateZ: isHidden ? 0 : rotateZ,
+          translateY: isHidden ? 0 : translateY,
+          translateX: isHidden ? 0 : containerTranslateX, // Use translateX instead of marginLeft
+          opacity: isHidden ? 1 : opacity,
           // If any row's grid is mounted/revealed, force full width so grid doesn't overflow
           width: isHidden ? '100%' : containerWidth,
         }}

@@ -35,7 +35,7 @@ const CoreValues = ({ data }: { data: CoreValuesData }) => {
     <section className="content-wrapper">
       {/* Title */}
       <m.h2
-        className="font-playfair mb-16 text-center text-4xl font-semibold text-orange-500 max-md:mb-10 md:text-[50px]"
+        className="font-playfair text-brand-orange mb-16 text-center text-4xl font-semibold max-md:mb-10 md:text-[50px]"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}

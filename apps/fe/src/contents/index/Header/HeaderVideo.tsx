@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { getStrapiMediaUrl } from '@/utils/helper';
 import ScrollDownButton from '@/components/ScrollDownButton';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 interface HeaderVideoProps {
   heroData?: any;
@@ -95,6 +95,7 @@ function HeaderVideo({
   const mobileVideoRef = useRef<HTMLVideoElement | null>(null);
   const fallbackVideoRef = useRef<HTMLVideoElement | null>(null);
   const skeletonRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // YouTube mounts and player refs
   const desktopYouTubeRef = useRef<HTMLDivElement | null>(null);
@@ -102,9 +103,37 @@ function HeaderVideo({
   const desktopYtPlayerRef = useRef<any>(null);
   const mobileYtPlayerRef = useRef<any>(null);
 
+  // Viewport visibility state
+  const [isInViewport, setIsInViewport] = useState(false);
+
   const hideSkeleton = () => {
     skeletonRef.current?.classList.add('hidden');
   };
+
+  // Intersection Observer để theo dõi viewport visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsInViewport(entry.isIntersecting);
+        });
+      },
+      {
+        threshold: 0.1, // Video phải hiển thị ít nhất 50% để được coi là trong viewport
+        rootMargin: '0px 0px -10% 0px', // Thêm margin để tránh flicker
+      }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
 
   // Load YouTube IFrame API once and return a promise that resolves when ready
   const loadYouTubeAPI = (() => {
@@ -159,6 +188,7 @@ function HeaderVideo({
       events: {
         onReady: (e: any) => {
           try {
+            // Mute initially, will be controlled by viewport visibility
             e.target.mute();
             e.target.playVideo();
           } catch (err) {}
@@ -211,6 +241,46 @@ function HeaderVideo({
     }
   };
 
+  // Điều khiển âm thanh dựa trên viewport visibility
+  useEffect(() => {
+    // Điều khiển video thường
+    const videos = [
+      desktopVideoRef.current,
+      mobileVideoRef.current,
+      fallbackVideoRef.current,
+    ];
+
+    videos.forEach((video) => {
+      if (video) {
+        if (isInViewport) {
+          video.muted = false;
+        } else {
+          video.muted = true;
+        }
+      }
+    });
+
+    // Điều khiển YouTube players
+    const youtubePlayers = [
+      desktopYtPlayerRef.current,
+      mobileYtPlayerRef.current,
+    ];
+
+    youtubePlayers.forEach((player) => {
+      if (player && player.unMute && player.mute) {
+        try {
+          if (isInViewport) {
+            player.unMute();
+          } else {
+            player.mute();
+          }
+        } catch (err) {
+          // Silent error handling
+        }
+      }
+    });
+  }, [isInViewport]);
+
   useEffect(() => {
     loadAndPlay(desktopVideoRef.current, desktopSrc ?? fallbackSrc);
   }, [desktopSrc, fallbackSrc]);
@@ -228,7 +298,7 @@ function HeaderVideo({
 
   const commonVideoProps = {
     autoPlay: true,
-    muted: false,
+    muted: true, // Bắt đầu muted, sẽ được điều khiển bởi viewport visibility
     loop: true,
     playsInline: true,
     preload: 'metadata' as const,
@@ -238,6 +308,7 @@ function HeaderVideo({
 
   return (
     <div
+      ref={containerRef}
       className={clsx(
         'header-video-container relative inset-0 z-0 w-full overflow-hidden',
         'max-sd:h-[calc(100vh-60px)] h-[calc(100vh-65px)]',

@@ -28,12 +28,12 @@ export default function ParallaxSection({ data }: any) {
   return (
     <div
       ref={container}
-      className="relative mt-[10vh] flex min-h-screen flex-col gap-[20px] max-md:mt-[22vh] lg:flex-row"
+      className="relative mb-[15vh] mt-[10vh] flex min-h-screen flex-col gap-[20px] max-md:mt-[22vh] lg:flex-row"
     >
       {data.map((section, index) => (
         <motion.div
           key={section.id}
-          className={`relative w-full ${index === 0 ? 'lg:w-1/2' : 'mt-0 w-full lg:mt-[15vh] lg:w-1/2'}`}
+          className={`relative w-full ${index === 0 ? 'lg:w-1/2' : 'mt-0 w-full lg:mt-[22vh] lg:w-1/2'}`}
           style={{
             y: useTransform(
               scrollYProgress,
@@ -53,7 +53,7 @@ export default function ParallaxSection({ data }: any) {
                   index === 0 ? ['20px', '-20px'] : ['0px', '-40px']
                 ),
               }}
-              className="text-brand-orange font-playfair m-0 mt-[10px] text-[8vw] font-semibold leading-[8vw] md:text-[6vw] md:leading-[6vw] lg:text-[4vw] lg:leading-[4vw]"
+              className="text-brand-orange font-playfair m-0 mt-[10px] text-4xl font-semibold leading-[8vw] md:text-[50px] md:leading-[6vw] lg:text-[50px] lg:leading-[50px]"
             >
               {section.title}
             </motion.h1>
@@ -65,7 +65,7 @@ export default function ParallaxSection({ data }: any) {
                   index === 0 ? ['15px', '-15px'] : ['0px', '-30px']
                 ),
               }}
-              className="m-0 mt-[10px] text-[16px] font-normal leading-[26px]"
+              className="m-0 mt-[10px] max-w-[530px] text-[16px] font-normal leading-[26px]"
             >
               {section.contents.map((content, contentIndex) => (
                 <div key={content.id}>

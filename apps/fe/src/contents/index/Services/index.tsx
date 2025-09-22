@@ -75,43 +75,34 @@ function Services({ servicesData = {} }: ServicesProps) {
           setHoveredIndex((prev) => (prev === index ? null : prev))
         }
       >
-        <FollowerPointerCard
+        <div
           onClick={() =>
             service.url ? router.push(`/service/${service.url}`) : null
           }
-          title={
-            <>
-              {service.url ? (
-                <button className="bg-brand-orange relative z-30 shrink-0 overflow-hidden rounded-md px-2 py-1 text-sm font-semibold text-white backdrop-blur-sm after:absolute after:bottom-0 after:left-0 after:-z-20 after:h-1 after:w-1 after:translate-y-full after:rounded-md after:transition-all after:duration-700 after:hover:scale-[300] after:hover:transition-all after:hover:duration-700">
-                  Xem thêm
-                </button>
-              ) : (
-                <></>
-              )}
-            </>
-          }
+          className={clsx(
+            'group relative h-full w-full',
+            service.url && 'cursor-pointer'
+          )}
         >
-          <div className="group relative h-full w-full">
-            <AnimatePresence>
-              {hoveredIndex === index && (
-                <motion.span
-                  layoutId="hoverBackground"
-                  className="bg-brand-orange/70 absolute inset-0 h-full w-full rounded-[12px]"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15 } }}
-                  exit={{
-                    opacity: 0,
-                    transition: { duration: 0.15, delay: 0.2 },
-                  }}
-                />
-              )}
-            </AnimatePresence>
+          <AnimatePresence>
+            {hoveredIndex === index && (
+              <motion.span
+                layoutId="hoverBackground"
+                className="bg-brand-orange/70 absolute inset-0 h-full w-full rounded-[12px]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.15 } }}
+                exit={{
+                  opacity: 0,
+                  transition: { duration: 0.15, delay: 0.2 },
+                }}
+              />
+            )}
+          </AnimatePresence>
 
-            <div className="relative z-20 h-full w-full p-1">
-              <ServiceCard service={service} active={config.active} />
-            </div>
+          <div className="pointer-events-none relative z-20 h-full w-full p-1">
+            <ServiceCard service={service} active={config.active} />
           </div>
-        </FollowerPointerCard>
+        </div>
       </div>
     );
   };

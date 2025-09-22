@@ -17,7 +17,7 @@ export default function SupermarketContent({ data }: any) {
           <Divider />
         </div>
 
-        <div className="max-sd:gap-[35px] my-[60px] flex flex-col items-center gap-[67px] lg:flex-row">
+        <div className="max-sd:gap-[35px] my-[60px] flex flex-col items-center gap-[67px] max-md:my-[29px] lg:flex-row">
           <div className="w-full max-md:w-[calc(100%+58px)] lg:w-1/2">
             <div className="max-sd:aspect-video max-sd:max-w-full max-sd:h-auto relative aspect-[594/410] h-[410px] w-full max-w-[594px] overflow-hidden">
               <Image

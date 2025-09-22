@@ -162,7 +162,7 @@ const legacyShowcaseData: any[] = [
 const ShowcaseItem = memo(
   ({ item, priority = false }: { item: ShowcaseItem; priority?: boolean }) => {
     const commonClasses =
-      'object-cover transition-transform duration-700 group-hover:scale-[1.02] z-[10]';
+      'object-cover transition-transform duration-700 z-[10]';
     const html = item.description?.replace(/\n/g, '<br/>') || '';
 
     // Helper function for skeleton hiding (used by other item types)
@@ -222,7 +222,7 @@ const ShowcaseItem = memo(
           playsInline={true}
           preload="metadata"
           onLoadedData={() => {}}
-           onError={() => {}}
+          onError={() => {}}
         />
       );
     }

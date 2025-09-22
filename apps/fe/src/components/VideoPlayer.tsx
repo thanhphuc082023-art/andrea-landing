@@ -40,6 +40,7 @@ const VideoPlayer = memo(
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
     const [isIntersecting, setIsIntersecting] = useState(false);
+    const [isInViewport, setIsInViewport] = useState(false);
     const [loadingProgress, setLoadingProgress] = useState(0);
 
     const hideSkeleton = () => {
@@ -87,18 +88,18 @@ const VideoPlayer = memo(
       onError?.();
     };
 
-    // Intersection Observer for lazy loading
+    // Intersection Observer for lazy loading and viewport visibility
     useEffect(() => {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
             setIsIntersecting(true);
-            observer.disconnect();
           }
+          setIsInViewport(entry.isIntersecting);
         },
         {
           threshold: 0.1,
-          rootMargin: '50px',
+          rootMargin: '0px 0px -10% 0px', // Thêm margin để tránh flicker
         }
       );
 
@@ -108,6 +109,17 @@ const VideoPlayer = memo(
 
       return () => observer.disconnect();
     }, []);
+
+    // Điều khiển âm thanh dựa trên viewport visibility
+    useEffect(() => {
+      if (videoRef.current) {
+        if (isInViewport) {
+          videoRef.current.muted = false;
+        } else {
+          videoRef.current.muted = true;
+        }
+      }
+    }, [isInViewport]);
 
     // YouTube video handling
     const isYouTubeUrl = (url: string) => {
@@ -153,7 +165,7 @@ const VideoPlayer = memo(
           {/* YouTube iframe */}
           {isIntersecting && (
             <iframe
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=${autoPlay ? 1 : 0}&controls=${controls ? 1 : 0}&loop=${loop ? 1 : 0}&mute=${muted ? 1 : 0}&playsinline=${playsInline ? 1 : 0}&playlist=${videoId}`}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=${autoPlay ? 1 : 0}&controls=${controls ? 1 : 0}&loop=${loop ? 1 : 0}&mute=${!isInViewport ? 1 : 0}&playsinline=${playsInline ? 1 : 0}&playlist=${videoId}`}
               title={alt}
               className="h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -193,23 +205,7 @@ const VideoPlayer = memo(
             backgroundSize: '200% 100%',
             animation: 'shimmer 1.5s infinite',
           }}
-        >
-          <div className="text-center">
-            <span className="text-sm text-gray-400">
-              {hasError
-                ? 'Error loading video'
-                : `Loading video... ${Math.round(loadingProgress)}%`}
-            </span>
-            {!hasError && (
-              <div className="mt-2 h-1 w-32 rounded-full bg-gray-300">
-                <div
-                  className="h-1 rounded-full bg-blue-500 transition-all duration-300"
-                  style={{ width: `${loadingProgress}%` }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
+        />
 
         {/* Error state */}
         {hasError && (
@@ -235,7 +231,7 @@ const VideoPlayer = memo(
           controls={controls}
           autoPlay={autoPlay && isIntersecting}
           loop={loop}
-          muted={muted}
+          muted={true} // Bắt đầu muted, sẽ được điều khiển bởi viewport visibility
           playsInline={playsInline}
           preload={isIntersecting ? preload : 'none'}
           onLoadStart={handleLoadStart}
