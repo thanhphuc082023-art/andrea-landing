@@ -300,6 +300,9 @@ export default function HeaderMotion({ heroData }: Props) {
       const endEase = [0.15, 0.9, 0.35, 1];
       const isMobile = window.innerWidth <= 767;
 
+      // Delay video animation slightly to allow video to start loading
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       // Start inertia/studios animations
       inertiaControls.start({
         x: isMobile ? '-50%' : '-50%', // Giữ nguyên logic slide từ left cho ANDREA
@@ -320,6 +323,9 @@ export default function HeaderMotion({ heroData }: Props) {
           duration: 1.2,
         },
       });
+
+      // Delay video animation to prevent flicker
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       videoControls.start({
         scale: 1,
