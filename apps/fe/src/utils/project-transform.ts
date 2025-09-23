@@ -318,7 +318,6 @@ export function prepareProjectDataForStrapi(projectData: ProjectData) {
 // Debug utilities
 export function debugProjectData(project: ProjectData) {
   console.log('=== PROJECT DATA DEBUG ===');
-  console.log('ID:', project.id);
   console.log('Title:', project.title);
   console.log('Slug:', project.slug);
   console.log('Status:', project.projectStatus);
