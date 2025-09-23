@@ -591,7 +591,10 @@ export default function HeaderMotion({ heroData }: Props) {
                         className="pointer-events-auto absolute inset-0 z-10"
                       >
                         <div className="h-full w-full">
-                          <HeaderVideo16x9 src={heroData?.desktopVideo?.url} />
+                          <HeaderVideo16x9
+                            src={heroData?.desktopVideo?.url}
+                            poster={heroData?.desktopPoster?.url}
+                          />
                         </div>
                       </m.div>
                     </div>

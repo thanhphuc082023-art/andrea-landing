@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import Image from 'next/image';
 
 interface HeaderVideo16x9Props {
   src?: string;
@@ -18,6 +19,7 @@ export default function HeaderVideo16x9({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const handleLoadedData = () => {
     setIsLoading(false);
@@ -27,6 +29,25 @@ export default function HeaderVideo16x9({
     setIsLoading(false);
     setHasError(true);
   };
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice =
+        window.innerWidth <= 768 ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      setIsMobile(isMobileDevice);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Simple autoplay attempt
   useEffect(() => {
@@ -71,22 +92,17 @@ export default function HeaderVideo16x9({
     };
   }, []);
 
-  if (!source) return null;
+  if (!source && !poster) return null;
 
   return (
     <div className={clsx('relative h-full w-full', className)}>
-      {/* Loading state */}
-      {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-100">
-          <div className="text-center">
-            <div className="mb-2 text-2xl text-gray-400">⏳</div>
-            <span className="text-sm text-gray-500">Loading video...</span>
-          </div>
-        </div>
+      {/* Loading state - only show for video */}
+      {isLoading && !isMobile && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-100" />
       )}
 
-      {/* Error state */}
-      {hasError && (
+      {/* Error state - only show for video */}
+      {hasError && !isMobile && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-gray-100">
           <div className="text-center">
             <div className="mb-2 text-2xl text-gray-400">⚠️</div>
@@ -95,23 +111,37 @@ export default function HeaderVideo16x9({
         </div>
       )}
 
-      {/* Video element */}
-      <video
-        ref={videoRef}
-        className={clsx(
-          'absolute inset-0 h-full w-full object-cover',
-          hasError && 'hidden'
-        )}
-        autoPlay
-        loop
-        playsInline
-        preload="auto"
-        poster={poster}
-        onLoadedData={handleLoadedData}
-        onError={handleError}
-      >
-        <source src={source} type="video/mp4" />
-      </video>
+      {/* Mobile: Show poster image */}
+      {isMobile && poster && (
+        <Image
+          src={poster}
+          alt="Header poster"
+          fill
+          className="absolute inset-0 h-full w-full object-cover"
+          priority
+          onLoad={() => setIsLoading(false)}
+        />
+      )}
+
+      {/* Desktop: Show video */}
+      {!isMobile && (
+        <video
+          ref={videoRef}
+          className={clsx(
+            'absolute inset-0 h-full w-full object-cover',
+            hasError && 'hidden'
+          )}
+          autoPlay
+          loop
+          playsInline
+          preload="auto"
+          poster={poster}
+          onLoadedData={handleLoadedData}
+          onError={handleError}
+        >
+          <source src={source} type="video/mp4" />
+        </video>
+      )}
     </div>
   );
 }
