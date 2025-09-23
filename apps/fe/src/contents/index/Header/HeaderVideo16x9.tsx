@@ -31,10 +31,22 @@ export default function HeaderVideo16x9({
 
   const handleLoadedData = () => {
     hideSkeleton();
+    // Đảm bảo autoplay sau khi load xong
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.warn('Autoplay failed on loadedData:', error);
+      });
+    }
   };
 
   const handleCanPlayThrough = () => {
     hideSkeleton();
+    // Đảm bảo autoplay sau khi có thể phát
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.warn('Autoplay failed on canPlayThrough:', error);
+      });
+    }
   };
 
   const handleError = () => {
@@ -46,8 +58,13 @@ export default function HeaderVideo16x9({
     if (!videoRef.current || !source) return;
     try {
       videoRef.current.load();
-      videoRef.current.play().catch(() => {});
-    } catch {}
+      // Thử autoplay ngay sau khi load
+      videoRef.current.play().catch((error) => {
+        console.warn('Initial autoplay failed:', error);
+      });
+    } catch (error) {
+      console.warn('Error in useEffect:', error);
+    }
   }, [source]);
 
   if (!source) return null;
