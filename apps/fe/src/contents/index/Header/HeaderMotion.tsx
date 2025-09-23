@@ -337,6 +337,9 @@ export default function HeaderMotion({ heroData }: Props) {
         },
       });
 
+      // Thêm delay để đảm bảo video autoplay sau khi animation hoàn thành
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       if (!mounted) return;
 
       // Mark animation as complete to enable scroll behavior
