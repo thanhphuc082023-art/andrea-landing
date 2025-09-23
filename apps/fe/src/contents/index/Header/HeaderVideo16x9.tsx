@@ -215,24 +215,6 @@ export default function HeaderVideo16x9({
         </div>
       )}
 
-      {/* Play button fallback */}
-      {showPlayButton && !hasError && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black bg-opacity-50">
-          <button
-            onClick={handlePlayClick}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-white bg-opacity-90 text-black transition-all hover:scale-110 hover:bg-opacity-100"
-          >
-            <svg
-              className="ml-1 h-8 w-8"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </button>
-        </div>
-      )}
-
       {/* Video element */}
       <video
         ref={videoRef}
