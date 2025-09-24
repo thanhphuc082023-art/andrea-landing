@@ -6,7 +6,9 @@ import React from 'react';
 // Dynamically import HeaderMotion with SSR disabled
 const HeaderMotion = dynamic(() => import('./HeaderMotion'), {
   ssr: false,
-  loading: () => <div className="flex h-screen" />,
+  loading: () => (
+    <div className="max-sd:h-[calc(100vh+60px)] flex h-[calc(100vh+65px)]" />
+  ),
 });
 
 interface Props {

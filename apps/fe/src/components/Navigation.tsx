@@ -116,6 +116,22 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      // Prevent scroll when menu is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore scroll when menu is closed
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleMobileMenuClick = (title: string) => {
     setIsMobileMenuOpen(false); // Đóng menu sau khi click
   };
