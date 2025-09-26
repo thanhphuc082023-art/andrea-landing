@@ -28,7 +28,7 @@ export default function ParallaxSection({ data }: any) {
   return (
     <div
       ref={container}
-      className="relative mb-[15vh] mt-[10vh] flex min-h-screen flex-col gap-[20px] max-md:mt-[22vh] lg:flex-row"
+      className="relative mb-0 mt-[10vh] flex min-h-screen flex-col gap-[20px] max-md:mt-[15vh] lg:flex-row"
     >
       {data.map((section, index) => (
         <motion.div

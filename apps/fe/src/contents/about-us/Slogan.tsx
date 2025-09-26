@@ -306,12 +306,12 @@ function SloganSection({
   const parallaxSlow = useTransform(
     scrollYProgress,
     [0, 2],
-    isMobile ? [150, -200] : [250, -700]
+    isMobile ? [0, 0] : [250, -700]
   );
   const parallaxFast = useTransform(
     scrollYProgress,
     [0, 2],
-    isMobile ? [300, 0] : [500, -600]
+    isMobile ? [0, 0] : [500, -600]
   );
 
   // Floating animation motion values
@@ -320,42 +320,42 @@ function SloganSection({
 
   // Spring animations for reduced floating effect
   const plane1X = useSpring(
-    useTransform(mouseX, [-800, 800], isMobile ? [-15, 15] : [-25, 25]),
+    useTransform(mouseX, [-800, 800], isMobile ? [0, 0] : [-25, 25]),
     {
       stiffness: 50,
       damping: 22,
     }
   );
   const plane1Y = useSpring(
-    useTransform(mouseY, [-800, 800], isMobile ? [-15, 15] : [-25, 25]),
+    useTransform(mouseY, [-800, 800], isMobile ? [0, 0] : [-25, 25]),
     {
       stiffness: 50,
       damping: 22,
     }
   );
   const plane2X = useSpring(
-    useTransform(mouseX, [-800, 800], isMobile ? [-20, 20] : [-35, 35]),
+    useTransform(mouseX, [-800, 800], isMobile ? [0, 0] : [-35, 35]),
     {
       stiffness: 50,
       damping: 20,
     }
   );
   const plane2Y = useSpring(
-    useTransform(mouseY, [-800, 800], isMobile ? [-20, 20] : [-35, 35]),
+    useTransform(mouseY, [-800, 800], isMobile ? [0, 0] : [-35, 35]),
     {
       stiffness: 50,
       damping: 20,
     }
   );
   const plane3X = useSpring(
-    useTransform(mouseX, [-800, 800], isMobile ? [-20, 20] : [-35, 35]),
+    useTransform(mouseX, [-800, 800], isMobile ? [0, 0] : [-35, 35]),
     {
       stiffness: 50,
       damping: 22,
     }
   );
   const plane3Y = useSpring(
-    useTransform(mouseY, [-800, 800], isMobile ? [-20, 20] : [-35, 35]),
+    useTransform(mouseY, [-800, 800], isMobile ? [0, 0] : [-35, 35]),
     {
       stiffness: 50,
       damping: 22,
@@ -442,7 +442,7 @@ function SloganSection({
   const handleOutsideClick = () => {
     setSelected(null);
   };
-  console.log('processedWorkflows', processedWorkflows);
+
   return (
     <div
       ref={containerRef}
@@ -454,7 +454,7 @@ function SloganSection({
       {/* Title section in center */}
       <div
         className="absolute left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 transform text-center max-md:w-full"
-        style={{ top: isMobile ? '46%' : '42%' }}
+        style={{ top: isMobile ? '38%' : '42%' }}
       >
         <h1 className="m-0 mb-2.5 max-w-[623px] text-[20px] font-normal leading-[35px] text-black max-md:mx-auto max-md:max-w-[95%] max-md:text-[16px] max-md:leading-[28px]">
           {slogan ? slogan.split('.')[0] : 'Andrea Creative Studio'}
@@ -464,9 +464,9 @@ function SloganSection({
       <DraggableCardContainer className="relative z-[51] h-full w-full">
         {processedWorkflows.slice(0, 3).map((item, index) => {
           const positions = [
-            { left: isMobile ? '4%' : '25%', top: isMobile ? '5%' : '17%' }, // Ảnh Andrea
-            { left: isMobile ? '2%' : '16%', top: isMobile ? '35%' : '57%' }, // Ảnh giữa trái
-            { left: isMobile ? '5%' : '20%', top: isMobile ? '74%' : '90%' }, // Ảnh dưới trái
+            { left: isMobile ? '4%' : '25%', top: isMobile ? '9%' : '17%' }, // Ảnh Andrea
+            { left: isMobile ? '2%' : '16%', top: isMobile ? '49%' : '57%' }, // Ảnh giữa trái
+            { left: isMobile ? '5%' : '20%', top: isMobile ? '67%' : '90%' }, // Ảnh dưới trái
           ];
 
           // Config cho từng position của plane2
@@ -553,16 +553,16 @@ function SloganSection({
             {
               left: isMobile ? 'auto' : '70%',
               right: isMobile ? '2%' : 'auto',
-              top: isMobile ? '7%' : '19%',
+              top: isMobile ? '11%' : '19%',
             }, // Ảnh trên phải
             {
               right: isMobile ? '2%' : '-5%',
-              top: isMobile ? '53%' : '55%',
+              top: isMobile ? '52%' : '55%',
             }, // Ảnh giữa phải
             {
               right: isMobile ? '6%' : 'auto',
               left: isMobile ? 'auto' : '51%',
-              top: isMobile ? '76%' : '68%',
+              top: isMobile ? '67%' : '68%',
             }, // Ảnh center-right
           ];
 
@@ -657,7 +657,7 @@ function SloganSection({
           const positions = [
             {
               right: isMobile ? '31%' : '1%',
-              bottom: isMobile ? '11%' : '0%',
+              bottom: isMobile ? '-7%' : '0%',
             }, // Ảnh dưới phải
           ];
 

@@ -433,11 +433,11 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '-100%' : '-100%',
-                      y: '-100%',
+                      y: '-83%',
                       opacity: 0,
                     }}
                     animate={inertiaControls}
-                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[170px] text-black md:text-[175px]"
+                    className="pointer-events-auto z-20 text-[83px] font-medium leading-normal text-black md:text-[175px]"
                     style={{
                       position: 'absolute',
                       left: isMobile ? '50%' : 0,
@@ -453,11 +453,11 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '100%' : '100%',
-                      y: '100%',
+                      y: '80%',
                       opacity: 0,
                     }}
                     animate={studiosControls}
-                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[155px] text-black md:text-[170px]"
+                    className="pointer-events-auto z-20 text-[83px] font-medium leading-normal text-black md:text-[170px]"
                     style={{
                       position: 'absolute',
                       right: isMobile ? '50%' : 0,
@@ -534,11 +534,11 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '-100%' : '-100%',
-                      y: '-100%',
+                      y: '-83%',
                       opacity: 0,
                     }}
                     animate={inertiaControls}
-                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[95px] text-black md:text-[175px]"
+                    className="pointer-events-auto z-20 text-[83px] font-medium leading-normal text-black md:text-[175px]"
                     style={{
                       position: 'absolute',
                       left: isMobile ? '50%' : 0,
@@ -554,11 +554,11 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '100%' : '100%',
-                      y: '100%',
+                      y: '80%',
                       opacity: 0,
                     }}
                     animate={studiosControls}
-                    className="pointer-events-auto z-20 text-[83px] font-medium leading-[90px] text-black md:text-[170px]"
+                    className="pointer-events-auto z-20 text-[83px] font-medium leading-normal text-black md:text-[170px]"
                     style={{
                       position: 'absolute',
                       right: isMobile ? '50%' : 0,
