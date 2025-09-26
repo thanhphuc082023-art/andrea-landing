@@ -453,7 +453,7 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '100%' : '100%',
-                      y: '80%',
+                      y: isMobile ? '81%' : '80%',
                       opacity: 0,
                     }}
                     animate={studiosControls}
@@ -554,7 +554,7 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '100%' : '100%',
-                      y: '80%',
+                      y: isMobile ? '81%' : '80%',
                       opacity: 0,
                     }}
                     animate={studiosControls}
