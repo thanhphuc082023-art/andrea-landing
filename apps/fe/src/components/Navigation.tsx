@@ -153,6 +153,7 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
           {/* Logo */}
           <Link
             href="/"
+            onClick={() => setIsMobileMenuOpen(false)}
             className="flex-shrink-0"
             aria-label="Andrea - Trang chủ"
           >
@@ -171,7 +172,11 @@ function Navbar({ serverGlobal = undefined, menuItems = [] }: NavbarProps) {
               const href = item.url || '/';
 
               return (
-                <Link key={item.label} href={href}>
+                <Link
+                  key={item.label}
+                  href={href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   <SwapText
                     finalText={item.label}
                     initialText={item.label}
