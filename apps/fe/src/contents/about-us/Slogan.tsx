@@ -71,11 +71,11 @@ const AutoSizedImage = ({
     const isMobile = windowSize.width <= 768;
 
     if (isMobile) {
-      // Mobile: smaller size for better performance and fit
+      // Mobile: larger size for better visibility
       return {
-        maxWidth: 200,
-        maxHeight: 150,
-        scaleFactor: 0.5,
+        maxWidth: 320,
+        maxHeight: 220,
+        scaleFactor: 0.7,
       };
     }
 
@@ -124,16 +124,12 @@ const AutoSizedImage = ({
     scaleFactor,
   } = getResponsiveMaxDimensions();
 
-  if (isLoading) {
-    // Simple skeleton - just a gray box with shimmer
+  if (isLoading && windowSize.width > 768) {
     return (
       <div
-        className="relative overflow-hidden rounded-lg bg-gray-200"
+        className="flex animate-pulse items-center justify-center bg-gray-200"
         style={{ width: responsiveMaxWidth, height: responsiveMaxHeight }}
-      >
-        {/* Shimmer effect */}
-        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
-      </div>
+      ></div>
     );
   }
 
