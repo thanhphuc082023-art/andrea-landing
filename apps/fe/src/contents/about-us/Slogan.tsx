@@ -657,7 +657,7 @@ function SloganSection({
           const positions = [
             {
               right: isMobile ? '54%' : '1%',
-              bottom: isMobile ? '-7%' : '0%',
+              bottom: isMobile ? '-10%' : '0%',
             }, // Ảnh dưới phải
           ];
 
