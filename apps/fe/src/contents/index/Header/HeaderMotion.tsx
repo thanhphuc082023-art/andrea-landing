@@ -316,7 +316,7 @@ export default function HeaderMotion({ heroData }: Props) {
 
       studiosControls.start({
         x: isMobile ? '50%' : '50%', // Giữ nguyên logic slide từ right cho AGENCY
-        y: isMobile ? '82%' : '80%',
+        y: isMobile ? '83%' : '80%',
         opacity: 1,
         transition: {
           type: 'tween',
@@ -454,7 +454,7 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '100%' : '100%',
-                      y: isMobile ? '82%' : '80%',
+                      y: isMobile ? '83%' : '80%',
                       opacity: 0,
                     }}
                     animate={studiosControls}
@@ -555,7 +555,7 @@ export default function HeaderMotion({ heroData }: Props) {
                   <m.div
                     initial={{
                       x: isMobile ? '100%' : '100%',
-                      y: isMobile ? '82%' : '80%',
+                      y: isMobile ? '83%' : '80%',
                       opacity: 0,
                     }}
                     animate={studiosControls}
