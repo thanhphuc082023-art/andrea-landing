@@ -71,11 +71,11 @@ const AutoSizedImage = ({
     const isMobile = windowSize.width <= 768;
 
     if (isMobile) {
-      // Mobile: larger size for better visibility
+      // Mobile: smaller size for better performance and fit
       return {
-        maxWidth: 320,
-        maxHeight: 220,
-        scaleFactor: 0.7,
+        maxWidth: 200,
+        maxHeight: 150,
+        scaleFactor: 0.5,
       };
     }
 
@@ -125,11 +125,15 @@ const AutoSizedImage = ({
   } = getResponsiveMaxDimensions();
 
   if (isLoading) {
+    // Simple skeleton - just a gray box with shimmer
     return (
       <div
-        className="flex animate-pulse items-center justify-center bg-gray-200"
+        className="relative overflow-hidden rounded-lg bg-gray-200"
         style={{ width: responsiveMaxWidth, height: responsiveMaxHeight }}
-      ></div>
+      >
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
+      </div>
     );
   }
 
@@ -465,7 +469,7 @@ function SloganSection({
         {processedWorkflows.slice(0, 3).map((item, index) => {
           const positions = [
             { left: isMobile ? '4%' : '25%', top: isMobile ? '9%' : '17%' }, // Ảnh Andrea
-            { left: isMobile ? '2%' : '16%', top: isMobile ? '49%' : '57%' }, // Ảnh giữa trái
+            { left: isMobile ? '24%' : '16%', top: isMobile ? '49%' : '57%' }, // Ảnh giữa trái
             { left: isMobile ? '5%' : '20%', top: isMobile ? '67%' : '90%' }, // Ảnh dưới trái
           ];
 
@@ -557,12 +561,12 @@ function SloganSection({
             }, // Ảnh trên phải
             {
               right: isMobile ? '2%' : '-5%',
-              top: isMobile ? '52%' : '55%',
+              top: isMobile ? '68%' : '55%',
             }, // Ảnh giữa phải
             {
               right: isMobile ? '6%' : 'auto',
               left: isMobile ? 'auto' : '51%',
-              top: isMobile ? '67%' : '68%',
+              top: isMobile ? '86%' : '68%',
             }, // Ảnh center-right
           ];
 
@@ -656,7 +660,7 @@ function SloganSection({
         {processedWorkflows.slice(6, 9).map((item, index) => {
           const positions = [
             {
-              right: isMobile ? '31%' : '1%',
+              right: isMobile ? '54%' : '1%',
               bottom: isMobile ? '-7%' : '0%',
             }, // Ảnh dưới phải
           ];
@@ -859,12 +863,12 @@ const SelectedCard = ({
         onMouseLeave={handleMouseLeave}
         className="transform-3d rounded-10 relative z-[70] flex items-center justify-center overflow-hidden bg-neutral-100 p-4 shadow-2xl dark:bg-neutral-900"
       >
-        <AutoSizedImage
+        {/* <AutoSizedImage
           src={selected?.image}
           alt={selected?.alt}
           maxWidth={Math.min(windowSize.width * 0.8, 900)}
           maxHeight={Math.min(windowSize.height * 0.8, 700)}
-        />
+        /> */}
       </motion.div>
     </div>
   );
