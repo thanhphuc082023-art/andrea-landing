@@ -142,9 +142,11 @@ function ContactForm() {
 
   return (
     <section
-      className={clsx('max-sd:min-h-[500px] bg-brand-orange-light py-12')}
+      className={clsx(
+        'max-sd:min-h-[500px] bg-brand-orange-light relative py-12'
+      )}
     >
-      <div className="content-wrapper relative flex h-full items-center justify-center">
+      <div className="content-wrapper flex h-full items-center justify-center">
         <div className={clsx('mx-auto w-full max-w-[795px]')}>
           {/* Section Title */}
           <div className={clsx('mb-16 text-center max-md:mb-12')}>
@@ -182,7 +184,7 @@ function ContactForm() {
                   'w-full py-1',
                   'border-b border-white bg-transparent text-white',
                   'placeholder:font-[400] placeholder:text-white',
-                  'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                  'focus:border-primary rounded-none outline-none focus:ring-0',
                   'transition-colors duration-300',
                   errors.name && 'border-red-500'
                 )}
@@ -206,7 +208,7 @@ function ContactForm() {
                     'w-full py-1',
                     'border-b border-white bg-transparent text-white',
                     'placeholder:font-[400] placeholder:text-white',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                    'focus:border-primary rounded-none outline-none focus:ring-0',
                     'transition-colors duration-300',
                     errors.phone && 'border-red-500'
                   )}
@@ -227,7 +229,7 @@ function ContactForm() {
                     'w-full py-1',
                     'border-b border-white bg-transparent text-white',
                     'placeholder:font-[400] placeholder:text-white',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                    'focus:border-primary rounded-none outline-none focus:ring-0',
                     'transition-colors duration-300',
                     errors.email && 'border-red-500'
                   )}
@@ -254,7 +256,7 @@ function ContactForm() {
                     'w-full py-1',
                     'border-b border-white bg-transparent text-white',
                     'placeholder:font-[400] placeholder:text-white',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                    'focus:border-primary rounded-none outline-none focus:ring-0',
                     'transition-colors duration-300',
                     errors.industry && 'border-red-500'
                   )}
@@ -276,7 +278,7 @@ function ContactForm() {
                     'w-full py-1',
                     'border-b border-white bg-transparent text-white',
                     'placeholder:font-[400] placeholder:text-white',
-                    'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                    'focus:border-primary rounded-none outline-none focus:ring-0',
                     'transition-colors duration-300',
                     errors.captcha && 'border-red-500'
                   )}
@@ -342,7 +344,7 @@ function ContactForm() {
                   'w-full py-1',
                   'border-b border-white bg-transparent text-white',
                   'placeholder:font-[400] placeholder:text-white',
-                  'focus:border-brand-orange rounded-none outline-none focus:ring-0',
+                  'focus:border-primary rounded-none outline-none focus:ring-0',
                   'resize-none outline-none transition-colors duration-300',
                   errors.message && 'border-red-500'
                 )}
