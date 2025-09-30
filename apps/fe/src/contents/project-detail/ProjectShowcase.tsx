@@ -1,8 +1,9 @@
 import clsx from 'clsx';
 import Image from 'next/image';
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import MinimalFlipBook from '@/components/MinimalFlipBook';
 import VideoPlayer from '@/components/VideoPlayer';
+import { ImageSkeleton } from '@/components/ui/ImageSkeleton';
 import {
   ProjectData,
   ProjectShowcaseSection,
@@ -12,6 +13,51 @@ import {
 // Types
 interface ProjectShowcaseProps {
   project?: ProjectData | null;
+}
+
+// Image component with skeleton loading
+interface ImageWithSkeletonProps {
+  src: string;
+  alt: string;
+  fill?: boolean;
+  style?: React.CSSProperties;
+  className?: string;
+}
+
+function ImageWithSkeleton({
+  src,
+  alt,
+  fill,
+  style,
+  className,
+}: ImageWithSkeletonProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <div className="relative h-full w-full">
+      {isLoading && (
+        <ImageSkeleton className="absolute inset-0 z-10" style={style} />
+      )}
+      <Image
+        src={src}
+        alt={alt}
+        fill={fill}
+        style={style}
+        className={className}
+        onLoad={() => setIsLoading(false)}
+        onError={() => {
+          setIsLoading(false);
+          setHasError(true);
+        }}
+      />
+      {hasError && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-gray-100">
+          <span className="text-sm text-gray-500">Failed to load image</span>
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface ShowcaseItem {
@@ -257,18 +303,12 @@ const ShowcaseItem = memo(
     }
 
     return (
-      <Image
+      <ImageWithSkeleton
         src={item.src}
         alt={item.alt}
         fill
         className={commonClasses}
-        sizes={
-          item.width > 1000
-            ? '(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1300px'
-            : '(max-width: 1024px) 100vw, 50vw'
-        }
-        priority={priority}
-        // style={{ objectFit: 'contain' }}
+        style={{ objectFit: 'cover' }}
       />
     );
   }
@@ -492,7 +532,7 @@ const ShowcaseSection = memo(
                       }}
                     >
                       {contentSrc ? (
-                        <Image
+                        <ImageWithSkeleton
                           src={contentSrc}
                           alt={contentAlt || title}
                           fill
@@ -520,7 +560,7 @@ const ShowcaseSection = memo(
                       }}
                     >
                       {contentSrc ? (
-                        <Image
+                        <ImageWithSkeleton
                           src={contentSrc}
                           alt={contentAlt || title}
                           fill
@@ -615,7 +655,9 @@ const ShowcaseSection = memo(
           key={section.id}
           className={clsx(
             'grid grid-cols-2',
-            section.type === 'text' ? 'max-lg:grid-cols-1' : '',
+            section.type === 'text'
+              ? 'max-lg:grid-cols-1'
+              : 'max-md:grid-cols-1',
             section.type === 'text' &&
               items?.length > 1 &&
               (items?.[1]?.title ||

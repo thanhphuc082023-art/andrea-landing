@@ -363,20 +363,20 @@ export default function ProjectFormPage({
                 />
 
                 {/* Content Section */}
-                <ContentSection
+                {/* <ContentSection
                   register={register}
                   watch={watch}
                   control={control}
                   errors={errors}
                   setValue={setValue}
-                />
+                /> */}
 
                 {/* Showcase Section */}
-                {/* <ShowcaseSection
+                <ShowcaseSection
                   showcaseSections={showcaseSections}
                   setShowcaseSections={setShowcaseSections}
                   onLogout={handleLogout}
-                /> */}
+                />
 
                 {/* Credits Section */}
                 <CreditsSection

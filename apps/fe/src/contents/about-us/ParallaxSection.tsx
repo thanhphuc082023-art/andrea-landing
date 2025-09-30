@@ -16,19 +16,15 @@ export default function ParallaxSection({ data }: any) {
 
   const getImageUrl = (image: any) => {
     // Use large format if available, otherwise fallback to original
-    return (
-      image?.formats?.large?.url ||
-      image?.formats?.medium?.url ||
-      image.url
-    )?.includes('http')
-      ? image?.formats?.large?.url || image?.formats?.medium?.url || image.url
-      : `${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.formats?.large?.url || image?.formats?.medium?.url || image.url}`;
+    return image.url?.includes('http')
+      ? image.url
+      : `${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`;
   };
 
   return (
     <div
       ref={container}
-      className="relative mb-0 mt-[10vh] flex min-h-screen flex-col gap-[20px] max-md:mt-[15vh] lg:flex-row"
+      className="relative mb-[10vh] mt-[10vh] flex min-h-screen flex-col gap-[20px] max-md:mb-0 max-md:mt-[15vh] lg:flex-row"
     >
       {data.map((section, index) => (
         <motion.div

@@ -12,19 +12,9 @@ interface CoreValuesData {
 const CoreValues = ({ data }: { data: CoreValuesData }) => {
   const getImageUrl = (image: any['image']) => {
     // Use large format if available, otherwise fallback to original
-    return (
-      image?.formats?.large?.url ||
-      image?.formats?.medium?.url ||
-      image?.formats?.small?.url ||
-      image?.formats?.thumbnail?.url ||
-      image.url
-    )?.includes('http')
-      ? image?.formats?.large?.url ||
-          image?.formats?.medium?.url ||
-          image?.formats?.small?.url ||
-          image?.formats?.thumbnail?.url ||
-          image.url
-      : `${process.env.NEXT_PUBLIC_STRAPI_URL}${image?.formats?.large?.url || image?.formats?.medium?.url || image?.formats?.small?.url || image?.formats?.thumbnail?.url || image.url}`;
+    return image.url?.includes('http')
+      ? image.url
+      : `${process.env.NEXT_PUBLIC_STRAPI_URL}${image.url}`;
   };
 
   if (!data || !data.coreValues || data.coreValues.length === 0) {
@@ -61,8 +51,10 @@ const CoreValues = ({ data }: { data: CoreValuesData }) => {
                 src={getImageUrl(value.image)}
                 alt={value.image.alternativeText || value.title}
                 fill
+                loading="lazy"
+                quality={100}
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                // sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               />
             </div>
 
