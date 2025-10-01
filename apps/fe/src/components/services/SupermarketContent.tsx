@@ -25,7 +25,7 @@ export default function SupermarketContent({ data }: any) {
                 alt={data?.heading || 'Supermarket aisle with products'}
                 fill
                 sizes="(min-width: 1024px) 512px, 100vw"
-                className="object-contain"
+                className="object-contain max-md:object-cover"
               />
             </div>
           </div>

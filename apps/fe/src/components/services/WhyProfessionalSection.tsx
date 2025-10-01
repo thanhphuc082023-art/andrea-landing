@@ -9,13 +9,15 @@ export default function WhyProfessionalSection({ data }: any) {
 
   return (
     <section className="content-wrapper my-[56px] max-md:my-[29px]">
-      <h2 className="text-brand-orange font-playfair mb-8 text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px]">
-        <div
-          className=""
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: data?.title || '' }}
-        />
-      </h2>
+      {data?.title && (
+        <h2 className="text-brand-orange font-playfair mb-8 text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px]">
+          <div
+            className=""
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: data?.title || '' }}
+          />
+        </h2>
+      )}
 
       <div className="grid grid-cols-1">
         {items.map((item: any, idx: number) => {

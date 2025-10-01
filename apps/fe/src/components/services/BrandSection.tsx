@@ -19,22 +19,27 @@ function BrandSection({ title = '', description = '' }: any) {
         >
           {title}
         </h2>
+        {description ? (
+          <>
+            {/* Decorative Line */}
+            <div className={clsx('my-3 flex justify-center md:my-5')}>
+              <div
+                className={clsx('h-0.5 w-32 md:w-40 lg:w-44', 'bg-[#979797]')}
+              />
+            </div>
 
-        {/* Decorative Line */}
-        <div className={clsx('my-3 flex justify-center md:my-5')}>
-          <div className={clsx('h-0.5 w-32 md:w-40 lg:w-44', 'bg-[#979797]')} />
-        </div>
-
-        {/* Description */}
-        <p
-          className={clsx(
-            'font-playfair text-[24px] text-black md:text-[30px]',
-            'max-sd:leading-[36px] font-medium leading-[55px] tracking-wide',
-            'mx-auto max-w-[644px]'
-          )}
-        >
-          {description}
-        </p>
+            {/* Description */}
+            <p
+              className={clsx(
+                'font-playfair text-[24px] text-black md:text-[30px]',
+                'max-sd:leading-[36px] font-medium leading-[55px] tracking-wide',
+                'mx-auto max-w-[644px]'
+              )}
+            >
+              {description}
+            </p>
+          </>
+        ) : null}
       </div>
     </section>
   );

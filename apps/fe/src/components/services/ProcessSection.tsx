@@ -80,11 +80,17 @@ function StepCard({ step, className }: { step: Step; className?: string }) {
       <div className="text-text-primary mb-3 text-[24px] font-medium leading-[30px]">
         {step.id}. {step.title}
       </div>
-      <ul className="list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-[#7D7D7D]">
-        {(step.bullets || []).map((b, i) => (
-          <li key={i}>{b}</li>
-        ))}
-      </ul>
+      {step.bullets?.length === 1 ? (
+        <div className="text-[16px] leading-relaxed text-[#7D7D7D]">
+          {step.bullets[0]}
+        </div>
+      ) : (
+        <ul className="list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-[#7D7D7D]">
+          {(step.bullets || []).map((b, i) => (
+            <li key={i}>{b}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -100,7 +106,7 @@ export default function ProcessSection({ data }: any) {
       items: steps.slice(0, 2),
       gridCols: 'grid-cols-2',
       gapClass: 'mb-5',
-      cardClass: 'px-[43px] py-[34px] min-h-[272px] max-sd:py-[35px]',
+      cardClass: 'px-[43px] py-[34px] max-sd:py-[35px]',
     },
     {
       items: steps.slice(2, 5),
@@ -112,13 +118,13 @@ export default function ProcessSection({ data }: any) {
       items: steps.slice(5, 7),
       gridCols: 'grid-cols-2',
       gapClass: 'mb-16',
-      cardClass: 'px-[43px] py-[34px] min-h-[272px] max-sd:py-[35px]',
+      cardClass: 'px-[43px] py-[34px] max-sd:py-[35px]',
     },
   ];
 
   return (
     <section className="content-wrapper my-[56px] max-md:my-[29px]">
-      <h2 className="text-brand-orange font-playfair mb-6 text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px] max-w-[869px]">
+      <h2 className="text-brand-orange font-playfair mb-6 max-w-[869px] text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px]">
         {data?.title}
       </h2>
 
