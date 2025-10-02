@@ -87,7 +87,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
               {/* Project Title */}
               <h1
                 className={clsx(
-                  'font-playfair text-primary text-[50px] font-medium leading-[80px]',
+                  'font-playfair text-primary text-[50px] font-medium leading-[65px]',
                   'max-lg:text-4xl max-lg:leading-[1.2] max-md:text-[30px] dark:text-white'
                 )}
               >
@@ -95,7 +95,7 @@ function ProjectHero({ project = null }: ProjectHeroProps) {
               </h1>
 
               {/* Project Meta Info */}
-              <div className="mt-[117px] text-xl leading-[35px] tracking-[0.5px] text-black max-lg:mt-8 max-lg:text-lg max-md:mt-[13px] max-md:text-[16px] dark:text-white">
+              <div className="mt-[10px] text-xl leading-[35px] tracking-[0.5px] text-black max-lg:text-lg max-md:text-[16px] dark:text-white">
                 {projectMetaInfo.map((info, index) => (
                   <div key={index} className="mb-0">
                     <span>{info}</span>
