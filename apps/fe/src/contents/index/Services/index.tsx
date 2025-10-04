@@ -30,7 +30,7 @@ function Services({ servicesData = {} }: ServicesProps) {
   const router = useRouter();
   const services = servicesData?.items || servicesExample;
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
+  console.log(servicesData);
   // Layout config cho 5 items đầu
   const layoutConfig = [
     { colStart: 1, colEnd: 3, rowStart: 1, rowEnd: 7, active: false }, // Item 1
@@ -193,13 +193,20 @@ function Services({ servicesData = {} }: ServicesProps) {
             return (
               <div
                 key={`service-${service.id || actualIndex}`}
-                className={gridClass}
                 onMouseEnter={() => setHoveredIndex(actualIndex)}
                 onMouseLeave={() =>
                   setHoveredIndex((prev) =>
                     prev === actualIndex ? null : prev
                   )
                 }
+                onClick={() =>
+                  service.url ? router.push(`/service/${service.url}`) : null
+                }
+                className={clsx(
+                  'group relative h-full w-full',
+                  service.url && 'cursor-pointer',
+                  gridClass
+                )}
               >
                 <div className="group relative h-full w-full">
                   <AnimatePresence>

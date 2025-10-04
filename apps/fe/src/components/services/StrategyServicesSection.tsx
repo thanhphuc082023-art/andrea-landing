@@ -2,6 +2,7 @@
 
 import StrategyImageSection from './StrategyImageSection';
 import { useImageAspectRatio } from '../../hooks/useImageAspectRatio';
+import clsx from 'clsx';
 
 interface Service {
   id: string;
@@ -16,9 +17,10 @@ interface Service {
 
 interface Props {
   data: Service[];
+  className?: string;
 }
 
-export default function StrategyServicesSection({ data }: Props) {
+export default function StrategyServicesSection({ data, className }: Props) {
   if (!data) return null;
 
   // Lấy tất cả image sources để check loading state
@@ -37,7 +39,9 @@ export default function StrategyServicesSection({ data }: Props) {
   const hasAnyImageError = imageLoadingStates.some((state) => state.error);
 
   return (
-    <section className="content-wrapper my-[56px] max-md:my-[29px]">
+    <section
+      className={clsx('content-wrapper my-[56px] max-md:my-[29px]', className)}
+    >
       {isAnyImageLoading && (
         <div className="flex items-center justify-center py-16">
           <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
