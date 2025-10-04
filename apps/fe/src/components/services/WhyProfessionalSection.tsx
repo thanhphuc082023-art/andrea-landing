@@ -10,7 +10,7 @@ export default function WhyProfessionalSection({ data }: any) {
   return (
     <section className="content-wrapper my-[56px] max-md:my-[29px]">
       {data?.title && (
-        <h2 className="text-brand-orange font-playfair mb-8 text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px]">
+        <h2 className="text-brand-orange font-playfair text-left text-[40px] font-medium !leading-[60px] max-md:text-[27px] max-md:!leading-[40px]">
           <div
             className=""
             // eslint-disable-next-line react/no-danger

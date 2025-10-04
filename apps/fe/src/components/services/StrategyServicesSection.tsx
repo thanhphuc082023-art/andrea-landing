@@ -56,9 +56,11 @@ export default function StrategyServicesSection({ data }: Props) {
         <>
           {data?.map((service, index) => (
             <div key={index} className="flex items-start gap-4 max-md:flex-col">
-              <div className="font-playfair flex items-center justify-start text-[100px] font-light leading-[50px] tracking-[-5px] text-[#D9D9D9]">
-                {service.id}
-              </div>
+              {service.id && (
+                <div className="font-playfair flex items-center justify-start text-[100px] font-light leading-[50px] tracking-[-5px] text-[#D9D9D9]">
+                  {service.id}
+                </div>
+              )}
               <div className="flex-1">
                 <div dangerouslySetInnerHTML={{ __html: service.title }} />
                 {service.description?.map((item, index) => (

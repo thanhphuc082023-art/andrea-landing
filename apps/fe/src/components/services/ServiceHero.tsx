@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { useImageAspectRatio } from '../../hooks/useImageAspectRatio';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import SkeletonLoader from '@/components/ui/SkeletonLoader';
 
 type Props = {
   desktopSrc: string;
@@ -19,6 +20,9 @@ export default function ServiceHero({
   const desktopAspectRatio = useImageAspectRatio(desktopSrc);
   const mobileAspectRatio = useImageAspectRatio(mobileSrc || '');
 
+  // Skeleton loading ref - học từ HeaderVideo.tsx
+  const skeletonRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -36,13 +40,6 @@ export default function ServiceHero({
       ? mobileAspectRatio.aspectRatio
       : desktopAspectRatio.aspectRatio;
 
-  // Kiểm tra loading state
-  const isLoading = isMobile
-    ? mobileSrc
-      ? mobileAspectRatio.loading
-      : desktopAspectRatio.loading
-    : desktopAspectRatio.loading;
-
   // Kiểm tra error state
   const hasError = isMobile
     ? mobileSrc
@@ -58,17 +55,19 @@ export default function ServiceHero({
     aspectRatio: aspectRatio.toString(),
   };
 
+  // Ẩn skeleton khi image đã load - học từ HeaderVideo.tsx
+  const hideSkeleton = () => {
+    skeletonRef.current?.classList.add('hidden');
+  };
+
   return (
     <div className={`w-full ${className}`}>
       <div className="relative w-full overflow-hidden" style={containerStyle}>
-         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
-          </div>
-        )}
+        {/* Skeleton Loading - học từ HeaderVideo.tsx */}
+        <SkeletonLoader ref={skeletonRef} variant="shimmer" />
 
         {hasError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-gray-100">
             <div className="text-center text-gray-500">
               <p>Không thể tải ảnh</p>
               <p className="text-sm">{hasError}</p>
@@ -76,21 +75,21 @@ export default function ServiceHero({
           </div>
         )}
 
-        {!isLoading && !hasError && (
-          <picture>
-            {mobileSrc && (
-              <source media="(max-width: 767px)" srcSet={mobileSrc} />
-            )}
-            <source media="(min-width: 768px)" srcSet={desktopSrc} />
-            <Image
-              src={desktopSrc}
-              alt={alt}
-              fill
-              sizes="(min-width: 768px) 1440px, 430px"
-              className="object-cover"
-            />
-          </picture>
-        )}
+        <picture>
+          {mobileSrc && (
+            <source media="(max-width: 767px)" srcSet={mobileSrc} />
+          )}
+          <source media="(min-width: 768px)" srcSet={desktopSrc} />
+          <Image
+            src={desktopSrc}
+            alt={alt}
+            fill
+            sizes="(min-width: 768px) 1440px, 430px"
+            className="object-cover"
+            onLoadingComplete={hideSkeleton}
+            onError={hideSkeleton}
+          />
+        </picture>
       </div>
     </div>
   );
