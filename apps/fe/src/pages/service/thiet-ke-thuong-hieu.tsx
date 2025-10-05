@@ -20,7 +20,10 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
   const pageSeo = {
     metaTitle: 'Thiết kế thương hiệu',
     metaDescription: 'Dịch vụ thiết kế thương hiệu chuyên nghiệp',
-    shareImage: servicesData?.supermarket?.image || defaultSeo?.shareImage,
+    shareImage:
+      servicesData?.supermarket?.image ||
+      defaultSeo?.shareImage ||
+      '/assets/images/services/thietkethuonghieu/thietke_thumb_mobile.png',
   };
 
   const seo = { ...defaultSeo, ...pageSeo };

@@ -18,7 +18,10 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
   const pageSeo = {
     metaTitle: 'Thiết kế bao bì',
     metaDescription: 'Dịch vụ thiết kế bao bì chuyên nghiệp',
-    shareImage: servicesData?.supermarket?.image || defaultSeo?.shareImage,
+    shareImage:
+      servicesData?.supermarket?.image ||
+      defaultSeo?.shareImage ||
+      '/assets/images/services/baobi/baobi_thumb_mobile.png',
   };
 
   const seo = { ...defaultSeo, ...pageSeo };

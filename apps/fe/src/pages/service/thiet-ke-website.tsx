@@ -18,7 +18,10 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
   const pageSeo = {
     metaTitle: 'Thiết kế website',
     metaDescription: 'Dịch vụ thiết kế website chuyên nghiệp',
-    shareImage: servicesData?.supermarket?.image || defaultSeo?.shareImage,
+    shareImage:
+      servicesData?.supermarket?.image ||
+      defaultSeo?.shareImage ||
+      '/assets/images/services/website/website_thumb_mobile.png',
   };
 
   const seo = { ...defaultSeo, ...pageSeo };

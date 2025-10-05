@@ -17,7 +17,10 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaTitle: 'Chiến lược thương hiệu',
     metaDescription:
       'Tư vấn chiến lược, xây dựng bộ máy vận hành và văn hóa doanh nghiệp',
-    shareImage: servicesData?.supermarket?.image || defaultSeo?.shareImage,
+    shareImage:
+      servicesData?.supermarket?.image ||
+      defaultSeo?.shareImage ||
+      '/assets/images/services/chienluoc/chien_luoc_thumb_mobile.png',
   };
 
   const seo = { ...defaultSeo, ...pageSeo };

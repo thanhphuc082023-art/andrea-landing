@@ -21,7 +21,10 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaTitle: 'Chiến lược thương hiệu',
     metaDescription:
       'Tư vấn chiến lược, xây dựng bộ máy vận hành và văn hóa doanh nghiệp',
-    shareImage: servicesData?.supermarket?.image || defaultSeo?.shareImage,
+    shareImage:
+      servicesData?.supermarket?.image ||
+      defaultSeo?.shareImage ||
+      '/assets/images/services/branding/branding_thumb_mobile.png',
   };
 
   const seo = { ...defaultSeo, ...pageSeo };
@@ -59,7 +62,7 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         subheadingHtml={servicesData?.imageText?.subheadingHtml}
       />
 
-      {/* <QuoteSection data={servicesData?.quote} /> */}
+      <QuoteSection data={servicesData?.quote} />
       <ProcessSection data={servicesData?.process} />
 
       <FinalSection data={servicesData?.final} />
