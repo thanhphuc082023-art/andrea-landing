@@ -40,7 +40,7 @@ export default function WhyProfessionalSection({
               <div
                 className={clsx(
                   'flex flex-1 items-center py-8',
-                  halfBorder ? 'border-black/20 lg:border-b' : ''
+                  halfBorder && !isLast ? 'border-black/20 lg:border-b' : ''
                 )}
               >
                 <div className="max-sm:max-w-full">
