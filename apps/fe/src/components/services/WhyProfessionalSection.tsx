@@ -4,7 +4,11 @@ import Image from 'next/image';
 import React from 'react';
 import { useImageDimensions } from '@/hooks/useImageDimensions';
 
-export default function WhyProfessionalSection({ data }: any) {
+export default function WhyProfessionalSection({
+  data,
+  reverse,
+  halfBorder,
+}: any) {
   const items = data?.items || [];
 
   return (
@@ -21,7 +25,7 @@ export default function WhyProfessionalSection({ data }: any) {
 
       <div className="grid grid-cols-1">
         {items.map((item: any, idx: number) => {
-          const isReverse = idx % 2 === 1;
+          const isReverse = reverse ? idx % 2 === 0 : idx % 2 === 1;
           const isLast = idx === items.length - 1;
 
           return (
@@ -29,9 +33,16 @@ export default function WhyProfessionalSection({ data }: any) {
               key={item?.id || idx}
               className={`flex flex-col items-center gap-8 border-black/20 max-md:gap-0 lg:gap-[8rem] ${
                 isLast ? '' : 'lg:border-b'
-              } ${isReverse ? 'md:flex-row-reverse' : 'md:flex-row'}`}
+              } ${isReverse ? 'md:flex-row-reverse' : 'md:flex-row'} ${
+                halfBorder ? 'lg:border-b-0' : ''
+              }`}
             >
-              <div className="flex flex-1 items-center py-8">
+              <div
+                className={clsx(
+                  'flex flex-1 items-center py-8',
+                  halfBorder ? 'border-black/20 lg:border-b' : ''
+                )}
+              >
                 <div className="max-sm:max-w-full">
                   <div className="font-playfair text-[100px] font-light leading-[50px] tracking-[-5px] text-[#D9D9D9]">
                     {item?.id || String(idx + 1).padStart(2, '0')}

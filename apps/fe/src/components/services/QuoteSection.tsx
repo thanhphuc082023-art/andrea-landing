@@ -1,11 +1,29 @@
+import ImageTextSection from '@/components/services/ImageTextSection';
+import clsx from 'clsx';
 import Image from 'next/image';
 import React from 'react';
 
-export default function QuoteSection({ data, layout = '', image }: any) {
+export default function QuoteSection({
+  data,
+  layout = '',
+  image,
+  isImageQueto = false,
+  className = '',
+}: any) {
+  if (isImageQueto)
+    return (
+      <section className={clsx('bg-text-primary text-white', className)}>
+        <ImageTextSection
+          image={data?.image}
+          subheadingHtml={data?.subheadingHtml}
+        />
+      </section>
+    );
+
   return (
     <>
       {layout === 'image-right' ? (
-        <section className="bg-text-primary text-white">
+        <section className={clsx('bg-text-primary text-white', className)}>
           <div className="content-wrapper">
             <div className="mx-auto flex flex-col items-center gap-12 py-[26px] lg:flex-row lg:items-stretch">
               <div className="flex w-full flex-1 items-center justify-center">

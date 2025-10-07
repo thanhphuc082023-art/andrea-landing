@@ -37,8 +37,8 @@ export default function ImageTextSection({
         </h2>
       )}
       <div className="max-sd:gap-[35px] flex flex-col items-center gap-[67px] lg:flex-row">
-        <div className="w-full max-md:w-[calc(100%+58px)] lg:w-1/2">
-          <div className="max-sd:aspect-video max-sd:max-w-full max-sd:h-auto relative aspect-[594/410] h-[410px] w-full max-w-[594px] overflow-hidden">
+        <div className="wrapper-left w-full max-md:w-[calc(100%+58px)] lg:w-1/2">
+          <div className="max-sd:aspect-video max-sd:max-w-full max-sd:h-auto image-left relative aspect-[594/410] h-[410px] w-full max-w-[594px] overflow-hidden">
             {/* Skeleton Loading - sử dụng reusable component */}
             <SkeletonLoader ref={skeletonRef} variant="shimmer" />
 
@@ -55,14 +55,14 @@ export default function ImageTextSection({
             />
           </div>
         </div>
-        <div className="lg:w-1/2">
+        <div className="wrapper-right lg:w-1/2">
           {heading && (
             <div className="text-[16px] leading-relaxed text-[#3F3F3F]">
               {heading}
             </div>
           )}
           <div
-            className="max-sd:mt-0 mt-8 text-[16px] leading-relaxed text-[#3F3F3F]"
+            className="subheading max-sd:mt-0 mt-8 text-[16px] leading-relaxed text-[#3F3F3F]"
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: subheadingHtml }}
           />

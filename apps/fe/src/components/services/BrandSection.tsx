@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 
 function BrandSection({ title = '', description = '' }: any) {
-  // Extract data with fallbacks
-
   return (
     <section
       className={clsx(
@@ -17,7 +15,7 @@ function BrandSection({ title = '', description = '' }: any) {
             'max-sd:mb-2 max-sd:text-[40px] max-sd:leading-[55px] font-medium max-md:text-[34px] max-md:leading-[40px]'
           )}
         >
-          {title}
+          <div dangerouslySetInnerHTML={{ __html: title }} />
         </h2>
         {description ? (
           <>
@@ -36,7 +34,7 @@ function BrandSection({ title = '', description = '' }: any) {
                 'mx-auto max-w-[644px]'
               )}
             >
-              {description}
+              <div dangerouslySetInnerHTML={{ __html: description }} />
             </p>
           </>
         ) : null}
