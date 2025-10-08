@@ -20,7 +20,6 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaDescription:
       'Truyền tải đúng bản sắc, giá trị cốt lõi và hình ảnh chuyên nghiệp. Lan tỏa cảm xúc, kết nối khách hang, đối tác, cộng đồng.',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/quayphim/quayphim_thumb_mobile.png',
   };
@@ -40,9 +39,7 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
-      />
+      <SupermarketContent data={{ ...servicesData?.brand }} />
 
       <StrategyServicesSection
         className="mx-auto max-w-[1080px] max-md:max-w-full"

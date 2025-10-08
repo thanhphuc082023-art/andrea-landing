@@ -9,6 +9,8 @@ import ContactForm from '@/contents/index/ContactForm';
 import SubmitButton from '@/components/SubmitButton';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
+import Divider from '@/components/services/Divider';
+import ImageTextSection from '@/components/services/ImageTextSection';
 
 export default function ServicesPage({ servicesData, currentGlobal }: any) {
   const router = useRouter();
@@ -18,7 +20,6 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaDescription:
       'Tư vấn chiến lược, xây dựng bộ máy vận hành và văn hóa doanh nghiệp',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/chienluoc/chien_luoc_thumb_mobile.png',
   };
@@ -42,9 +43,20 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
+      <SupermarketContent data={{ ...servicesData?.brand }} />
+      <div className="content-wrapper max-md:hidden">
+        <Divider />
+      </div>
+
+      <ImageTextSection
+        image={servicesData?.imageText?.image}
+        heading={servicesData?.imageText?.heading}
+        subheadingHtml={servicesData?.imageText?.subheading}
       />
+
+      <div className="content-wrapper mt-[56px] max-md:mt-[29px]">
+        <Divider />
+      </div>
 
       <StrategyServicesSection data={servicesData.strategyServices} />
 
@@ -78,7 +90,7 @@ export const getStaticProps = async () =>
         title:
           'Tư vấn chiến lược, xây dựng bộ máy vận hành và văn hóa doanh nghiệp',
       },
-      supermarket: {
+      imageText: {
         image: '/assets/images/services/chienluoc/chienluoc1.png',
         heading: '',
         subheading:

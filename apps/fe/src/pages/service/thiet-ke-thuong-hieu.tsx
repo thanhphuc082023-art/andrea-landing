@@ -7,21 +7,20 @@ import { getStaticPropsWithGlobalAndData } from '@/lib/page-helpers';
 import StrapiHead from '@/components/meta/StrapiHead';
 import ServiceHero from '@/components/services/ServiceHero';
 import ImageTextSection from '@/components/services/ImageTextSection';
-import Image from 'next/image';
-import WhyProfessionalSectionSimple from '@/components/services/WhyProfessionalSectionSimple';
 import ContactForm from '@/contents/index/ContactForm';
 import clsx from 'clsx';
 import SubmitButton from '@/components/SubmitButton';
 import { useRouter } from 'next/router';
+import Divider from '@/components/services/Divider';
 
 export default function ServicesPage({ servicesData, currentGlobal }: any) {
   const router = useRouter();
   const defaultSeo = currentGlobal?.defaultSeo || {};
   const pageSeo = {
     metaTitle: 'Thiết kế thương hiệu',
-    metaDescription: 'Dịch vụ thiết kế thương hiệu chuyên nghiệp',
+    metaDescription:
+      'Một thương hiệu mạnh luôn cần hệ thống nhận diện đồng bộ, chuyên nghiệp và khác biệt.',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/thietkethuonghieu/thietke_thumb_mobile.png',
   };
@@ -47,48 +46,38 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
+      <SupermarketContent data={{ ...servicesData?.brand }} />
+
+      <div className="content-wrapper max-md:hidden">
+        <Divider />
+      </div>
+
+      <ImageTextSection
+        image={servicesData?.imageText?.image}
+        heading={servicesData?.imageText?.heading}
+        subheadingHtml={servicesData?.imageText?.subheading}
       />
+
+      <div className="content-wrapper mt-[56px] max-md:mt-[29px]">
+        <Divider />
+      </div>
+
       <WhyProfessionalSection data={servicesData?.whyProfessional} />
-      <QuoteSection data={servicesData?.quote} />
-      <ImageTextSection />
-      <QuoteSection
-        data={servicesData?.quoteTwo}
-        layout="image-right"
-        image={servicesData?.quoteTwo?.image}
+
+      <div className="mt-[77px] max-md:mt-[29px]" />
+      <ImageTextSection
+        title={servicesData?.imageTextTwo?.title}
+        image={servicesData?.imageTextTwo?.image}
+        heading={servicesData?.imageTextTwo?.heading}
+        subheadingHtml={servicesData?.imageTextTwo?.subheading}
       />
+
+      <QuoteSection data={servicesData?.quote} />
+
       <ProcessSection data={servicesData?.process} />
 
-      <QuoteSection
-        data={servicesData?.quoteThree}
-        layout="center"
-        image={servicesData?.quoteThree?.image}
-      />
-
-      <div className="content-wrapper flex shrink-0 items-center justify-center pt-10 max-md:px-0 max-md:pt-0">
-        <div className="relative w-full" style={{ aspectRatio: '1300 / 665' }}>
-          {servicesData?.image ? (
-            <Image
-              src={servicesData?.image}
-              alt={servicesData?.imageAlt || 'quote image'}
-              layout="fill"
-              className="object-cover"
-            />
-          ) : (
-            <Image
-              src="/assets/images/default-quote-right.jpg"
-              alt="quote image"
-              layout="fill"
-              className="object-cover"
-            />
-          )}
-        </div>
-      </div>
       <ProcessSection data={servicesData?.processTwo} />
-      <WhyProfessionalSectionSimple
-        data={servicesData?.whyProfessionalSimple}
-      />
+
       <FinalSection data={servicesData?.final} />
       <div className={clsx('my-9 text-center')}>
         <SubmitButton
@@ -115,16 +104,25 @@ export const getStaticProps = async () =>
     const servicesData = {
       brand: {
         title: 'Thiết kế thương hiệu',
-        description: 'Dịch vụ thiết kế thương hiệu trọn gói',
+        description:
+          'Một thương hiệu mạnh luôn cần hệ thống nhận diện đồng bộ, chuyên nghiệp và khác biệt.',
       },
-      supermarket: {
+      imageText: {
         image: '/assets/images/services/thietkethuonghieu/thietke1.png',
         heading: '',
         subheading:
-          'Chúng tôi cung cấp giải pháp thiết kế thương hiệu toàn diện, bao gồm từ việc đặt tên thương hiệu, sáng tác slogan, thiết kế logo, cho đến xây dựng bộ nhận diện thương hiệu chuyên nghiệp. Ngoài ra, bạn hoàn toàn có thể lựa chọn từng hạng mục dịch vụ riêng lẻ, phù hợp với nhu cầu hiện tại và chiến lược kinh doanh của doanh nghiệp mình. <br/> Các hạng mục dịch vụ bao gồm: <br/><ul class="list-disc pl-6 ml-0"><li>Đặt tên thương hiệu</li><li>Sáng tác Slogan</li><li>Thiết kế Logo</li><li>Thiết kế Bộ nhận diện thương hiệu</li></ul>',
+          'Chúng tôi cung cấp giải pháp thiết kế thương hiệu toàn diện, bao gồm từ việc đặt tên thương hiệu, sáng tác slogan, thiết kế logo, cho đến xây dựng bộ nhận diện thương hiệu chuyên nghiệp. Ngoài ra, bạn hoàn toàn có thể lựa chọn từng hạng mục dịch vụ riêng lẻ, phù hợp với nhu cầu hiện tại và chiến lược kinh doanh của doanh nghiệp mình.',
       },
+      imageTextTwo: {
+        title: 'Andrea – Thương hiệu không chỉ đẹp mà còn có chiều sâu',
+        image: '/assets/images/services/thietkethuonghieu/thietke6.png',
+        heading: '',
+        subheading:
+          'Tại Andrea, chúng tôi tin rằng mỗi thương hiệu là một thực thể sống, có linh hồn, cảm xúc, tính cách và có hành trình phát triển riêng, cần được kể đúng cách và chúng tôi giúp bạn kể điều đó bằng hình ảnh.<br/>Sự kết hợp giữa chiến lược thương hiệu, chiến lược kinh doanh, chiến lược công ty và hình ảnh thương hiệu thể hiện nhất quán, chúng tôi đảm bảo mỗi thiết kế không chỉ đẹp mà còn đúng định hướng, đúng mục tiêu truyền thông và tầm nhìn thương hiệu.',
+      },
+
       whyProfessional: {
-        title: `Vì sao doanh nghiệp cần thiết kế <br /> bao bì chuyên nghiệp?`,
+        title: `Các hạng mục dịch vụ bao gồm`,
         items: [
           {
             id: '01',
@@ -152,36 +150,11 @@ export const getStaticProps = async () =>
           },
         ],
       },
-      whyProfessionalSimple: {
-        items: [
-          {
-            title: 'Andrea – Thương hiệu không chỉ đẹp mà còn có hồn',
-            image: '/assets/images/services/thietkethuonghieu/thietke10.png',
-          },
-          {
-            title: 'Bạn cần gì ngay bây giờ?',
-            image: '/assets/images/services/thietkethuonghieu/thietke11.png',
-            body: '<ul class="text-[#7D7D7D] list-disc pl-6 ml-0"><li>Một đội ngũ hiểu thương hiệu như hiểu chính mình?</li><li>Một bộ nhận diện vừa đẹp, vừa có chiều sâu?</li><li>Một logo và slogan tạo cảm xúc và kết nối khách hàng?</li></ul>',
-          },
-          {
-            title:
-              'Mỗi thương hiệu là một linh hồn, một hành trình, một câu chuyện cần được kể đúng cách và chúng tôi giúp bạn kể điều đó bằng hình ảnh.',
-            image: '/assets/images/services/thietkethuonghieu/thietke12.png',
-          },
-        ],
-      },
+
       quote: {
-        text: 'Một thương hiệu mạnh luôn cần hệ thống nhận diện đồng bộ, chuyên nghiệp và khác biệt.',
-      },
-      quoteTwo: {
         text: 'Andrea là sự kết hợp giữa nghệ thuật trực giác và kỹ năng triển khai chiến lược thương hiệu chuyên nghiệp.',
-        image: '/assets/images/services/thietkethuonghieu/thietke7.png',
       },
-      quoteThree: {
-        text: 'Một thương hiệu mạnh luôn cần hệ thống nhận diện đồng bộ, chuyên nghiệp và khác biệt.',
-        image: '/assets/images/services/thietkethuonghieu/thietke8.png',
-      },
-      image: '/assets/images/services/thietkethuonghieu/thietke9.png',
+
       process: {
         title: 'Quy trình tiến hành dự án của Andrea',
         steps: [

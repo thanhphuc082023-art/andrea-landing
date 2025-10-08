@@ -27,7 +27,7 @@ function BrandSection({ title = '', description = '' }: any) {
             </div>
 
             {/* Description */}
-            <p
+            <div
               className={clsx(
                 'font-playfair text-[24px] text-black md:text-[30px]',
                 'max-sd:leading-[36px] font-medium leading-[55px] tracking-wide',
@@ -35,7 +35,7 @@ function BrandSection({ title = '', description = '' }: any) {
               )}
             >
               <div dangerouslySetInnerHTML={{ __html: description }} />
-            </p>
+            </div>
           </>
         ) : null}
       </div>

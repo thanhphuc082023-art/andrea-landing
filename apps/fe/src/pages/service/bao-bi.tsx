@@ -11,6 +11,8 @@ import ContactForm from '@/contents/index/ContactForm';
 import clsx from 'clsx';
 import SubmitButton from '@/components/SubmitButton';
 import { useRouter } from 'next/router';
+import ImageTextSection from '@/components/services/ImageTextSection';
+import Divider from '@/components/services/Divider';
 
 export default function ServicesPage({ servicesData, currentGlobal }: any) {
   const router = useRouter();
@@ -19,7 +21,6 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaTitle: 'Thiết kế bao bì',
     metaDescription: 'Dịch vụ thiết kế bao bì chuyên nghiệp',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/baobi/baobi_thumb_mobile.png',
   };
@@ -39,9 +40,21 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
+      <SupermarketContent data={{ ...servicesData?.brand }} />
+
+      <div className="content-wrapper max-md:hidden">
+        <Divider />
+      </div>
+
+      <ImageTextSection
+        image={servicesData?.imageText?.image}
+        heading={servicesData?.imageText?.heading}
+        subheadingHtml={servicesData?.imageText?.subheading}
       />
+
+      <div className="content-wrapper mt-[56px] max-md:mt-[29px]">
+        <Divider />
+      </div>
       <WhyProfessionalSection data={servicesData?.whyProfessional} />
       <CriteriaSection data={servicesData?.criteria} />
       <QuoteSection data={servicesData?.quote} />
@@ -75,7 +88,7 @@ export const getStaticProps = async () =>
         description:
           'Thiết kế bao bì sáng tạo, chuyên nghiệp, đúng nhận diện thương hiệu',
       },
-      supermarket: {
+      imageText: {
         image: '/assets/images/services/baobi/baobi1.png',
         heading:
           'Bao bì là một trong những điểm chạm đầu tiên với khách hàng để tạo ấn tượng và truyền tải bản sắc',

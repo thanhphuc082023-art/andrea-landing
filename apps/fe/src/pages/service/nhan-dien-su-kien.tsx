@@ -21,7 +21,6 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaDescription:
       'Giải pháp thiết kế sự kiện đồng bộ thương hiệu – tạo dấu ấn khác biệt',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/nhandien/nhandien_thumb_mobile.png',
   };
@@ -41,9 +40,7 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
-      />
+      <SupermarketContent data={{ ...servicesData?.brand }} />
 
       <StrategyServicesSection
         className="mx-auto max-w-[1080px] max-md:max-w-full"
@@ -58,7 +55,7 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         title={servicesData?.imageText?.title}
         image={servicesData?.imageText?.image}
         heading={servicesData?.imageText?.heading}
-        subheadingHtml={servicesData?.imageText?.subheadingHtml}
+        subheadingHtml={servicesData?.imageText?.subheading}
       />
 
       <QuoteSection data={servicesData?.quote} />
@@ -153,7 +150,7 @@ export const getStaticProps = async () =>
         title: 'Đối tượng sự kiện Andrea đã đồng hành',
         image: '/assets/images/services/nhandien/nhandien7.png',
         heading: '',
-        subheadingHtml:
+        subheading:
           '<div class="text-[16px]">Sự kiện kỷ niệm thành lập doanh nghiệp</div><div class="h-[1px] w-full bg-black/20 my-4"></div><div class="text-[16px]">Lễ công bố chiến lược, tái định vị thương hiệu</div><div class="h-[1px] w-full bg-black/20 my-4"></div><div class="text-[16px]">Hội nghị chiến lược, lễ tri ân, gala dinner</div>',
       },
       quote: {

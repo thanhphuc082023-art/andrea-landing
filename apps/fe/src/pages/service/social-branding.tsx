@@ -22,7 +22,6 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaDescription:
       'Tư vấn chiến lược, xây dựng bộ máy vận hành và văn hóa doanh nghiệp',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/branding/branding_thumb_mobile.png',
   };
@@ -42,9 +41,7 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
-      />
+      <SupermarketContent data={{ ...servicesData?.brand }} />
 
       <StrategyServicesSection
         className="mx-auto max-w-[1080px] max-md:max-w-full"
@@ -59,7 +56,7 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         title={servicesData?.imageText?.title}
         image={servicesData?.imageText?.image}
         heading={servicesData?.imageText?.heading}
-        subheadingHtml={servicesData?.imageText?.subheadingHtml}
+        subheadingHtml={servicesData?.imageText?.subheading}
       />
 
       <QuoteSection data={servicesData?.quote} />
@@ -136,7 +133,7 @@ export const getStaticProps = async () =>
         title: 'Vì sao doanh nghiệp cần Social Branding Guideline?',
         image: '/assets/images/services/branding/branding4.png',
         heading: '',
-        subheadingHtml:
+        subheading:
           '<div class="text-[16px]">Việt Nam có hơn 76 triệu người dùng mạng xã hội – nếu không nổi bật, bạn sẽ bị lãng quên.</div><div class="h-[1px] w-full bg-black/20 my-4"></div><div class="text-[16px]">Các bài đăng thiếu định hướng khiến thương hiệu mỗi bài một kiểu, loãng thông điệp</div><div class="h-[1px] w-full bg-black/20 my-4"></div><div class="text-[16px]">Social Branding Guideline giúp tiết kiệm thời gian, truyền thông chuyên nghiệp và dễ dàng vận hành đội ngũ nội bộ.</div>',
       },
       quote: {

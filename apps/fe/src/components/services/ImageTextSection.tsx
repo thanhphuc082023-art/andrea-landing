@@ -18,8 +18,8 @@ export default function ImageTextSection({
   image,
   heading,
   subheadingHtml = '',
-  defaultImage = '/assets/images/services/baobi/baobi1.png',
-  defaultAlt = 'Supermarket aisle with products',
+  defaultImage = '',
+  defaultAlt = '',
 }: ImageTextSectionProps) {
   // Ref để control skeleton loading - học từ HeaderVideo.tsx
   const skeletonRef = useRef<HTMLDivElement | null>(null);
@@ -32,7 +32,7 @@ export default function ImageTextSection({
   return (
     <div className="content-wrapper my-[60px] max-md:my-[29px]">
       {title && (
-        <h2 className="font-playfair text-brand-orange mb-3 flex max-w-[748px] items-center justify-start text-[40px] font-medium leading-[50px] max-md:max-w-full max-md:text-[27px] max-md:leading-[36px]">
+        <h2 className="font-playfair text-brand-orange max-sd:mb-[35px] mb-[67px] flex max-w-[748px] items-center justify-start text-[40px] font-medium leading-[50px] max-md:max-w-full max-md:text-[27px] max-md:leading-[36px]">
           {title}
         </h2>
       )}

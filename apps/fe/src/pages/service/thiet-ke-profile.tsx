@@ -21,7 +21,6 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaDescription:
       'Dịch vụ thiết kế profile, catalog, báo cáo thường niên chuyên nghiệp',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/profile/profile_thumb_mobile.png',
   };
@@ -41,15 +40,17 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
-      />
+      <SupermarketContent data={{ ...servicesData?.brand }} />
+
+      <div className="content-wrapper max-md:hidden">
+        <Divider />
+      </div>
 
       <ImageTextSection
         title={servicesData?.imageText?.title}
         image={servicesData?.imageText?.image}
         heading={servicesData?.imageText?.heading}
-        subheadingHtml={servicesData?.imageText?.subheadingHtml}
+        subheadingHtml={servicesData?.imageText?.subheading}
       />
 
       <div className="content-wrapper mt-[56px] max-md:mt-[29px]">
@@ -99,7 +100,7 @@ export const getStaticProps = async () =>
       imageText: {
         image: '/assets/images/services/profile/profile1.png',
         heading: '',
-        subheadingHtml:
+        subheading:
           '<div class="max-w-[500px] mb-[40px] max-md:mb-[20px] text-[16px]">Giải pháp thiết kế ấn phẩm doanh nghiệp chuyên nghiệp - nâng tầm giá trị thương hiệu.<br/>Tại Andrea, chúng tôi cung cấp dịch vụ thiết kế Profile, Catalogue và Báo cáo thường niên với tính thẩm mỹ cao và định hướng chiến lược rõ ràng.<br/>Chúng tôi không chỉ thiết kế đẹp mà còn tư vấn và xây dựng nội dung nhằm làm nổi bật tầm nhìn, năng lực, tinh thần, văn hóa và giá trị cốt lõi của doanh nghiệp.</div>',
       },
 

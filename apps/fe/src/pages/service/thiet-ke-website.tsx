@@ -11,6 +11,8 @@ import ImageTextSectionWithTitle from '@/components/services/ImageTextSectionWit
 import SubmitButton from '@/components/SubmitButton';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
+import Divider from '@/components/services/Divider';
+import ImageTextSection from '@/components/services/ImageTextSection';
 
 export default function ServicesPage({ servicesData, currentGlobal }: any) {
   const router = useRouter();
@@ -19,7 +21,6 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
     metaTitle: 'Thiết kế website',
     metaDescription: 'Dịch vụ thiết kế website chuyên nghiệp',
     shareImage:
-      servicesData?.supermarket?.image ||
       defaultSeo?.shareImage ||
       '/assets/images/services/website/website_thumb_mobile.png',
   };
@@ -39,11 +40,23 @@ export default function ServicesPage({ servicesData, currentGlobal }: any) {
         alt="Services"
       />
 
-      <SupermarketContent
-        data={{ ...servicesData?.supermarket, ...servicesData?.brand }}
+      <SupermarketContent data={{ ...servicesData?.brand }} />
+      <div className="content-wrapper max-md:hidden">
+        <Divider />
+      </div>
+
+      <ImageTextSection
+        image={servicesData?.imageText?.image}
+        heading={servicesData?.imageText?.heading}
+        subheadingHtml={servicesData?.imageText?.subheading}
       />
+
+      <div className="content-wrapper mt-[56px] max-md:mt-[29px]">
+        <Divider />
+      </div>
+
       <WhyProfessionalSection data={servicesData?.whyProfessional} />
-      <ImageTextSectionWithTitle data={servicesData?.imageText} />
+      <ImageTextSectionWithTitle data={servicesData?.imageTextTwo} />
       <QuoteSection data={servicesData?.quote} />
       <ProcessSection data={servicesData?.process} />
 
@@ -76,13 +89,13 @@ export const getStaticProps = async () =>
         description:
           'Dịch vụ thiết kế Website chuyên nghiệp, đúng định vị, nâng cao hình ảnh thương hiệu.',
       },
-      imageText: {
+      imageTextTwo: {
         title: 'Andrea <br/> Không chỉ là thiết kế, mà là đồng hành chiến lược',
         image: '/assets/images/services/website/website7.png',
         description:
           'Chúng tôi thiết kế website dựa trên đặc trưng ngành nghề, định vị thương hiệu và hành vi người dùng. Andrea không dùng mẫu có sẵn, mỗi thiết kế là một giải pháp được cá nhân hóa, mang đậm dấu ấn riêng:<ul class="list-disc pl-6 ml-0"><li>Thiết kế độc quyền, đúng hệ thống nhận diện thương hiệu.</li><li>Giao diện đẹp, tối ưu hành vi người dùng trên mọi thiết bị.</li><li>Kết hợp giữa trải nghiệm cảm xúc (UX) và giao diện thân thiện (UI).</li><li>Đồng bộ nội dung, hình ảnh, tone giọng truyền thông.</li><li>Hệ thống quản trị dễ dùng, dễ mở rộng, phù hợp cả với đội ngũ không chuyên.</li></ul>',
       },
-      supermarket: {
+      imageText: {
         image: '/assets/images/services/website/website1.png',
         heading: '',
         subheading:
